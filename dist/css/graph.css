@@ -59,8 +59,7 @@
     z-index: 999999999 !important;
 }
 
-
-.dygraph-legend>.highlight {
+.dygraph-legend > .highlight {
     z-index: 999999;
     display: inline;
     background: none !important;
