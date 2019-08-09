@@ -11,6 +11,7 @@ export interface Features {
     scroll: boolean;
     rangeBar: boolean;
     connectPoints?: boolean;
+    legend?: any;
     export?: { pic: boolean, data: boolean };
 }
 
@@ -56,7 +57,8 @@ export interface GraphCollection {
     interval: number;
     yLabel?: string;
     y2Label?: string;
-    range?: { min: number, max: number }
+    threshold?: { min: number, max: number };
+    initScales?: { left: { min: number, max: number }, right?: { min: number, max: number } };
 }
 
 /**

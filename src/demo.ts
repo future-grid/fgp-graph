@@ -1,7 +1,8 @@
 import { FgpGraph } from "./index";
 import { GraphConfig, ViewConfig } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
-import moment from 'moment';
+import moment from 'moment-timezone';
+import { Formatters } from "./extras/formatters";
 
 class DataService implements DataHandler {
     randomNumber = (min, max) => { // min and max included 
@@ -17,7 +18,7 @@ class DataService implements DataHandler {
 
     fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
         console.debug("fetching data for first and last~");
-        //
+
         return new Promise((resolve, reject) => {
             // sample data for first and last
             resolve([{ id: "meter1", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter2", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter3", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "substation1", data: { first: { timestamp: new Date("2019/06/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), avgConsumptionVah: this.randomNumber(252, 255) } } }]);
@@ -39,7 +40,7 @@ class DataService implements DataHandler {
             sampleData.forEach(deviceData => {
                 if (deviceData.id.indexOf('meter') != -1) {
                     //
-                    deviceData.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2) });
+                    deviceData.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                 } else if (deviceData.id.indexOf('substation') != -1) {
                     //
                     let max: number = this.randomNumber(253, 255);
@@ -65,6 +66,8 @@ class DataService implements DataHandler {
 let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
 
+let formatters: Formatters = new Formatters("Australia/Melbourne");
+// let formatters:Formatters = new Formatters("Pacific/Auckland");
 
 // data not needed in the future
 const dataService: DataHandler = new DataService();
@@ -75,7 +78,8 @@ let vdConfig: ViewConfig = {
         features: {
             zoom: true,
             scroll: true,
-            rangeBar: true
+            rangeBar: true,
+            legend: formatters.legendForAllSeries
         },
         entities: [
             { id: "substation1", type: "substation", name: "**F**substation" },
@@ -99,9 +103,10 @@ let vdConfig: ViewConfig = {
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
-                range: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 7 days
+                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
                 yLabel: 'Consumption',
-                y2Label: 'Consumption'
+                y2Label: 'Consumption',
+                initScales: { left: { min: 245, max: 260 } }
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
@@ -111,9 +116,10 @@ let vdConfig: ViewConfig = {
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
-                range: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 30 * 24) },    // 7 days ~ 2 years
+                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'Consumption',
-                y2Label: 'Consumption'
+                y2Label: 'Consumption',
+                initScales: { left: { min: 230, max: 260 } }
             }
         ]
     },
@@ -126,7 +132,9 @@ let vdConfig: ViewConfig = {
     initRange: {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
-    }
+    },
+    timezone: 'Australia/Melbourne'
+    // timezone: 'Pacific/Auckland'
 };
 
 let vsConfig: ViewConfig = {
@@ -135,7 +143,8 @@ let vsConfig: ViewConfig = {
         features: {
             zoom: true,
             scroll: true,
-            rangeBar: true
+            rangeBar: true,
+            legend: formatters.legendForSingleSeries
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -143,11 +152,11 @@ let vsConfig: ViewConfig = {
         ],
         rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
         rangeCollection: {
-            label: 'meter_day',
-            name: 'meter_read_day',
+            label: 'substation_day',
+            name: 'substation_interval_day',
             interval: 86400000,
             series: [
-                { label: "Avg", type: 'line', exp: "data.avgVoltage" }
+                { label: "Avg", type: 'line', exp: "data.avgConsumptionVah" }
             ]
         },
         collections: [
@@ -157,14 +166,18 @@ let vsConfig: ViewConfig = {
                 interval: 3600000,
                 series: [
                     { label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left' }
-                ]
+                ],
+                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
+                initScales: { left: { min: 245, max: 260 } }
             }, {
                 label: 'meter_day',
                 name: 'meter_read_day',
                 interval: 86400000,
                 series: [
                     { label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left' }
-                ]
+                ],
+                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
+                initScales: { left: { min: 245, max: 260 } }
             }
         ]
     },
@@ -177,7 +190,9 @@ let vsConfig: ViewConfig = {
     initRange: {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
-    }
+    },
+    timezone: 'Australia/Melbourne'
+    // timezone: 'Pacific/Auckland'
 };
 
 
