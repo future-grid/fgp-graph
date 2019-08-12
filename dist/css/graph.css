@@ -42,6 +42,47 @@
     float: right;
     margin-right: 5px;
 }
+
+.fgp-interval-labels {
+    float: right;
+    margin-right: 5px;
+}
+
+.fgp-interval-labels .badge {
+    display: inline-block;
+    padding: 0.3em 0.4em;
+    font-size: 80%;
+    font-weight: normal;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.fgp-interval-labels .badge-pill {
+    padding-right: 0.6em;
+    padding-left: 0.6em;
+    border-radius: 10rem;
+}
+
+.fgp-interval-labels .badge-success {
+    color: #fff;
+    background-color: #28a745;
+}
+
+.fgp-interval-labels .badge-warning {
+    color: #212529;
+    background-color: #ffc107;
+}
+
+.fgp-interval-labels .badge-secondary {
+    color: #fff;
+    background-color: #6c757d;
+}
+
 .fgp-graph-range-bar-date-label-left {
     float: left;
 }
@@ -69,4 +110,3 @@
     font-weight: bold;
     white-space: nowrap;
 }
-

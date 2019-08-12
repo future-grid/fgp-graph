@@ -23,8 +23,6 @@ export class FgpGraph {
 
     private viewConfigs: Array<ViewConfig>;
 
-    private viewButtons: Array<string>;
-
     private defaultGraphRanges: Array<{ name: string, value: number, show?: boolean }>;
 
     private parentDom: HTMLElement;
@@ -32,6 +30,8 @@ export class FgpGraph {
     private viewsDropdown: HTMLElement;
 
     private intervalsDropdown: HTMLElement;
+
+    private intervalLabelsArea: HTMLElement;
 
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
@@ -54,10 +54,14 @@ export class FgpGraph {
         let intervalsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-intervals-dropdown" }];
         this.intervalsDropdown = DomElementOperator.createElement('select', intervalsDropdownAttrs);
 
+        let intervalsLabelsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-interval-labels" }];
+        this.intervalLabelsArea = DomElementOperator.createElement('div', intervalsLabelsAttrs);
+
         let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
         this.header = DomElementOperator.createElement('div', headerAttrs);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
+        this.header.appendChild(this.intervalLabelsArea);
         // create doms
         let containerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-container' }];
         this.graphContainer = DomElementOperator.createElement('div', containerAttrs);
@@ -78,7 +82,7 @@ export class FgpGraph {
      * @memberof FgpGraph
      */
     private initGraph = () => {
-
+        let operator: GraphOperator = new GraphOperator();
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig = null;
@@ -101,13 +105,13 @@ export class FgpGraph {
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
-                        GraphOperator.init(this.graph, this.rangeBarGraph, config, this.graphContainer, this.body, this.intervalsDropdown);
+                        operator.init(this.graph, this.rangeBarGraph, config, this.graphContainer, this.body, this.intervalsDropdown, this.header);
                     }
                 });
             }
 
             if (showView) {
-                GraphOperator.init(this.graph, this.rangeBarGraph, showView, this.graphContainer, this.body, this.intervalsDropdown);
+                operator.init(this.graph, this.rangeBarGraph, showView, this.graphContainer, this.body, this.intervalsDropdown, this.header);
             }
         }
     }
