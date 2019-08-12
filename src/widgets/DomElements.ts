@@ -363,6 +363,12 @@ export class GraphOperator {
                 rangebarDatewindowChangeFunc(e, yRanges);
             };
 
+
+            let dateLabelLeftAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-left' }];
+            let startLabelLeft: HTMLElement = DomElementOperator.createElement('label', dateLabelLeftAttrs);
+            let dateLabelRightAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-right' }];
+            let endLabelRight: HTMLElement = DomElementOperator.createElement('label', dateLabelRightAttrs);
+
             // create a interaction model instance
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
 
@@ -384,8 +390,8 @@ export class GraphOperator {
                     y2: y2Scale
                 },
                 highlightSeriesOpts: { strokeWidth: 1 },
-                pointClickCallback: (e, x, points) => {
-                    console.debug(points);
+                pointClickCallback: (e, p) => {
+                    // 
                 },
                 interactionModel: {
                     'mousedown': interactionModel.mouseDown,
@@ -395,6 +401,13 @@ export class GraphOperator {
                     'DOMMouseScroll': interactionModel.mouseScroll,
                     'wheel': interactionModel.mouseScroll,
                     'mouseenter': interactionModel.mouseEnter,
+                },
+                drawCallback: (dygraph, is_initial) => {
+                    if (view.graphConfig.features.rangeBar && view.graphConfig.rangeCollection) {
+                        const xAxisRange: Array<number> = dygraph.xAxisRange();
+                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], view.timezone ? view.timezone : moment.tz.guess()).format('lll z');
+                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], view.timezone ? view.timezone : moment.tz.guess()).format('lll z');
+                    }
                 }
             });
             // remove first
@@ -442,10 +455,7 @@ export class GraphOperator {
                 }
 
                 // create 2 labels for start and end
-                let dateLabelLeftAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-left' }];
-                let startLabelLeft: HTMLElement = DomElementOperator.createElement('label', dateLabelLeftAttrs);
-                let dateLabelRightAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-right' }];
-                let endLabelRight: HTMLElement = DomElementOperator.createElement('label', dateLabelRightAttrs);
+
                 let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{ key: 'style', value: 'height:20px;' }]);
                 dateLabels.appendChild(startLabelLeft);
                 dateLabels.appendChild(endLabelRight);
@@ -563,7 +573,7 @@ export class GraphOperator {
             let graphData = [];
             let finalData = [];
             let _dates: Array<number> = [];
-            if(first && last){
+            if (first && last) {
                 _dates = [first, last];
             }
             data.forEach(entityData => {

@@ -128,6 +128,12 @@ export class GraphInteractions {
                     axis.valueRange = [minValue, maxValue];
                 }
             } else {
+                //
+                var zoomRange = this.dateRange;
+                if (minDate < zoomRange[0] || maxDate > zoomRange[1]) {
+                    console.info("return~~~~", new Date(minDate), new Date(zoomRange[0]), new Date(maxDate), new Date(zoomRange[1]));
+                    return;
+                }
                 if (g.getOptionForAxis("logscale", "x")) {
                     g.dateWindow_ = [new Date(Math.pow(10, minDate)), new Date(Math.pow(10, maxDate))];
                 } else {
@@ -181,37 +187,25 @@ export class GraphInteractions {
             var newZoomRange = this.adjustAxis(ranges, zoomInPercentage, xBias);
             // do not bigger than range data
             var zoomRange = this.dateRange;
-
+            this.scrollTimer = window.setTimeout(() => {
+                this.callback();
+            }, 500);
             if (newZoomRange[0] < zoomRange[0] && newZoomRange[1] > zoomRange[1]) {
                 return;
             } else if (newZoomRange[0] >= newZoomRange[1]) {
                 return;
             } else if (newZoomRange[0] <= zoomRange[0] && newZoomRange[1] < zoomRange[1]) {
                 g.updateOptions({
-                    dateWindow: [new Date(zoomRange[0]), new Date(newZoomRange[1])]
+                    dateWindow: [zoomRange[0], newZoomRange[1]]
                 });
-
-                // put a timer here and
-                this.scrollTimer = window.setTimeout(() => {
-                    this.callback();
-                }, 500);
             } else if (newZoomRange[0] > zoomRange[0] && newZoomRange[1] >= zoomRange[1]) {
                 g.updateOptions({
-                    dateWindow: [new Date(newZoomRange[0]), new Date(zoomRange[1])]
+                    dateWindow: [newZoomRange[0], zoomRange[1]]
                 });
-
-                // put a timer here and
-                this.scrollTimer = window.setTimeout(() => {
-                    this.callback();
-                }, 500);
             } else {
                 g.updateOptions({
-                    dateWindow: [new Date(newZoomRange[0]), new Date(newZoomRange[1])]
+                    dateWindow: [newZoomRange[0], newZoomRange[1]]
                 });
-                // put a timer here and
-                this.scrollTimer = window.setTimeout(() => {
-                    this.callback();
-                }, 500);
             }
         }
     }
@@ -223,10 +217,11 @@ export class GraphInteractions {
             currentDatewindow[0] = currentDatewindow[0].getTime();
             currentDatewindow[1] = currentDatewindow[1].getTime();
         }
+
+        context.isPanning = false;
+        Dygraph.endPan(event, g, context);
         // call upadte this.panEnable = false;
         if (this.panEnable && this.needRefresh && (this.preDatewindow[0] != currentDatewindow[0] || this.preDatewindow[1] != currentDatewindow[1])) {
-            context.isPanning = false;
-            Dygraph.endPan(event, g, context);
             this.callback(e, g.yAxisRanges());
             this.panEnable = false;
         }
