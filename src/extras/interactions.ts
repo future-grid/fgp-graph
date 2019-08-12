@@ -14,6 +14,8 @@ export class GraphInteractions {
 
     private preDatewindow: Array<any>;
 
+    private needRefresh: boolean;
+
 
     constructor(public callback: any, public dateRange?: Array<number>) {
         this.panEnable = false;
@@ -97,12 +99,6 @@ export class GraphInteractions {
             }
         }
 
-        if (g.getOptionForAxis("logscale", "x")) {
-            g.dateWindow_ = [new Date(Math.pow(10, minDate)), new Date(Math.pow(10, maxDate))];
-        } else {
-            g.dateWindow_ = [new Date(minDate), new Date(maxDate)];
-        }
-
         // y-axis scaling is automatic unless this is a full 2D pan.
         if (context.is2DPan) {
             var pixelsDragged = context.dragEndY - context.dragStartY;
@@ -130,6 +126,12 @@ export class GraphInteractions {
                     axis.valueRange = [Math.pow(10, minValue), Math.pow(10, maxValue)];
                 } else {
                     axis.valueRange = [minValue, maxValue];
+                }
+            } else {
+                if (g.getOptionForAxis("logscale", "x")) {
+                    g.dateWindow_ = [new Date(Math.pow(10, minDate)), new Date(Math.pow(10, maxDate))];
+                } else {
+                    g.dateWindow_ = [new Date(minDate), new Date(maxDate)];
                 }
             }
         }
@@ -222,7 +224,7 @@ export class GraphInteractions {
             currentDatewindow[1] = currentDatewindow[1].getTime();
         }
         // call upadte this.panEnable = false;
-        if (this.panEnable && (this.preDatewindow[0] != currentDatewindow[0] || this.preDatewindow[1] != currentDatewindow[1])) {
+        if (this.panEnable && this.needRefresh && (this.preDatewindow[0] != currentDatewindow[0] || this.preDatewindow[1] != currentDatewindow[1])) {
             context.isPanning = false;
             Dygraph.endPan(event, g, context);
             this.callback(e, g.yAxisRanges());
@@ -236,8 +238,7 @@ export class GraphInteractions {
             this.preDatewindow[0] = this.preDatewindow[0].getTime();
             this.preDatewindow[1] = this.preDatewindow[1].getTime();
         }
-        console.debug("dwon:", this.preDatewindow);
-        // after hold the mouse down for more than a second!
+
         this.panEnable = true;
         context.initializeMouseDown(event, g, context);
         Dygraph.startPan(event, g, context);
@@ -247,10 +248,13 @@ export class GraphInteractions {
     public mouseMove = (e, g, context) => {
         if (this.panEnable && context.isPanning) {
             if (e.offsetX <= (g.plotter_.area.x)) {
+                this.needRefresh = false;
                 this.pan(e, g, context, 'r');
             } else if (e.offsetX >= (g.plotter_.area.x + g.plotter_.area.w)) {
+                this.needRefresh = false;
                 this.pan(e, g, context, 'l');
             } else {
+                this.needRefresh = true;
                 this.pan(e, g, context, 'h');
             }
         }
