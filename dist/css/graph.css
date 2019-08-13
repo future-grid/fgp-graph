@@ -42,10 +42,17 @@
     float: right;
     margin-right: 5px;
 }
+.fgp-series-dropdown {
+    float: right;
+    margin-right: 5px;
+}
 
 .fgp-interval-labels {
     float: right;
+    position: relative;
+    top: -2px;
     margin-right: 5px;
+    cursor: default;
 }
 
 .fgp-interval-labels .badge {

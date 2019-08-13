@@ -168,7 +168,8 @@ let vsConfig: ViewConfig = {
                     { label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left' }
                 ],
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
-                initScales: { left: { min: 245, max: 260 } }
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
             }, {
                 label: 'meter_day',
                 name: 'meter_read_day',
@@ -177,7 +178,8 @@ let vsConfig: ViewConfig = {
                     { label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
-                initScales: { left: { min: 245, max: 260 } }
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
             }
         ]
     },

@@ -1,5 +1,5 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
 import { DataHandler } from '../services/dataService';
@@ -12,7 +12,7 @@ export class DropdownButton {
     private select: HTMLSelectElement;
 
     private btns: Array<{ id: string, label: string, selected?: boolean }>;
-    constructor(select: HTMLSelectElement, buttons: Array<{ id: string, label: string, selected?: boolean }>) {
+    constructor(select: HTMLSelectElement, buttons: Array<{ id: string, label: string, selected?: boolean, formatter?: any }>) {
         this.select = select;
         this.btns = buttons;
     }
@@ -36,6 +36,32 @@ export class DropdownButton {
             this.select.add(opt);
         });
     }
+}
+
+
+export class SelectWithCheckbox {
+
+    private select: HTMLSelectElement;
+    private opts: Array<{ checked: boolean, name: string, label: string }>;
+
+    constructor(select: HTMLSelectElement, opts: Array<{ checked: boolean, name: string, label: string }>) {
+        this.select = select;
+        this.opts = opts;
+    }
+
+    render = () => {
+        this.select.innerHTML = "";
+        // create options
+        this.opts.forEach(opt => {
+            let optElement: HTMLOptionElement = document.createElement('option');
+            let checkbox: HTMLInputElement = document.createElement('input');
+            checkbox.setAttribute("type", "checkbox");
+            optElement.appendChild(checkbox);
+            optElement.append(opt.label);
+            this.select.add(optElement);
+        });
+    }
+
 }
 
 
@@ -103,10 +129,36 @@ export class GraphOperator {
             }
             let label: HTMLElement = this.createElement('span', labelAttrs);
             label.innerText = _collection.label;
+
+
+
             firstLabelArea.appendChild(label);
         });
 
     }
+
+
+    private updateSeriesDropdown = (header: HTMLElement, series: Array<GraphSeries>) => {
+        let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
+
+        if (dropdown && dropdown[0]) {
+            dropdown[0].innerHTML = "";
+        }
+        let select: HTMLSelectElement = <HTMLSelectElement>this.createElement("select", []);
+        dropdown[0].appendChild(select);
+
+        let opts: Array<{ checked: boolean, name: string, label: string }> = [];
+        series.forEach(_series => {
+            opts.push(
+                { checked: true, name: _series.label, label: _series.label }
+            );
+        });
+
+        new SelectWithCheckbox(select, opts).render();
+    }
+
+
+
 
     init = (mainGraph: Dygraph, rangeGraph: Dygraph, view: ViewConfig, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement) => {
         let formatters: Formatters = new Formatters(view.timezone ? view.timezone : moment.tz.guess());
@@ -187,6 +239,9 @@ export class GraphOperator {
             fieldsForCollection = fieldsForCollection.concat(_tempFields);
         });
 
+        let mainGraphSeries: any = null;
+
+        // 
         view.dataService.fetchFirstNLast(entities, view.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
             // get first and last records, just need start and end timestamp
             let first: any = { timestamp: moment.tz(view.timezone ? view.timezone : moment.tz.guess()).valueOf() };
@@ -253,7 +308,7 @@ export class GraphOperator {
             let initialData = [[new Date(first.timestamp)], [new Date(last.timestamp)]];
             let isY2: boolean = false;
             let mainGraphLabels: Array<string> = [];
-            let mainGraphSeries: any = null;
+
             if (entities.length == 1) {
                 mainGraphLabels = [];
                 mainGraphSeries = {};
@@ -410,6 +465,8 @@ export class GraphOperator {
                     }
                 }
             });
+
+
             // remove first
             if (graphContainer.getElementsByClassName("fgp-graph-bottom").length > 0) {
                 let bottoms = graphContainer.getElementsByClassName("fgp-graph-bottom");
@@ -424,39 +481,30 @@ export class GraphOperator {
                 let lastData = [new Date(last.timestamp)];
                 let rangeSeries = null;
 
-                if (entities.length == 1) {
-                    rangeSeries = {};
-                    // check if ther is a y2
-                    view.graphConfig.rangeCollection.series.forEach((series, _index) => {
-                        labels.push(series.label);
-                        firstData[_index + 1] = null;
-                        lastData[_index + 1] = null;
-                        rangeSeries[series.label] = {
-                            axis: (series.yIndex == "left" || !series.yIndex) ? 'y' : 'y2'
-                        };
-                    });
+                // range device always one
+                rangeSeries = {};
+                // check if ther is a y2
+                view.graphConfig.rangeCollection.series.forEach((series, _index) => {
+                    labels.push(series.label);
+                    firstData[_index + 1] = null;
+                    lastData[_index + 1] = null;
+                    rangeSeries[series.label] = {
+                        axis: (series.yIndex == "left" || !series.yIndex) ? 'y' : 'y2'
+                    };
+                });
 
-                    if (isY2) {
-                        labels.push("y2");
-                        rangeSeries["y2"] = {
-                            axis: "y2"
-                        };
-                        firstData.push(null);
-                        lastData.push(null);
-                    }
-
-                } else if (entities.length > 1 && view.graphConfig.rangeCollection.series && view.graphConfig.rangeCollection.series[0]) {
-                    // 
-                    entities.forEach((entity, _index) => {
-                        labels.push(entity);
-                        firstData[_index + 1] = null;
-                        lastData[_index + 1] = null;
-                    });
+                if (isY2) {
+                    labels.push("y2");
+                    rangeSeries["y2"] = {
+                        axis: "y2"
+                    };
+                    firstData.push(null);
+                    lastData.push(null);
                 }
 
                 // create 2 labels for start and end
 
-                let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{ key: 'style', value: 'height:20px;' }]);
+                let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{ key: 'style', value: 'height:22px;' }]);
                 dateLabels.appendChild(startLabelLeft);
                 dateLabels.appendChild(endLabelRight);
                 bottom = DomElementOperator.createElement('div', bottomAttrs);
@@ -512,6 +560,9 @@ export class GraphOperator {
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element = rangeBarHandles[i];
+                    let style = element.getAttribute("style");
+                    style.replace("z-index: 10;", "z-index: " + (10 + i) + ";");
+                    element.setAttribute("style", style);
                     element.addEventListener('mousedown', rangebarMousedownFunc);
                 }
 
@@ -525,6 +576,8 @@ export class GraphOperator {
 
             this.update(mainGraph, rangeGraph, view, choosedCollection, view.graphConfig.rangeCollection, timewindowStart, timewindowEnd, first.timestamp, last.timestamp);
             this.updateCollectionLabels(header, choosedCollection, view.graphConfig.collections);
+
+            this.updateSeriesDropdown(header, choosedCollection.series);
         });
     }
 
@@ -776,7 +829,7 @@ export class GraphOperator {
             fieldsForRangebarGraph = fieldsForRangebarGraph.concat(_tempFields);
         });
 
-        //
+        // for range
         view.dataService.fetchdata(rangeEntities, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
 
             // merge data

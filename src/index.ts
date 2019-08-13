@@ -33,6 +33,8 @@ export class FgpGraph {
 
     private intervalLabelsArea: HTMLElement;
 
+    private seriesDropdown: HTMLElement;
+
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
     // store locally
@@ -57,10 +59,14 @@ export class FgpGraph {
         let intervalsLabelsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-interval-labels" }];
         this.intervalLabelsArea = DomElementOperator.createElement('div', intervalsLabelsAttrs);
 
+        let seriesDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-series-dropdown" }];
+        this.seriesDropdown = DomElementOperator.createElement('div', seriesDropdownAttrs);
+
         let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
         this.header = DomElementOperator.createElement('div', headerAttrs);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
+        this.header.appendChild(this.seriesDropdown);
         this.header.appendChild(this.intervalLabelsArea);
         // create doms
         let containerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-container' }];
