@@ -1,5 +1,5 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
 import { DataHandler } from '../services/dataService';
@@ -35,6 +35,59 @@ export class DropdownButton {
             // add it into select
             this.select.add(opt);
         });
+    }
+}
+
+
+export class DropdownMenu {
+    private dropdown: HTMLElement; // div
+    private opts: Array<{ checked: boolean, name: string, label: string }>;
+    private callback: any;
+
+    constructor(dropdownArea: HTMLElement, opts: Array<{ checked: boolean, name: string, label: string }>, callback: any) {
+        this.dropdown = dropdownArea;
+        this.opts = opts;
+        this.callback = callback;
+    }
+    render = () => {
+        this.dropdown.innerHTML = '';
+        let div: HTMLElement = document.createElement('div');
+        div.setAttribute("class", "fgp-graphs-dropdown");
+        //
+        let span: HTMLElement = document.createElement('div');
+        span.innerHTML = `
+        <select>
+            <option>series</option>
+        </select>`;
+        let content: HTMLElement = document.createElement('ul');
+        content.setAttribute('class', "dropdown-content");
+
+        // add options
+        this.opts.forEach(opt => {
+            // create li
+            let li: HTMLElement = document.createElement('li');
+            let checkbox: HTMLElement = document.createElement('input');
+            checkbox.setAttribute("type", "checkbox");
+            if (opt.checked) {
+                checkbox.setAttribute("checked", "checked");
+                checkbox.setAttribute("data-value", opt.label);
+            }
+            checkbox.addEventListener("click", (e) => {
+                //
+                let series = (<HTMLInputElement>e.target).getAttribute("data-value");
+                let checked = (<HTMLInputElement>e.target).checked;
+                console.debug("series: ", series, checked);
+                // update graph with callback function
+                this.callback(series, checked);
+            });
+            li.appendChild(checkbox);
+            li.append(' ' + opt.label);
+            content.appendChild(li);
+        });
+        //
+        div.appendChild(span);
+        div.appendChild(content);
+        this.dropdown.appendChild(div);
     }
 }
 
@@ -107,7 +160,7 @@ export class GraphOperator {
      * @private
      * @memberof GraphOperator
      */
-    private updateCollectionLabels = (header: HTMLElement, choosedCollection: GraphCollection, collections: Array<GraphCollection>) => {
+    private updateCollectionLabels = (header: HTMLElement, entities: Array<Entity>, choosedCollection: GraphCollection, collections: Array<GraphCollection>) => {
         // 
         let labels = header.getElementsByClassName('fgp-interval-labels');// should only have one.
         let firstLabelArea: any = null;
@@ -123,38 +176,51 @@ export class GraphOperator {
         collections.forEach(_collection => {
             //
             let labelAttrs: Array<DomAttrs> = [{ key: 'class', value: 'badge badge-pill badge-secondary' }];
-
-            if (_collection.name === choosedCollection.name) {
+            if (_collection.name == choosedCollection.name) {
                 labelAttrs = [{ key: 'class', value: 'badge badge-pill badge-success' }];
             }
             let label: HTMLElement = this.createElement('span', labelAttrs);
             label.innerText = _collection.label;
-
-
-
             firstLabelArea.appendChild(label);
         });
+
 
     }
 
 
-    private updateSeriesDropdown = (header: HTMLElement, series: Array<GraphSeries>) => {
+    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph) => {
         let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
 
         if (dropdown && dropdown[0]) {
             dropdown[0].innerHTML = "";
         }
-        let select: HTMLSelectElement = <HTMLSelectElement>this.createElement("select", []);
+        let select: HTMLElement = <HTMLSelectElement>this.createElement("div", []);
         dropdown[0].appendChild(select);
 
         let opts: Array<{ checked: boolean, name: string, label: string }> = [];
         series.forEach(_series => {
+
             opts.push(
-                { checked: true, name: _series.label, label: _series.label }
+                { checked: true, name: _series, label: _series }
             );
         });
 
-        new SelectWithCheckbox(select, opts).render();
+        // new SelectWithCheckbox(select, opts).render();
+
+        new DropdownMenu(select, opts, (series, checked) => {
+            let visibility: Array<boolean> = graph.getOption('visibility');
+            let labels: Array<string> = graph.getLabels();
+
+            labels.forEach((label, index) => {
+                if (label == series) {
+                    visibility[index - 1] = checked;
+                }
+            });
+            graph.updateOptions({
+                visibility: visibility
+            });
+
+        }).render();
     }
 
 
@@ -213,7 +279,7 @@ export class GraphOperator {
         intervalsDropdown.onchange = (e) => {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
-                if (config.name === intervalDropdown.value) {
+                if (config.name == intervalDropdown.value) {
                     rangeGraph.updateOptions({
                         dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
                     });
@@ -223,7 +289,7 @@ export class GraphOperator {
                     });
 
                     this.update(mainGraph, rangeGraph, view, choosedCollection, view.graphConfig.rangeCollection, (timewindowEnd - config.value), timewindowEnd);
-                    this.updateCollectionLabels(header, choosedCollection, view.graphConfig.collections);
+                    this.updateCollectionLabels(header, view.graphConfig.entities, choosedCollection, view.graphConfig.collections);
                 }
             });
         };
@@ -250,7 +316,7 @@ export class GraphOperator {
             entities.forEach(entity => {
                 //
                 resp.forEach(entityData => {
-                    if (entityData.id === entity) {
+                    if (entityData.id == entity) {
                         if (entityData.data && entityData.data.first && entityData.data.first.timestamp) {
                             //
                             if (first.timestamp > entityData.data.first.timestamp) {
@@ -369,16 +435,16 @@ export class GraphOperator {
                     console.debug("no change!");
                 } else {
 
-                    if (yAxisRange) {
-                        yAxisRange.forEach((element, _index) => {
-                            if (_index == 0) {
-                                //left
+                    // if (yAxisRange) {
+                    //     yAxisRange.forEach((element, _index) => {
+                    //         if (_index == 0) {
+                    //             //left
 
-                            } else if (_index == 1) {
+                    //         } else if (_index == 1) {
 
-                            }
-                        });
-                    }
+                    //         }
+                    //     });
+                    // }
 
                     // fetch data again 
                     // sorting
@@ -407,7 +473,7 @@ export class GraphOperator {
                     }
 
                     this.update(mainGraph, rangeGraph, view, collection, view.graphConfig.rangeCollection, datewindow[0], datewindow[1]);
-                    this.updateCollectionLabels(header, choosedCollection, view.graphConfig.collections);
+                    this.updateCollectionLabels(header, view.graphConfig.entities, choosedCollection, view.graphConfig.collections);
                 }
 
 
@@ -575,9 +641,21 @@ export class GraphOperator {
             });
 
             this.update(mainGraph, rangeGraph, view, choosedCollection, view.graphConfig.rangeCollection, timewindowStart, timewindowEnd, first.timestamp, last.timestamp);
-            this.updateCollectionLabels(header, choosedCollection, view.graphConfig.collections);
+            this.updateCollectionLabels(header, view.graphConfig.entities, choosedCollection, view.graphConfig.collections);
+            const seriesName = [];
+            if (view.graphConfig.entities.length > 1) {
+                view.graphConfig.entities.forEach(entity => {
+                    seriesName.push(entity.name);
+                });
+            } else {
+                // single device with multiple lines
+                choosedCollection.series.forEach(series => {
+                    seriesName.push(series.label);
+                });
+            }
 
-            this.updateSeriesDropdown(header, choosedCollection.series);
+            this.updateSeriesDropdown(header, seriesName, mainGraph);
+
         });
     }
 
@@ -651,8 +729,8 @@ export class GraphOperator {
                     // generate data for this column
                     _dates.forEach(date => {
                         // find date in finalData
-                        let point = finalData.find(record => record[0].getTime() === date);
-                        let record = graphData[0].find(data => data.timestamp === date);
+                        let point = finalData.find(record => record[0].getTime() == date);
+                        let record = graphData[0].find(data => data.timestamp == date);
 
                         if (point) {
                             point[_index + 1] = record ? f(record) : null;
@@ -702,16 +780,14 @@ export class GraphOperator {
                                 }
                             }
                         });
-
                     });
-
                 });
             } else if (entities.length > 1 && collection.series && collection.series[0]) {
                 const exp = collection.series[0].exp;
                 var f = new Function("data", "with(data) { if(" + exp + "!=null)return " + exp + ";return null;}");
                 _dates.forEach(date => {
                     // get the record
-                    let point = finalData.find(record => record[0].getTime() === date);
+                    let point = finalData.find(record => record[0].getTime() == date);
                     // if not found just add it as new one.
                     if (!point) {
                         point = [new Date(date)];
@@ -719,7 +795,7 @@ export class GraphOperator {
                     }
 
                     entities.forEach((entity, _index) => {
-                        let record = graphData[_index].find(data => data.timestamp === date);
+                        let record = graphData[_index].find(data => data.timestamp == date);
                         point[_index + 1] = record ? f(record) : null;
 
                         yIndexs.forEach(_yIndex => {

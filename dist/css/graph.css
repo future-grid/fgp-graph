@@ -117,3 +117,34 @@
     font-weight: bold;
     white-space: nowrap;
 }
+
+.fgp-graphs-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+.fgp-graphs-dropdown .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+.fgp-graphs-dropdown .dropdown-content > li {
+    list-style-type: none;
+}
+
+.fgp-graphs-dropdown:hover .dropdown-content {
+    display: block;
+    top: -5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 400px;
+    border-radius: 6px;
+    color: #ffffff;
+    background-color: #828282;
+}
