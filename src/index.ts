@@ -132,7 +132,6 @@ export class FgpGraph {
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
                         this.operator.init(config, (graph) => {
-                            debugger;
                             this.graph = graph;
                         }, () => {
                             this.childrenGraphs.forEach(graph => {

@@ -17,43 +17,100 @@ class DataService implements DataHandler {
         meter_read: 3600000
     };
 
+    private rangeData = [];
+
+    private deviceData = [];
+
+    constructor() {
+        this.rangeData = [{ id: "meter1", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter2", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter3", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "substation1", data: { first: { timestamp: new Date("2019/06/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), avgConsumptionVah: this.randomNumber(252, 255) } } }]
+    }
+
+
+
     fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
         // console.debug("fetching data for first and last~");
 
         return new Promise((resolve, reject) => {
             // sample data for first and last
-            resolve([{ id: "meter1", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter2", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter3", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "substation1", data: { first: { timestamp: new Date("2019/06/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), avgConsumptionVah: this.randomNumber(252, 255) } } }]);
+            resolve(this.rangeData);
         });
     }
 
     fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
         // console.debug("fetching data from server...");
-
-        let tempDate = moment(range.start).startOf('day').valueOf();
-        let sampleData: Array<{ id: string, data: Array<any> }> = [];
-
+        let tempDate = moment(range.start).startOf('day').valueOf(); 
+        let existData = [];
         ids.forEach(id => {
-            sampleData.push({ id: id, data: [] });
+            let exist = this.deviceData.find((_data) => {
+                return _data.id == id && _data.interval == interval;
+            });
+            if (!exist) {
+                exist = { id: id, interval: interval, data: [] };
+                this.deviceData.push(exist);
+            }
+            existData.push(exist);
         });
 
         while (tempDate <= range.end) {
             // create data for different devices with correct interval
-            sampleData.forEach(deviceData => {
-                if (deviceData.id.indexOf('meter') != -1) {
-                    //
-                    deviceData.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
-                } else if (deviceData.id.indexOf('substation') != -1) {
-                    //
-                    let max: number = this.randomNumber(253, 255);
-                    let min: number = this.randomNumber(250, 252);
-                    let avg: number = Math.floor((max + min) / 2);
-                    deviceData.data.push({ 'timestamp': tempDate, 'avgConsumptionVah': avg, 'maxConsumptionVah': max, 'minConsumptionVah': min });
+            existData.forEach(_ed => {
+                if (_ed.id.indexOf('meter') != -1) {
+                    // get existing data
+                    if (_ed.interval == interval) {
+                        // find data
+                        let recordExist = false;
+                        _ed.data.forEach(_data => {
+                            if (_data.timestamp == tempDate) {
+                                // found it
+                                recordExist = true;
+                            }
+                        });
+                        if (!recordExist) {
+                            // add new one
+                            _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
+                        }
+                    }
+
+                } else if (_ed.id.indexOf('substation') != -1) {
+                    if (_ed.interval == interval) {
+                        // find data
+                        let recordExist = false;
+                        _ed.data.forEach(_data => {
+                            if (_data.timestamp == tempDate) {
+                                // found it
+                                recordExist = true;
+                            }
+                        });
+                        if (!recordExist) {
+                            let max: number = this.randomNumber(253, 255);
+                            let min: number = this.randomNumber(250, 252);
+                            let avg: number = Math.floor((max + min) / 2);
+                            // add new one
+                            _ed.data.push({ 'timestamp': tempDate, 'avgConsumptionVah': avg, 'maxConsumptionVah': max, 'minConsumptionVah': min });
+                        }
+                    }
                 }
             });
             tempDate += this.intervals[interval];
         }
 
         return new Promise((resolve, reject) => {
+            let sampleData: Array<{ id: string, data: Array<any> }> = [];
+            // find data for current device and interval
+            this.deviceData.forEach(_data => {
+                ids.forEach(_id => {
+                    if(_id == _data.id && _data.interval == interval){
+                        // found data
+                        let _records = [];
+                        _data.data.forEach(_d => {
+                            if(_d.timestamp >= range.start && _d.timestamp <= range.end){
+                                _records.push(_d);
+                            }
+                        });
+                        sampleData.push({id:_id, data: _records});
+                    }
+                });
+            });
             resolve(sampleData);
         });
     }

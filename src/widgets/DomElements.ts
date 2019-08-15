@@ -475,7 +475,7 @@ export class GraphOperator {
                 if (datewindow[1] instanceof Date) {
                     datewindow[1] = datewindow[1].getTime();
                 }
-                
+
                 if (datewindow[0] == currentDatewindowOnMouseDown[0] && datewindow[1] == currentDatewindowOnMouseDown[1]) {
                     // console.debug("no change!");
                 } else {
@@ -490,7 +490,7 @@ export class GraphOperator {
                     });
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
                     Object.assign(collection, choosedCollection);
-                    
+
                     if (yAxisRange) {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
@@ -522,11 +522,11 @@ export class GraphOperator {
 
             let callbackFuncForInteractions = (e, yAxisRange, refreshData) => {
 
-                if(refreshData){
+                if (refreshData) {
                     datewindowChangeFunc(e, yAxisRange);
                 } else {
                     // set initsacle
-                    if(yAxisRange){
+                    if (yAxisRange) {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
                                 //left
@@ -544,9 +544,9 @@ export class GraphOperator {
                             }
                         });
                     }
-                    
+
                 }
-            
+
 
                 if (interactionCallback) {
                     // ready to update children
@@ -784,7 +784,7 @@ export class GraphOperator {
             Object.assign(collection, this.currentCollection);
             // check initScale
 
-            
+
 
             this.update();
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
