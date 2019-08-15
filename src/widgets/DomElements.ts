@@ -525,7 +525,6 @@ export class GraphOperator {
             }
 
             let callbackFuncForInteractions = (e, yAxisRange, refreshData) => {
-
                 if (refreshData) {
                     datewindowChangeFunc(e, yAxisRange);
                 } else {

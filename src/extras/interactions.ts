@@ -154,7 +154,7 @@ export class GraphInteractions {
         return [axis[0] + foo[0], axis[1] - foo[1]];
     }
 
-    private zoom = (g, zoomInPercentage, xBias, yBias, direction, side) => {
+    private zoom = (g, zoomInPercentage, xBias, yBias, direction, side, e?) => {
 
         xBias = xBias || 0.5;
         yBias = yBias || 0.5;
@@ -190,7 +190,7 @@ export class GraphInteractions {
             // do not bigger than range data
             var zoomRange = this.dateRange;
             this.scrollTimer = window.setTimeout(() => {
-                this.callback();
+                this.callback(e, g.yAxisRanges(), true);
             }, 500);
             if (newZoomRange[0] < zoomRange[0] && newZoomRange[1] > zoomRange[1]) {
                 return;
