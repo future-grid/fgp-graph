@@ -690,7 +690,7 @@ export class GraphOperator {
                 // check 
                 let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
                 sync.synchronize();
-                readyCallback(this.mainGraph);
+                // readyCallback(this.mainGraph);
                 let rangeBarCanvas = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
                 let rangeBarHandles = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
                 const rangebarMousedownFunc = (e) => {
@@ -728,7 +728,7 @@ export class GraphOperator {
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
             } else {
-                readyCallback(this.mainGraph);
+                
             }
             // update datewindow
             this.mainGraph.updateOptions({
@@ -737,9 +737,10 @@ export class GraphOperator {
 
             this.start = timewindowStart;
             this.end = timewindowEnd;
-
-
+        
             this.update(first.timestamp, last.timestamp);
+            // send "ready" after update 
+            readyCallback(this.mainGraph);
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
             const seriesName = [];
             if (this.currentView.graphConfig.entities.length > 1) {

@@ -133,6 +133,15 @@ export class FgpGraph {
                     if (config.name === choosedView) {
                         this.operator.init(config, (graph) => {
                             this.graph = graph;
+
+                            this.childrenGraphs.forEach(graph => {
+                                // call updateDatewinow
+                                if (graph.serialnumber != this.serialnumber) {
+                                    // update data
+                                    graph.operator.refresh();
+                                }
+                            });
+
                         }, () => {
                             this.childrenGraphs.forEach(graph => {
                                 // call updateDatewinow
