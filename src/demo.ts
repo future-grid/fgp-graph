@@ -18,7 +18,7 @@ class DataService implements DataHandler {
     };
 
     fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
-        console.debug("fetching data for first and last~");
+        // console.debug("fetching data for first and last~");
 
         return new Promise((resolve, reject) => {
             // sample data for first and last
@@ -27,7 +27,7 @@ class DataService implements DataHandler {
     }
 
     fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
-        console.debug("fetching data from server...");
+        // console.debug("fetching data from server...");
 
         let tempDate = moment(range.start).startOf('day').valueOf();
         let sampleData: Array<{ id: string, data: Array<any> }> = [];
@@ -66,7 +66,7 @@ class DataService implements DataHandler {
 
 let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
-
+let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
 let formatters: Formatters = new Formatters("Australia/Melbourne");
 // let formatters:Formatters = new Formatters("Pacific/Auckland");
 
@@ -139,10 +139,10 @@ let vdConfig: ViewConfig = {
     interaction: {
         callback: {
             highlighCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             selectCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -209,10 +209,10 @@ let vsConfig: ViewConfig = {
     interaction: {
         callback: {
             highlighCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             selectCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -227,8 +227,8 @@ let vsConfig2: ViewConfig = {
     graphConfig: {
         features: {
             zoom: true,
-            scroll: true,
-            rangeBar: true,
+            scroll: false,
+            rangeBar: false,
             legend: formatters.legendForSingleSeries
         },
         entities: [
@@ -281,10 +281,79 @@ let vsConfig2: ViewConfig = {
     interaction: {
         callback: {
             highlighCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             selectCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
+            }
+        }
+    },
+    timezone: 'Australia/Melbourne'
+    // timezone: 'Pacific/Auckland'
+};
+let vsConfig3: ViewConfig = {
+    name: "scatter view",
+    graphConfig: {
+        features: {
+            zoom: true,
+            scroll: false,
+            rangeBar: false,
+            legend: formatters.legendForSingleSeries
+        },
+        entities: [
+            { id: "meter1", type: "meter", name: "meter1" },
+            { id: "meter2", type: "meter", name: "meter2" }
+        ],
+        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeCollection: {
+            label: 'substation_day',
+            name: 'substation_interval_day',
+            interval: 86400000,
+            series: [
+                { label: "Avg", type: 'line', exp: "data.avgConsumptionVah" }
+            ]
+        },
+        collections: [
+            {
+                label: 'meter_raw',
+                name: 'meter_read',
+                interval: 3600000,
+                series: [
+                    { label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left' }
+                ],
+                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
+            }, {
+                label: 'meter_day',
+                name: 'meter_read_day',
+                interval: 86400000,
+                series: [
+                    { label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left' }
+                ],
+                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
+            }
+        ]
+    },
+    dataService: dataService,
+    show: true,
+    ranges: [
+        { name: "7 days", value: 604800000, show: true },
+        { name: "1 month", value: 2592000000 }
+    ],
+    initRange: {
+        start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        end: moment().add(1, 'days').valueOf()
+    },
+    interaction: {
+        callback: {
+            highlighCallback: (datetime, series, points) => {
+                // console.debug("selected series: ", series);
+            },
+            selectCallback: (series) => {
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -293,6 +362,10 @@ let vsConfig2: ViewConfig = {
 };
 
 
+
+let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+graph3.initGraph();
+
 let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
 graph2.initGraph();
 // graph1
@@ -300,8 +373,8 @@ let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 
 // link graphs
-graph1.setChildren([graph2]);
+graph1.setChildren([graph2, graph3]);
 
-graph2.setChildren([graph1]);
+graph2.setChildren([graph1]);   // problem with right and left axis 
 
 

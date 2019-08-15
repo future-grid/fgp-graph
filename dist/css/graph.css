@@ -45,6 +45,8 @@
 .fgp-series-dropdown {
     float: right;
     margin-right: 5px;
+    position: relative;
+    top: -1px;
 }
 
 .fgp-interval-labels {

@@ -56,7 +56,7 @@ export class FgpGraph {
         this.parentDom = dom;
 
         this.serialnumber = (Math.random() * 10000 | 0) + 1;
-        console.debug("serialNumber", this.serialnumber);
+        // console.debug("serialNumber", this.serialnumber);
 
         let viewsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-views-dropdown" }];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
@@ -127,12 +127,13 @@ export class FgpGraph {
             this.viewsDropdown.onchange = (e) => {
                 const choosedView = (<HTMLSelectElement>e.target).value;
                 // change view
-                console.debug("Current View: ", choosedView);
+                // console.debug("Current View: ", choosedView);
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
                         this.operator.init(config, (graph) => {
-                            this.graph = graph
+                            debugger;
+                            this.graph = graph;
                         }, () => {
                             this.childrenGraphs.forEach(graph => {
                                 // call updateDatewinow
@@ -163,19 +164,23 @@ export class FgpGraph {
     }
 
 
-    
+
 
     public updateDatewinow = (datewindow: Array<number>) => {
         // update graph 
         if (this.graph) {
-            this.graph.updateOptions({
-                dateWindow: datewindow
-            });
+            const range: Array<number> = this.graph.xAxisRange();
+            // if datewindow same then ignorn that
+            if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
+                this.graph.updateOptions({
+                    dateWindow: datewindow
+                });
+            }
         }
     }
 
     public setChildren = (graphs: Array<FgpGraph>) => {
-        this.childrenGraphs = graphs;
+        this.childrenGraphs = this.childrenGraphs.concat(graphs);
     }
 
 

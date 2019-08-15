@@ -16,6 +16,7 @@ export class GraphInteractions {
 
     private needRefresh: boolean;
 
+    private yAxisRangeChanged: boolean;
 
     constructor(public callback: any, public dateRange?: Array<number>) {
         this.panEnable = false;
@@ -104,7 +105,7 @@ export class GraphInteractions {
             var pixelsDragged = context.dragEndY - context.dragStartY;
             // Adjust each axis appropriately.
             if (side && ("r" == side || "l" == side)) {
-                var index = (side == 'l' ? 1 : 0);
+                var index = (side == 'l' ? 0 : 1);
                 var axis = g.axes_[index];
                 var axis_data = context.axes[index];
                 var unitsDragged = pixelsDragged * axis_data.unitsPerPixel;
@@ -115,6 +116,7 @@ export class GraphInteractions {
                     maxValue = Math.min(maxValue, boundedValue[index]);
                 }
                 var minValue = maxValue - axis_data.dragValueRange;
+
                 if (boundedValue) {
                     if (minValue < boundedValue[0]) {
                         // Adjust maxValue, and recompute minValue.
@@ -127,11 +129,12 @@ export class GraphInteractions {
                 } else {
                     axis.valueRange = [minValue, maxValue];
                 }
+                // console.debug(axis.valueRange);
             } else {
                 //
                 var zoomRange = this.dateRange;
                 if (minDate < zoomRange[0] || maxDate > zoomRange[1]) {
-                    console.info("return~~~~", new Date(minDate), new Date(zoomRange[0]), new Date(maxDate), new Date(zoomRange[1]));
+                    // console.info("return~~~~", new Date(minDate), new Date(zoomRange[0]), new Date(maxDate), new Date(zoomRange[1]));
                     return;
                 }
                 if (g.getOptionForAxis("logscale", "x")) {
@@ -141,7 +144,6 @@ export class GraphInteractions {
                 }
             }
         }
-
         g.drawGraph_(false);
     }
 
@@ -211,7 +213,7 @@ export class GraphInteractions {
     }
 
     public mouseUp = (e, g, context) => {
-        console.debug("mouse up");
+        // console.debug("mouse up");
         let currentDatewindow = g.dateWindow_;
         if (currentDatewindow[0] instanceof Date) {
             currentDatewindow[0] = currentDatewindow[0].getTime();
@@ -222,7 +224,10 @@ export class GraphInteractions {
         Dygraph.endPan(event, g, context);
         // call upadte this.panEnable = false;
         if (this.panEnable && this.needRefresh && (this.preDatewindow[0] != currentDatewindow[0] || this.preDatewindow[1] != currentDatewindow[1])) {
-            this.callback(e, g.yAxisRanges());
+            this.callback(e, g.yAxisRanges(), true);
+            this.panEnable = false;
+        } else if (this.yAxisRangeChanged) {
+            this.callback(e, g.yAxisRanges(), false);
             this.panEnable = false;
         }
     }
@@ -237,17 +242,19 @@ export class GraphInteractions {
         this.panEnable = true;
         context.initializeMouseDown(event, g, context);
         Dygraph.startPan(event, g, context);
-        console.debug("mouse down", context);
+        // console.debug("mouse down", context);
     }
 
     public mouseMove = (e, g, context) => {
         if (this.panEnable && context.isPanning) {
             if (e.offsetX <= (g.plotter_.area.x)) {
                 this.needRefresh = false;
-                this.pan(e, g, context, 'r');
+                this.yAxisRangeChanged = true;
+                this.pan(e, g, context, 'l');
             } else if (e.offsetX >= (g.plotter_.area.x + g.plotter_.area.w)) {
                 this.needRefresh = false;
-                this.pan(e, g, context, 'l');
+                this.yAxisRangeChanged = true;
+                this.pan(e, g, context, 'r');
             } else {
                 this.needRefresh = true;
                 this.pan(e, g, context, 'h');
@@ -256,7 +263,7 @@ export class GraphInteractions {
     }
 
     public mouseOut = (e, g, context) => {
-        console.debug("mouse out");
+        // console.debug("mouse out");
         if (this.mouseTimer) {
             window.clearTimeout(this.mouseTimer);
         }
@@ -308,7 +315,7 @@ export class GraphInteractions {
         }
         this.mouseTimer = window.setTimeout(() => {
             this.scrollEnable = true;
-            console.debug("enable scroll zooming~");
+            // console.debug("enable scroll zooming~");
         }, 1000);
     }
 

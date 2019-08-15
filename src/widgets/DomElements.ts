@@ -76,7 +76,7 @@ export class DropdownMenu {
                 //
                 let series = (<HTMLInputElement>e.target).getAttribute("data-value");
                 let checked = (<HTMLInputElement>e.target).checked;
-                console.debug("series: ", series, checked);
+                // console.debug("series: ", series, checked);
                 // update graph with callback function
                 this.callback(series, checked);
             });
@@ -174,6 +174,8 @@ export class GraphOperator {
     private graphBody: HTMLElement;
     private intervalsDropdown: HTMLElement;
     private header: HTMLElement;
+
+    private yAxisRanges = [];
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
         this.mainGraph = mainGraph;
@@ -473,9 +475,9 @@ export class GraphOperator {
                 if (datewindow[1] instanceof Date) {
                     datewindow[1] = datewindow[1].getTime();
                 }
-
+                
                 if (datewindow[0] == currentDatewindowOnMouseDown[0] && datewindow[1] == currentDatewindowOnMouseDown[1]) {
-                    console.debug("no change!");
+                    // console.debug("no change!");
                 } else {
                     // fetch data again 
                     // sorting
@@ -488,7 +490,7 @@ export class GraphOperator {
                     });
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
                     Object.assign(collection, choosedCollection);
-                    //
+                    
                     if (yAxisRange) {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
@@ -507,7 +509,7 @@ export class GraphOperator {
                             }
                         });
                     }
-                    this.currentCollection = choosedCollection;
+                    this.currentCollection = collection;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
 
                     this.start = datewindow[0];
@@ -518,8 +520,31 @@ export class GraphOperator {
                 }
             }
 
-            let callbackFuncForInteractions = (e, yRanges) => {
-                datewindowChangeFunc(e, yRanges);
+            let callbackFuncForInteractions = (e, yAxisRange, refreshData) => {
+
+                if(refreshData){
+                    datewindowChangeFunc(e, yAxisRange);
+                } else {
+                    // set initsacle
+                    yAxisRange.forEach((element, _index) => {
+                        if (_index == 0) {
+                            //left
+                            if (!this.currentCollection.initScales.left) {
+                                this.currentCollection.initScales.left = { min: 0, max: 0 };
+                            }
+                            this.currentCollection.initScales.left.min = element[0];
+                            this.currentCollection.initScales.left.max = element[1];
+                        } else if (_index == 1) {
+                            if (!this.currentCollection.initScales.right) {
+                                this.currentCollection.initScales.right = { min: 0, max: 0 };
+                            }
+                            this.currentCollection.initScales.right.min = element[0];
+                            this.currentCollection.initScales.right.max = element[1];
+                        }
+                    });
+                }
+            
+
                 if (interactionCallback) {
                     // ready to update children
                     interactionCallback();
@@ -740,7 +765,7 @@ export class GraphOperator {
 
         // get correct collection then call update
         if (datewindow[0] == this.start && datewindow[1] == this.end) {
-            console.debug("no change!");
+            // console.debug("no change!");
         } else {
             this.start = datewindow[0];
             this.end = datewindow[1];
@@ -754,6 +779,9 @@ export class GraphOperator {
             });
             let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
             Object.assign(collection, this.currentCollection);
+            // check initScale
+
+            
 
             this.update();
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
