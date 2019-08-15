@@ -123,7 +123,6 @@
     display: inline-block;
 }
 
-
 .fgp-graphs-dropdown .dropdown-content {
     display: none;
     position: absolute;
@@ -140,11 +139,20 @@
 
 .fgp-graphs-dropdown:hover .dropdown-content {
     display: block;
-    top: -5px;
+    /* top: -5px; */
     overflow-x: hidden;
     overflow-y: auto;
     max-height: 400px;
     border-radius: 6px;
     color: #ffffff;
     background-color: #828282;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }

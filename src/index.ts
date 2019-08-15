@@ -37,9 +37,14 @@ export class FgpGraph {
 
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
+    private childrenGraphs: Array<FgpGraph> = [];
+
     // store locally
     private rangeBarData: any = [];
 
+    public serialnumber = -1;
+
+    private operator: GraphOperator;
 
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
@@ -49,6 +54,9 @@ export class FgpGraph {
             { name: "1 month", value: 2592000000, show: false }
         ];
         this.parentDom = dom;
+
+        this.serialnumber = (Math.random() * 10000 | 0) + 1;
+        console.debug("serialNumber", this.serialnumber);
 
         let viewsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-views-dropdown" }];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
@@ -69,7 +77,7 @@ export class FgpGraph {
         this.header.appendChild(this.seriesDropdown);
         this.header.appendChild(this.intervalLabelsArea);
         // create doms
-        let containerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-container' }];
+        let containerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-container noselect' }];
         this.graphContainer = DomElementOperator.createElement('div', containerAttrs);
         this.graphContainer.appendChild(this.header);
 
@@ -78,8 +86,20 @@ export class FgpGraph {
         this.graphContainer.appendChild(this.body);
         this.parentDom.appendChild(this.graphContainer);
         this.viewConfigs = viewConfigs;
-        this.initGraph();
     }
+
+    private datewindowHandler = (datewindow: Array<number>) => {
+
+        this.childrenGraphs.forEach(graph => {
+            // call updateDatewinow
+            if (graph.serialnumber != this.serialnumber) {
+                graph.updateDatewinow(datewindow);
+            }
+        });
+
+    }
+
+
 
     /**
      * init graph with configuration
@@ -87,8 +107,8 @@ export class FgpGraph {
      * @private
      * @memberof FgpGraph
      */
-    private initGraph = () => {
-        let operator: GraphOperator = new GraphOperator();
+    public initGraph = () => {
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.datewindowHandler);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig = null;
@@ -111,14 +131,52 @@ export class FgpGraph {
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
-                        operator.init(this.graph, this.rangeBarGraph, config, this.graphContainer, this.body, this.intervalsDropdown, this.header);
+                        this.operator.init(config, (graph) => {
+                            this.graph = graph
+                        }, () => {
+                            this.childrenGraphs.forEach(graph => {
+                                // call updateDatewinow
+                                if (graph.serialnumber != this.serialnumber) {
+                                    // update data
+                                    graph.operator.refresh();
+                                }
+                            });
+                        });
                     }
                 });
             }
 
             if (showView) {
-                operator.init(this.graph, this.rangeBarGraph, showView, this.graphContainer, this.body, this.intervalsDropdown, this.header);
+                this.operator.init(showView, (graph) => {
+                    this.graph = graph;
+                }, () => {
+                    this.childrenGraphs.forEach(graph => {
+                        // call updateDatewinow
+                        if (graph.serialnumber != this.serialnumber) {
+                            // update data
+                            graph.operator.refresh();
+                        }
+                    });
+                });
             }
         }
     }
+
+
+    
+
+    public updateDatewinow = (datewindow: Array<number>) => {
+        // update graph 
+        if (this.graph) {
+            this.graph.updateOptions({
+                dateWindow: datewindow
+            });
+        }
+    }
+
+    public setChildren = (graphs: Array<FgpGraph>) => {
+        this.childrenGraphs = graphs;
+    }
+
+
 }

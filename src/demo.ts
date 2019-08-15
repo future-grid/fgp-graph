@@ -3,6 +3,7 @@ import { GraphConfig, ViewConfig } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
+import { Synchronizer } from "./extras/synchronizer";
 
 class DataService implements DataHandler {
     randomNumber = (min, max) => { // min and max included 
@@ -99,14 +100,15 @@ let vdConfig: ViewConfig = {
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
+                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' },
+                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
+                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
                 ],
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
-                yLabel: 'Consumption',
-                y2Label: 'Consumption',
-                initScales: { left: { min: 245, max: 260 } }
+                yLabel: 'voltage',
+                y2Label: 'voltage',
+                initScales: { left: { min: 245, max: 260 } },
+                fill: false
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
@@ -117,9 +119,10 @@ let vdConfig: ViewConfig = {
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
-                yLabel: 'Consumption',
-                y2Label: 'Consumption',
-                initScales: { left: { min: 230, max: 260 } }
+                yLabel: 'voltage',
+                y2Label: 'voltage',
+                initScales: { left: { min: 230, max: 260 } },
+                fill: false
             }
         ]
     },
@@ -132,6 +135,16 @@ let vdConfig: ViewConfig = {
     initRange: {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
+    },
+    interaction: {
+        callback: {
+            highlighCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
+            },
+            selectCallback: (series) => {
+                console.debug("choosed series: ", series);
+            }
+        }
     },
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
@@ -193,13 +206,102 @@ let vsConfig: ViewConfig = {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
     },
+    interaction: {
+        callback: {
+            highlighCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
+            },
+            selectCallback: (series) => {
+                console.debug("choosed series: ", series);
+            }
+        }
+    },
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
 
 
 
-const graph: FgpGraph = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
+let vsConfig2: ViewConfig = {
+    name: "scatter view",
+    graphConfig: {
+        features: {
+            zoom: true,
+            scroll: true,
+            rangeBar: true,
+            legend: formatters.legendForSingleSeries
+        },
+        entities: [
+            { id: "meter1", type: "meter", name: "meter1" },
+            { id: "meter2", type: "meter", name: "meter2" }
+        ],
+        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeCollection: {
+            label: 'substation_day',
+            name: 'substation_interval_day',
+            interval: 86400000,
+            series: [
+                { label: "Avg", type: 'line', exp: "data.avgConsumptionVah" }
+            ]
+        },
+        collections: [
+            {
+                label: 'meter_raw',
+                name: 'meter_read',
+                interval: 3600000,
+                series: [
+                    { label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left' }
+                ],
+                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
+            }, {
+                label: 'meter_day',
+                name: 'meter_read_day',
+                interval: 86400000,
+                series: [
+                    { label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left' }
+                ],
+                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
+                initScales: { left: { min: 245, max: 260 } },
+                yLabel: 'voltage'
+            }
+        ]
+    },
+    dataService: dataService,
+    show: true,
+    ranges: [
+        { name: "7 days", value: 604800000, show: true },
+        { name: "1 month", value: 2592000000 }
+    ],
+    initRange: {
+        start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        end: moment().add(1, 'days').valueOf()
+    },
+    interaction: {
+        callback: {
+            highlighCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
+            },
+            selectCallback: (series) => {
+                console.debug("choosed series: ", series);
+            }
+        }
+    },
+    timezone: 'Australia/Melbourne'
+    // timezone: 'Pacific/Auckland'
+};
 
 
-const graph2: FgpGraph = new FgpGraph(graphDiv2, [vdConfig, vsConfig]);
+let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+graph2.initGraph();
+// graph1
+let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
+graph1.initGraph();
+
+// link graphs
+graph1.setChildren([graph2]);
+
+graph2.setChildren([graph1]);
+
+

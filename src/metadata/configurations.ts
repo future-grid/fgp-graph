@@ -58,7 +58,8 @@ export interface GraphCollection {
     yLabel?: string;
     y2Label?: string;
     threshold?: { min: number, max: number };
-    initScales?: { left: { min: number, max: number }, right?: { min: number, max: number } };
+    initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
+    fill?: boolean;
 }
 
 /**
@@ -68,7 +69,6 @@ export interface GraphCollection {
  * @interface GraphConfig
  */
 export interface GraphConfig {
-
     features: Features;
     entities: Array<Entity>;
     rangeEntity: Entity;
@@ -77,6 +77,14 @@ export interface GraphConfig {
 
 }
 
+
+
+
+export interface Callbacks {
+    dataCallback?(data);
+    highlighCallback?(datetime, series, points);
+    selectCallback?(series);
+}
 /**
  * View config
  *
@@ -84,7 +92,6 @@ export interface GraphConfig {
  * @interface ViewConfig
  */
 export interface ViewConfig {
-
     name: string;
     graphConfig: GraphConfig;
     dataService: DataHandler;
@@ -92,5 +99,6 @@ export interface ViewConfig {
     ranges?: Array<{ name: string, value: number, show?: boolean }>;
     timezone?: string;
     initRange?: { start: number, end: number };
+    interaction?: { callback?: Callbacks }
 
 }

@@ -2,8 +2,19 @@ import Dygraph from 'dygraphs';
 
 export class Synchronizer {
 
-    static synchronize = (args: any[]) => {
-        if (args.length === 0) {
+    args: Array<any>;
+    graphs: Array<Dygraph>;
+
+    constructor(graphs: Array<Dygraph>) {
+        this.graphs = graphs;
+        this.args = graphs.concat([{
+            zoom: true,
+            selection: false
+        }]);
+    }
+
+    synchronize = () => {
+        if (this.args.length === 0) {
             throw 'Invalid invocation of Dygraph.synchronize(). Need >= 1 argument.';
         }
 
@@ -116,29 +127,29 @@ export class Synchronizer {
         }
 
 
-        if (args[0] instanceof Dygraph) {
+        if (this.args[0] instanceof Dygraph) {
             // Arguments are Dygraph objects.
-            for (var i = 0; i < args.length; i++) {
-                if (args[i] instanceof Dygraph) {
-                    dygraphs.push(args[i]);
+            for (var i = 0; i < this.args.length; i++) {
+                if (this.args[i] instanceof Dygraph) {
+                    dygraphs.push(this.args[i]);
                 } else {
                     break;
                 }
             }
-            if (i < args.length - 1) {
+            if (i < this.args.length - 1) {
                 throw 'Invalid invocation of Dygraph.synchronize(). ' +
                 'All but the last argument must be Dygraph objects.';
-            } else if (i == args.length - 1) {
-                parseOpts(args[args.length - 1]);
+            } else if (i == this.args.length - 1) {
+                parseOpts(this.args[this.args.length - 1]);
             }
-        } else if (args[0].length) {
+        } else if (this.args[0].length) {
             // Invoked w/ list of dygraphs, options
-            for (var i = 0; i < args[0].length; i++) {
-                dygraphs.push(args[0][i]);
+            for (var i = 0; i < this.args[0].length; i++) {
+                dygraphs.push(this.args[0][i]);
             }
-            if (args.length == 2) {
-                parseOpts(args[1]);
-            } else if (args.length > 2) {
+            if (this.args.length == 2) {
+                parseOpts(this.args[1]);
+            } else if (this.args.length > 2) {
                 throw 'Invalid invocation of Dygraph.synchronize(). ' +
                 'Expected two arguments: array and optional options argument.';
             }  // otherwise arguments.length == 1, which is fine.
@@ -198,7 +209,8 @@ export class Synchronizer {
                 dygraphs = null;
                 opts = null;
                 prevCallbacks = null;
-            }
+            },
+            graphs: [this.graphs]
         };
     };
 
