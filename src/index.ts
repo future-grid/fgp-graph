@@ -1,5 +1,4 @@
 import Dygraph from "dygraphs";
-import moment from 'moment';
 
 import { DomAttrs, GraphConfig, ViewConfig, GraphCollection } from "./metadata/configurations";
 import { numberLiteralTypeAnnotation } from "@babel/types";

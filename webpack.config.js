@@ -22,7 +22,8 @@ module.exports = {
     },
     externals:{
         'dygraphs': 'Dygraph',
-        'moment': 'moment'
+        'moment': 'moment',
+        'timezone': 'moment-timezone'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
