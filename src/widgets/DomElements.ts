@@ -526,22 +526,25 @@ export class GraphOperator {
                     datewindowChangeFunc(e, yAxisRange);
                 } else {
                     // set initsacle
-                    yAxisRange.forEach((element, _index) => {
-                        if (_index == 0) {
-                            //left
-                            if (!this.currentCollection.initScales.left) {
-                                this.currentCollection.initScales.left = { min: 0, max: 0 };
+                    if(yAxisRange){
+                        yAxisRange.forEach((element, _index) => {
+                            if (_index == 0) {
+                                //left
+                                if (!this.currentCollection.initScales.left) {
+                                    this.currentCollection.initScales.left = { min: 0, max: 0 };
+                                }
+                                this.currentCollection.initScales.left.min = element[0];
+                                this.currentCollection.initScales.left.max = element[1];
+                            } else if (_index == 1) {
+                                if (!this.currentCollection.initScales.right) {
+                                    this.currentCollection.initScales.right = { min: 0, max: 0 };
+                                }
+                                this.currentCollection.initScales.right.min = element[0];
+                                this.currentCollection.initScales.right.max = element[1];
                             }
-                            this.currentCollection.initScales.left.min = element[0];
-                            this.currentCollection.initScales.left.max = element[1];
-                        } else if (_index == 1) {
-                            if (!this.currentCollection.initScales.right) {
-                                this.currentCollection.initScales.right = { min: 0, max: 0 };
-                            }
-                            this.currentCollection.initScales.right.min = element[0];
-                            this.currentCollection.initScales.right.max = element[1];
-                        }
-                    });
+                        });
+                    }
+                    
                 }
             
 
