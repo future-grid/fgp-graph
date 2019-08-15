@@ -17,7 +17,8 @@ module.exports = {
         ]
     },
     externals:{
-        'dygraphs': 'Dygraph'
+        'dygraphs': 'Dygraph',
+        'moment': 'moment'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
