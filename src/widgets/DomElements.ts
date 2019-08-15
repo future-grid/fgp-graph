@@ -333,6 +333,10 @@ export class GraphOperator {
 
                     this.update();
                     this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
+                    if (interactionCallback) {
+                        // ready to update children
+                        interactionCallback();
+                    }
                 }
             });
         };
