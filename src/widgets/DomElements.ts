@@ -314,9 +314,12 @@ export class GraphOperator {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
-                    this.ragnebarGraph.updateOptions({
-                        dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
-                    });
+                    if(this.ragnebarGraph){
+                        this.ragnebarGraph.updateOptions({
+                            dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
+                        });
+                    }
+                    
                     // find the correct collection and update graph
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                         return collection.threshold && (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
