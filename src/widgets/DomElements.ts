@@ -314,6 +314,7 @@ export class GraphOperator {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
+                    // if ragnebar graph not exist, ignore it.
                     if(this.ragnebarGraph){
                         this.ragnebarGraph.updateOptions({
                             dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
