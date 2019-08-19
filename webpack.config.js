@@ -3,7 +3,7 @@ module.exports = {
     entry: {
         'fgp-graph': './src/demo.ts'
     },
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
         compress: true,
