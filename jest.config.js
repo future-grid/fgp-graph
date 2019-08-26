@@ -1,8 +1,7 @@
 module.exports = {
-    "roots": [
-        "src"
-      ],
-      "transform": {
-        "^.+\\.tsx?$": "ts-jest"
-      }
-}
+    testPathIgnorePatterns: ['/node_modules/'],
+    transform: {
+        '^.+\\.(t|j)sx?$': 'ts-jest'
+    },
+    testMatch: ['<rootDir>/tests/**/*.[jt]s?(x)']
+};

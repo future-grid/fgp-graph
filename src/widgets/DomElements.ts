@@ -122,11 +122,17 @@ export class DomElementOperator {
 
     static createElement = (type: string, attrs: Array<DomAttrs>): HTMLElement => {
         let dom: HTMLElement = document.createElement(type);
+        let errorHappened = false;
         // put attributes on element
         attrs.forEach(attr => {
-            dom.setAttribute(attr.key, attr.value);
-        });
+            // check the attribute, if exist then throw exception
+            if (!dom.getAttribute(attr.key)) {
+                dom.setAttribute(attr.key, attr.value);
+            } else {
+                throw new Error("Duplicate Attrs " + attr.key);
+            }
 
+        });
         return dom;
     }
 
@@ -315,12 +321,12 @@ export class GraphOperator {
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
                     // if ragnebar graph not exist, ignore it.
-                    if(this.ragnebarGraph){
+                    if (this.ragnebarGraph) {
                         this.ragnebarGraph.updateOptions({
                             dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
                         });
                     }
-                    
+
                     // find the correct collection and update graph
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                         return collection.threshold && (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
@@ -732,7 +738,7 @@ export class GraphOperator {
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
             } else {
-                
+
             }
             // update datewindow
             this.mainGraph.updateOptions({
@@ -741,7 +747,7 @@ export class GraphOperator {
 
             this.start = timewindowStart;
             this.end = timewindowEnd;
-        
+
             this.update(first.timestamp, last.timestamp);
             // send "ready" after update 
             readyCallback(this.mainGraph);
