@@ -482,15 +482,6 @@ export class GraphOperator {
                 } else {
                     datewindow = this.mainGraph.xAxisRange();
                 }
-                // check
-
-                // if (datewindow[0] instanceof Date) {
-                //     datewindow[0] = datewindow[0].getTime();
-                // }
-
-                // if (datewindow[1] instanceof Date) {
-                //     datewindow[1] = datewindow[1].getTime();
-                // }
 
                 if (datewindow[0] == currentDatewindowOnMouseDown[0] && datewindow[1] == currentDatewindowOnMouseDown[1]) {
                     // console.debug("no change!");
@@ -717,13 +708,6 @@ export class GraphOperator {
                 const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
                     const datewindow = this.ragnebarGraph.xAxisRange();
-                    // if (datewindow[0] instanceof Date) {
-                    //     datewindow[0] = datewindow[0].getTime();
-                    // }
-
-                    // if (datewindow[1] instanceof Date) {
-                    //     datewindow[1] = datewindow[1].getTime();
-                    // }
                     currentDatewindowOnMouseDown = datewindow;
 
                     window.addEventListener("mouseup", (e) => {
