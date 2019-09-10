@@ -28,10 +28,6 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
     },
-    exclude: [
-		"**/__tests__/*",
-		"node_modules"
-	],
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist')

@@ -1,9 +1,9 @@
 import { DataHandler } from "../src/services/dataService";
-let fdh = null;
+let fdh:DataHandler;
 
 beforeAll(() => {
     class FgpDataHandler implements DataHandler {
-        source: string;
+        source!: string;
 
         fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
             throw new Error("Method not implemented.");
@@ -15,7 +15,7 @@ beforeAll(() => {
         }
     }
 
-    fdh = new FgpDataHandler()
+    fdh = new FgpDataHandler();
     return fdh != null;
 });
 

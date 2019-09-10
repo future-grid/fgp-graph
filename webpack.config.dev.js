@@ -1,38 +1,40 @@
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
     entry: {
         'fgp-graph': './src/index.ts'
     },
     devtool: 'source-map', //inline-source-map
-    devServer: {
-        contentBase: './dist'
-    },
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: [{ loader: 'ts-loader' }],
                 exclude: /node_modules/
             }
         ]
     },
-    externals:{
-        'dygraphs': 'Dygraph',
-        'moment': 'moment',
-        'timezone': 'moment-timezone'
+    externals: {
+        dygraphs: 'Dygraph',
+        moment: 'moment',
+        timezone: 'moment-timezone',
+        tz: 'moment-timezone'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
     },
-    exclude: [
-		"**/__tests__/*",
-		"node_modules"
-	],
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                include: /\.min\.js$/
+            })
+        ]
+    },
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'lib',
-        libraryTarget: "umd",
+        library: 'FgpGraph',
+        libraryTarget: 'commonjs',
         umdNamedDefine: true,
         globalObject: "(typeof self !== 'undefined' ? self : this)"
     }

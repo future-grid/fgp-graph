@@ -164,15 +164,15 @@ export class GraphOperator {
 
     private ragnebarGraph: Dygraph;
 
-    private currentView: ViewConfig;
+    private currentView!: ViewConfig;
 
-    private currentCollection: GraphCollection;
+    private currentCollection!: GraphCollection | undefined;
 
-    private rangeCollection: GraphCollection;
+    private rangeCollection!: GraphCollection;
 
-    private start: number;
+    private start!: number;
 
-    private end: number;
+    private end!: number;
 
     public datewindowCallback: any;
 
@@ -199,7 +199,7 @@ export class GraphOperator {
      * @private
      * @memberof GraphOperator
      */
-    private updateCollectionLabels = (header: HTMLElement, entities: Array<Entity>, choosedCollection: GraphCollection, collections: Array<GraphCollection>) => {
+    private updateCollectionLabels = (header: HTMLElement, entities: Array<Entity>, choosedCollection: GraphCollection | undefined, collections: Array<GraphCollection>) => {
         // 
         let labels = header.getElementsByClassName('fgp-interval-labels');// should only have one.
         let firstLabelArea: any = null;
@@ -215,7 +215,7 @@ export class GraphOperator {
         collections.forEach(_collection => {
             //
             let labelAttrs: Array<DomAttrs> = [{ key: 'class', value: 'badge badge-pill badge-secondary' }];
-            if (_collection.name == choosedCollection.name) {
+            if (choosedCollection && _collection.name == choosedCollection.name) {
                 labelAttrs = [{ key: 'class', value: 'badge badge-pill badge-success' }];
             }
             let label: HTMLElement = this.createElement('span', labelAttrs);
@@ -246,11 +246,11 @@ export class GraphOperator {
 
         // new SelectWithCheckbox(select, opts).render();
 
-        new DropdownMenu(select, opts, (series, checked) => {
+        new DropdownMenu(select, opts, (series: string, checked: boolean) => {
             let visibility: Array<boolean> = graph.getOption('visibility');
             let labels: Array<string> = graph.getLabels();
 
-            labels.forEach((label, index) => {
+            labels.forEach((label: string, index: number) => {
                 if (label == series) {
                     visibility[index - 1] = checked;
                 }
@@ -279,8 +279,8 @@ export class GraphOperator {
         // find fields from configuration
         let timewindowEnd: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).add(1, 'days').startOf('day').valueOf();
         let timewindowStart: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).subtract(7, 'days').startOf('day').valueOf();   // default 7 days
-        const ranges: Array<{ name: string, value: number, show?: boolean }> = this.currentView.ranges;
-        if (ranges.length > 0) {
+        const ranges: Array<{ name: string, value: number, show?: boolean }> | undefined = this.currentView.ranges;
+        if (ranges && ranges.length > 0) {
             // get first "show" == true
             const selected = ranges.find((value, index, arr) => {
                 if (value.show) {
@@ -311,7 +311,7 @@ export class GraphOperator {
             );
         });
 
-        let choosedCollection: GraphCollection = null;
+        let choosedCollection: GraphCollection | undefined;
 
         const intervalsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.intervalsDropdown, [...dropdownOpts]);
         intervalsDropdonwOptions.render();
@@ -323,7 +323,7 @@ export class GraphOperator {
                     // if ragnebar graph not exist, ignore it.
                     if (this.ragnebarGraph) {
                         this.ragnebarGraph.updateOptions({
-                            dateWindow: [new Date(timewindowEnd - config.value), new Date(timewindowEnd)]
+                            dateWindow: [(timewindowEnd - config.value), timewindowEnd]
                         });
                     }
 
@@ -352,12 +352,14 @@ export class GraphOperator {
         };
 
         // get fields
-        let fieldsForCollection = [];
+        let fieldsForCollection: any[] = [];
         // get range config and find the first and last
         this.currentView.graphConfig.rangeCollection.series.forEach(series => {
-            let _tempFields = (series.exp).match(GraphOperator.FIELD_PATTERN);
+            let _tempFields: string[] | null = (series.exp).match(GraphOperator.FIELD_PATTERN);
             // replace all "data."" with ""
-            _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
+            if (_tempFields) {
+                _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
+            }
             // put fields together
             fieldsForCollection = fieldsForCollection.concat(_tempFields);
         });
@@ -391,7 +393,7 @@ export class GraphOperator {
             });
 
             // init empty graph with start and end  no other data
-            let firstRanges = graphRangesConfig.find(range => range.show && range.show == true);
+            let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
             if (!firstRanges) {
                 // throw errors;
                 throw new Error("non default range for range-bar!");
@@ -432,11 +434,11 @@ export class GraphOperator {
             let mainGraphLabels: Array<string> = [];
 
 
-            if (entities.length == 1) {
+            if (choosedCollection && entities.length == 1) {
                 mainGraphLabels = [];
                 choosedCollection.series.forEach((series, _index) => {
                     mainGraphLabels.push(series.label);
-                    initialData.forEach(_data => {
+                    initialData.forEach((_data: any) => {
                         _data[_index + 1] = null;
                     });
                     if (series.yIndex == "right") {
@@ -444,20 +446,20 @@ export class GraphOperator {
                     }
                 });
 
-            } else if (entities.length > 1 && choosedCollection.series && choosedCollection.series[0]) {
+            } else if (choosedCollection && entities.length > 1 && choosedCollection.series && choosedCollection.series[0]) {
                 mainGraphLabels = [];
                 entities.forEach((entity, _index) => {
                     mainGraphLabels.push(entity);
-                    initialData.forEach(_data => {
+                    initialData.forEach((_data: any) => {
                         _data[_index + 1] = null;
                     });
                 });
             }
 
-            let yScale = null;
-            let y2Scale = null;
+            let yScale: any = {};
+            let y2Scale: any = {};
             // check if there is a init scale
-            if (choosedCollection.initScales) {
+            if (choosedCollection && choosedCollection.initScales) {
                 if (choosedCollection.initScales.left) {
                     yScale = {
                         valueRange: [choosedCollection.initScales.left.min, choosedCollection.initScales.left.max]
@@ -470,10 +472,10 @@ export class GraphOperator {
                 }
 
             }
-            let currentDatewindowOnMouseDown = [];
+            let currentDatewindowOnMouseDown: any[] = [];
 
-            const datewindowChangeFunc = (e, yAxisRange?: Array<Array<number>>) => {
-                let datewindow = [];
+            const datewindowChangeFunc = (e: MouseEvent, yAxisRange?: Array<Array<number>>) => {
+                let datewindow: number[] = [];
 
                 if (this.ragnebarGraph) {
                     datewindow = this.ragnebarGraph.xAxisRange();
@@ -482,13 +484,13 @@ export class GraphOperator {
                 }
                 // check
 
-                if (datewindow[0] instanceof Date) {
-                    datewindow[0] = datewindow[0].getTime();
-                }
+                // if (datewindow[0] instanceof Date) {
+                //     datewindow[0] = datewindow[0].getTime();
+                // }
 
-                if (datewindow[1] instanceof Date) {
-                    datewindow[1] = datewindow[1].getTime();
-                }
+                // if (datewindow[1] instanceof Date) {
+                //     datewindow[1] = datewindow[1].getTime();
+                // }
 
                 if (datewindow[0] == currentDatewindowOnMouseDown[0] && datewindow[1] == currentDatewindowOnMouseDown[1]) {
                     // console.debug("no change!");
@@ -509,17 +511,19 @@ export class GraphOperator {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
                                 //left
-                                if (!collection.initScales.left) {
+                                if (collection && collection.initScales && !collection.initScales.left) {
                                     collection.initScales.left = { min: 0, max: 0 };
+                                } else if (collection && collection.initScales && collection.initScales.left) {
+                                    collection.initScales.left.min = element[0];
+                                    collection.initScales.left.max = element[1];
                                 }
-                                collection.initScales.left.min = element[0];
-                                collection.initScales.left.max = element[1];
                             } else if (_index == 1) {
-                                if (!collection.initScales.right) {
+                                if (collection && collection.initScales && !collection.initScales.right) {
                                     collection.initScales.right = { min: 0, max: 0 };
+                                } else if (collection && collection.initScales && collection.initScales.right) {
+                                    collection.initScales.right.min = element[0];
+                                    collection.initScales.right.max = element[1];
                                 }
-                                collection.initScales.right.min = element[0];
-                                collection.initScales.right.max = element[1];
                             }
                         });
                     }
@@ -534,7 +538,7 @@ export class GraphOperator {
                 }
             }
 
-            let callbackFuncForInteractions = (e, yAxisRange, refreshData) => {
+            let callbackFuncForInteractions = (e: MouseEvent, yAxisRange: Array<Array<number>>, refreshData: any) => {
                 if (refreshData) {
                     datewindowChangeFunc(e, yAxisRange);
                 } else {
@@ -543,23 +547,24 @@ export class GraphOperator {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
                                 //left
-                                if (!this.currentCollection.initScales.left) {
+                                if (this.currentCollection && this.currentCollection.initScales && !this.currentCollection.initScales.left) {
                                     this.currentCollection.initScales.left = { min: 0, max: 0 };
+                                } else if (this.currentCollection && this.currentCollection.initScales && this.currentCollection.initScales.left) {
+                                    this.currentCollection.initScales.left.min = element[0];
+                                    this.currentCollection.initScales.left.max = element[1];
                                 }
-                                this.currentCollection.initScales.left.min = element[0];
-                                this.currentCollection.initScales.left.max = element[1];
+
                             } else if (_index == 1) {
-                                if (!this.currentCollection.initScales.right) {
+                                if (this.currentCollection && this.currentCollection.initScales && !this.currentCollection.initScales.right) {
                                     this.currentCollection.initScales.right = { min: 0, max: 0 };
+                                } else if (this.currentCollection && this.currentCollection.initScales && this.currentCollection.initScales.right) {
+                                    this.currentCollection.initScales.right.min = element[0];
+                                    this.currentCollection.initScales.right.max = element[1];
                                 }
-                                this.currentCollection.initScales.right.min = element[0];
-                                this.currentCollection.initScales.right.max = element[1];
                             }
                         });
                     }
-
                 }
-
 
                 if (interactionCallback) {
                     // ready to update children
@@ -576,10 +581,16 @@ export class GraphOperator {
             // create a interaction model instance
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
+
+
+
+
+
+
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
-                ylabel: choosedCollection.yLabel,
-                y2label: choosedCollection.y2Label,
+                ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
+                y2label: choosedCollection && choosedCollection.y2Label ? choosedCollection.y2Label : "",
                 rangeSelectorHeight: 30,
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
@@ -633,9 +644,9 @@ export class GraphOperator {
             // range-bar?
             if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
                 let labels: Array<string> = [];
-                let firstData = [new Date(first.timestamp)];
-                let lastData = [new Date(last.timestamp)];
-                let rangeSeries = null;
+                let firstData: any[] = [new Date(first.timestamp)];
+                let lastData: any[] = [new Date(last.timestamp)];
+                let rangeSeries: any = null;
                 this.rangeCollection = this.currentView.graphConfig.rangeCollection;
                 // range device always one
                 rangeSeries = {};
@@ -674,50 +685,49 @@ export class GraphOperator {
                     firstData,   // first
                     lastData    // last
                 ], {
-                        xAxisHeight: 0,
-                        axes: {
-                            x: { drawAxis: false },
-                            y: {
-                                axisLabelWidth: 60
-                            },
-                            y2: {
-                                axisLabelWidth: 60
-                            }
+                    xAxisHeight: 0,
+                    axes: {
+                        x: { drawAxis: false },
+                        y: {
+                            axisLabelWidth: 60
                         },
-                        labels: ['x'].concat(labels),
-                        // series: rangeSeries,
-                        showRangeSelector: true,
-                        rangeSelectorHeight: 30,
-                        legend: 'never',
-                        drawCallback: (dygraph, is_initial) => {
-                            const xAxisRange: Array<number> = dygraph.xAxisRange();
-                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                            this.datewindowCallback(xAxisRange);
+                        y2: {
+                            axisLabelWidth: 60
                         }
-                    });
+                    },
+                    labels: ['x'].concat(labels),
+                    // series: rangeSeries,
+                    showRangeSelector: true,
+                    rangeSelectorHeight: 30,
+                    legend: 'never',
+                    drawCallback: (dygraph, is_initial) => {
+                        const xAxisRange: Array<number> = dygraph.xAxisRange();
+                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        this.datewindowCallback(xAxisRange);
+                    }
+                });
 
                 // check 
                 let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
                 sync.synchronize();
                 // readyCallback(this.mainGraph);
-                let rangeBarCanvas = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
-                let rangeBarHandles = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
-                const rangebarMousedownFunc = (e) => {
+                let rangeBarCanvas: any = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
+                let rangeBarHandles: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
                     const datewindow = this.ragnebarGraph.xAxisRange();
-                    if (datewindow[0] instanceof Date) {
-                        datewindow[0] = datewindow[0].getTime();
-                    }
+                    // if (datewindow[0] instanceof Date) {
+                    //     datewindow[0] = datewindow[0].getTime();
+                    // }
 
-                    if (datewindow[1] instanceof Date) {
-                        datewindow[1] = datewindow[1].getTime();
-                    }
+                    // if (datewindow[1] instanceof Date) {
+                    //     datewindow[1] = datewindow[1].getTime();
+                    // }
                     currentDatewindowOnMouseDown = datewindow;
 
-
                     window.addEventListener("mouseup", (e) => {
-                        datewindowChangeFunc(e, null);
+                        datewindowChangeFunc(e, []);
 
                         if (interactionCallback) {
                             // ready to update children
@@ -728,13 +738,12 @@ export class GraphOperator {
 
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
-                    const element = rangeBarHandles[i];
-                    let style = element.getAttribute("style");
+                    const element: any = rangeBarHandles[i];
+                    let style: any = element.getAttribute("style");
                     style.replace("z-index: 10;", "z-index: " + (10 + i) + ";");
                     element.setAttribute("style", style);
                     element.addEventListener('mousedown', rangebarMousedownFunc);
                 }
-
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
             } else {
@@ -742,7 +751,7 @@ export class GraphOperator {
             }
             // update datewindow
             this.mainGraph.updateOptions({
-                dateWindow: [new Date(timewindowStart), new Date(timewindowEnd)]
+                dateWindow: [timewindowStart, timewindowEnd]
             });
 
             this.start = timewindowStart;
@@ -752,16 +761,19 @@ export class GraphOperator {
             // send "ready" after update 
             readyCallback(this.mainGraph);
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
-            const seriesName = [];
+            const seriesName: string[] = [];
             if (this.currentView.graphConfig.entities.length > 1) {
                 this.currentView.graphConfig.entities.forEach(entity => {
                     seriesName.push(entity.name);
                 });
             } else {
                 // single device with multiple lines
-                choosedCollection.series.forEach(series => {
-                    seriesName.push(series.label);
-                });
+                if (choosedCollection) {
+                    choosedCollection.series.forEach(series => {
+                        seriesName.push(series.label);
+                    });
+                }
+
             }
 
             this.updateSeriesDropdown(this.header, seriesName, this.mainGraph);
@@ -773,7 +785,7 @@ export class GraphOperator {
     refresh = () => {
         const xAxisRange: Array<number> = this.mainGraph.xAxisRange();
 
-        let datewindow = [];
+        let datewindow: number[] = [];
 
         if (xAxisRange) {
             datewindow[0] = xAxisRange[0];
@@ -809,8 +821,8 @@ export class GraphOperator {
 
 
     update = (first?: number, last?: number) => {
-        let mainGraph = this.mainGraph;
-        let rangebarGraph = this.ragnebarGraph;
+        let mainGraph: any = this.mainGraph;
+        let rangebarGraph: any = this.ragnebarGraph;
         let graphCollection = this.currentCollection;
         let rangeCollection = this.rangeCollection;
         let start = this.start;
@@ -828,55 +840,59 @@ export class GraphOperator {
         });
 
         // get fields for main graph
-        let fieldsForMainGraph = [];
-        let yAxis = { min: null, max: null };
-        let yAxis2 = { min: null, max: null };
+        let fieldsForMainGraph: string[] = [];
+        let yAxis: any = { min: null, max: null };
+        let yAxis2: any = { min: null, max: null };
         let yIndexs: Array<number> = [];
         let y2Indexs: Array<number> = [];
         let colors: Array<string> = [];
-        let mainGraphSeries = {};
+        let mainGraphSeries: any = {};
         let isY2: boolean = false;
-        graphCollection.series.forEach((series, _index) => {
-            let _tempFields = (series.exp).match(GraphOperator.FIELD_PATTERN);
-            // replace all "data."" with ""
-            _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
-            // put fields together
-            fieldsForMainGraph = fieldsForMainGraph.concat(_tempFields);
+        if (graphCollection) {
+            graphCollection.series.forEach((series, _index) => {
+                let _tempFields: string[] | null = (series.exp).match(GraphOperator.FIELD_PATTERN);
+                // replace all "data."" with ""
+                if (_tempFields) {
+                    _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
+                    fieldsForMainGraph = fieldsForMainGraph.concat(_tempFields);
+                }
+                // put fields together
+                if (view.graphConfig.entities.length == 1 && series.color) {
+                    colors.push(series.color);
+                }
 
-            if (view.graphConfig.entities.length == 1 && series.color) {
-                colors.push(series.color);
-            }
+                if (series.yIndex && series.yIndex == 'right') {
+                    // right
+                    y2Indexs.push(_index + 1);
+                } else if (!series.yIndex || series.yIndex == 'left') {
+                    // left
+                    yIndexs.push(_index + 1);
+                }
 
-            if (series.yIndex && series.yIndex == 'right') {
-                // right
-                y2Indexs.push(_index + 1);
-            } else if (!series.yIndex || series.yIndex == 'left') {
-                // left
-                yIndexs.push(_index + 1);
-            }
+                mainGraphSeries[series.label] = {
+                    axis: series.yIndex == 'left' ? 'y' : 'y2',
+                    color: series.color,
+                    highlightCircleSize: 4
+                };
 
-            mainGraphSeries[series.label] = {
-                axis: series.yIndex == 'left' ? 'y' : 'y2',
-                color: series.color,
-                highlightCircleSize: 4
-            };
+                if (series.type == 'dots') {
+                    mainGraphSeries[series.label]["strokeWidth"] = 0;
+                    mainGraphSeries[series.label]["drawPoints"] = true;
+                }
 
-            if (series.type == 'dots') {
-                mainGraphSeries[series.label]["strokeWidth"] = 0;
-                mainGraphSeries[series.label]["drawPoints"] = true;
-            }
+                if (series.yIndex != 'left') {
+                    isY2 = true;
+                }
 
-            if (series.yIndex != 'left') {
-                isY2 = true;
-            }
-
-        });
+            });
+        }
 
 
-        let prepareGraphData = (data, entities, collection): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } } } => {
+
+        let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } } } => {
             // update main graph
-            let graphData = [];
-            let finalData = [];
+            let graphData: any[] = [];
+            let finalData: any[] = [];
             let _dates: Array<number> = [];
             if (first && last) {
                 _dates = [first, last];
@@ -886,7 +902,7 @@ export class GraphOperator {
                     if (id == entityData.id) {
                         graphData.push(entityData.data);
                         // merge date 
-                        entityData.data.forEach(item => {  // item is object
+                        entityData.data.forEach((item: any) => {  // item is object
                             if (_dates.indexOf(item.timestamp) == -1) {
                                 _dates.push(item.timestamp);
                             }
@@ -898,13 +914,13 @@ export class GraphOperator {
             _dates.sort();
             if (entities.length == 1) {
                 // get collection config
-                collection.series.forEach((series, _index) => {
+                collection.series.forEach((series: any, _index: number) => {
                     var f = new Function("data", "with(data) { if(" + series.exp + "!=null)return " + series.exp + ";return null;}");
                     // generate data for this column
                     _dates.forEach(date => {
                         // find date in finalData
                         let point = finalData.find(record => record[0].getTime() == date);
-                        let record = graphData[0].find(data => data.timestamp == date);
+                        let record = graphData[0].find((data: any) => data.timestamp == date);
 
                         if (point) {
                             point[_index + 1] = record ? f(record) : null;
@@ -969,7 +985,7 @@ export class GraphOperator {
                     }
 
                     entities.forEach((entity, _index) => {
-                        let record = graphData[_index].find(data => data.timestamp == date);
+                        let record = graphData[_index].find((data: any) => data.timestamp == date);
                         point[_index + 1] = record ? f(record) : null;
 
                         yIndexs.forEach(_yIndex => {
@@ -1018,75 +1034,81 @@ export class GraphOperator {
             return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
         }
 
-        // get data for 
-        view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
+        if (graphCollection) {
+            // get data for 
+            view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
 
-            let graphData = prepareGraphData(resp, mainEntities, graphCollection);
-            let yScale: { valueRange: Array<number> } = { valueRange: [] };
-            let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
-            // get init scale
-            if (!graphCollection.initScales) {
-                if (graphData.axis) {
-                    if (graphData.axis.y) {
-                        yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                let graphData = prepareGraphData(resp, mainEntities, graphCollection);
+                let yScale: { valueRange: Array<number> } = { valueRange: [] };
+                let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
+                // get init scale
+                if (graphCollection && !graphCollection.initScales) {
+                    if (graphData.axis) {
+                        if (graphData.axis.y) {
+                            yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                        }
+
+                        if (graphData.axis.y2) {
+                            y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                        }
                     }
+                } else {
+                    // check if there is a init scale
+                    if (graphCollection && graphCollection.initScales && graphCollection.initScales.left) {
+                        yScale.valueRange = [graphCollection.initScales.left.min, graphCollection.initScales.left.max];
 
-                    if (graphData.axis.y2) {
-                        y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                    }
+                    if (graphCollection && graphCollection.initScales && graphCollection.initScales.right) {
+                        y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max]
                     }
                 }
-            } else {
-                // check if there is a init scale
-                if (graphCollection.initScales.left) {
-                    yScale.valueRange = [graphCollection.initScales.left.min, graphCollection.initScales.left.max];
-
-                }
-                if (graphCollection.initScales.right) {
-                    y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max]
-                }
-            }
-            // clear old graph
-            mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
-            // update main graph
-            mainGraph.updateOptions({
-                file: graphData.data,
-                series: mainGraphSeries,
-                fillGraph: graphCollection.fill ? graphCollection.fill : false,
-                highlightSeriesOpts: {
-                    strokeWidth: 1.5
-                },
-                axes: {
-                    x: {
-                        axisLabelFormatter: formatters.axisLabel
+                // clear old graph
+                mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
+                // update main graph
+                mainGraph.updateOptions({
+                    file: graphData.data,
+                    series: mainGraphSeries,
+                    fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
+                    highlightSeriesOpts: {
+                        strokeWidth: 1.5
                     },
-                    y: {
-                        valueRange: yScale.valueRange,
-                        axisLabelWidth: 60,
-                        labelsKMB: true
-                    },
-                    y2: {
-                        valueRange: y2Scale.valueRange,
-                        axisLabelWidth: 60,
-                        labelsKMB: true
+                    axes: {
+                        x: {
+                            axisLabelFormatter: formatters.axisLabel
+                        },
+                        y: {
+                            valueRange: yScale.valueRange,
+                            axisLabelWidth: 60,
+                            labelsKMB: true
+                        },
+                        y2: {
+                            valueRange: y2Scale.valueRange,
+                            axisLabelWidth: 60,
+                            labelsKMB: true
+                        }
                     }
-                }
+                });
+
             });
+        }
 
-        });
+
 
 
         if (view.graphConfig.features.rangeBar) {
             // get fields for range-bar 
             const rangeEntities: Array<string> = [view.graphConfig.rangeEntity.id];
             // get fields for main graph
-            let fieldsForRangebarGraph = [];
+            let fieldsForRangebarGraph: string[] = [];
 
             rangeCollection.series.forEach(series => {
-                let _tempFields = (series.exp).match(GraphOperator.FIELD_PATTERN);
+                let _tempFields: string[] | null = (series.exp).match(GraphOperator.FIELD_PATTERN);
                 // replace all "data."" with ""
-                _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
-                // put fields together
-                fieldsForRangebarGraph = fieldsForRangebarGraph.concat(_tempFields);
+                if (_tempFields) {
+                    _tempFields = _tempFields.map(exp => exp.replace("data.", ""));
+                    // put fields together
+                    fieldsForRangebarGraph = fieldsForRangebarGraph.concat(_tempFields);
+                }
             });
 
             // for range
@@ -1115,7 +1137,7 @@ export class GraphOperator {
                     return a[0].getTime() > b[0].getTime() ? 1 : -1;
                 });
 
-                let rangeSeries = {};
+                let rangeSeries: any = {};
                 let labels = [];
                 // check if ther is a y2
                 rangeCollection.series.forEach((series, _index) => {

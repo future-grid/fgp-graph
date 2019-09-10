@@ -24,7 +24,7 @@ describe('DropdownCheckbox Element Creation Test Cases！', () => {
 
 describe('Element Creation Test Cases！', () => {
 
-    let dom: HTMLElement = null;
+    let dom: HTMLElement;
 
     test('Div without any attrs', () => {
         dom = DomElementOperator.createElement("div", []);

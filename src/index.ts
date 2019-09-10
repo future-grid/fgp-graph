@@ -1,12 +1,9 @@
 import Dygraph from "dygraphs";
 
 import { DomAttrs, GraphConfig, ViewConfig, GraphCollection } from "./metadata/configurations";
-import { numberLiteralTypeAnnotation } from "@babel/types";
 import { DropdownButton, DomElementOperator, GraphOperator } from "./widgets/DomElements";
 
-import { Synchronizer } from "./extras/synchronizer";
-
-export class FgpGraph {
+export default class FgpGraph {
 
     private graphContainer: HTMLElement;
 
@@ -14,11 +11,11 @@ export class FgpGraph {
 
     private body: HTMLElement;
 
-    private bottom: HTMLElement;
+    private bottom!: HTMLElement;
 
-    private graph: Dygraph;
+    private graph!: Dygraph;
 
-    private rangeBarGraph: Dygraph;
+    private rangeBarGraph!: Dygraph;
 
     private viewConfigs: Array<ViewConfig>;
 
@@ -43,7 +40,7 @@ export class FgpGraph {
 
     public serialnumber = -1;
 
-    private operator: GraphOperator;
+    private operator!: GraphOperator;
 
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
@@ -110,7 +107,7 @@ export class FgpGraph {
         this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.datewindowHandler);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
-            let showView: ViewConfig = null;
+            let showView: ViewConfig | undefined;
             let dropdownOpts: Array<{ id: string, label: string, selected?: boolean }> = [];
             this.viewConfigs.forEach(view => {
                 if (view.show) {
@@ -130,7 +127,7 @@ export class FgpGraph {
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
-                        this.operator.init(config, (graph) => {
+                        this.operator.init(config, (graph: Dygraph) => {
                             this.graph = graph;
 
                             this.childrenGraphs.forEach(graph => {
@@ -155,7 +152,7 @@ export class FgpGraph {
             }
 
             if (showView) {
-                this.operator.init(showView, (graph) => {
+                this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
                 }, () => {
                     this.childrenGraphs.forEach(graph => {

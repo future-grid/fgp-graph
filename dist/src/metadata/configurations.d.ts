@@ -1,5 +1,4 @@
 import { DataHandler } from "../services/dataService";
-
 /**
  *
  *
@@ -12,9 +11,11 @@ export interface Features {
     rangeBar: boolean;
     connectPoints?: boolean;
     legend?: any;
-    export?: { pic: boolean, data: boolean };
+    export?: {
+        pic: boolean;
+        data: boolean;
+    };
 }
-
 /**
  * device entity
  *
@@ -28,7 +29,6 @@ export interface Entity {
     description?: string;
     extension?: any;
 }
-
 /**
  * div dom element
  *
@@ -39,9 +39,6 @@ export interface DomAttrs {
     key: string;
     value: string;
 }
-
-
-
 export interface GraphSeries {
     label: string;
     color?: string;
@@ -49,7 +46,6 @@ export interface GraphSeries {
     type: string;
     yIndex?: string;
 }
-
 export interface GraphCollection {
     label: string;
     name: string;
@@ -57,11 +53,22 @@ export interface GraphCollection {
     interval: number;
     yLabel?: string;
     y2Label?: string;
-    threshold?: { min: number, max: number };
-    initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
+    threshold?: {
+        min: number;
+        max: number;
+    };
+    initScales?: {
+        left?: {
+            min: number;
+            max: number;
+        };
+        right?: {
+            min: number;
+            max: number;
+        };
+    };
     fill?: boolean;
 }
-
 /**
  * graph configuration
  *
@@ -74,15 +81,10 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-
 }
-
-
-
-
 export interface Callbacks {
-    dataCallback?(data: any): any[];
-    highlighCallback?(datetime: any, series: any, points: any[]): any[];
+    dataCallback?(data: any): any;
+    highlighCallback?(datetime: any, series: any, points: any): any;
     selectCallback?(series: any): any;
 }
 /**
@@ -96,9 +98,17 @@ export interface ViewConfig {
     graphConfig: GraphConfig;
     dataService: DataHandler;
     show: boolean;
-    ranges?: Array<{ name: string, value: number, show?: boolean }>;
+    ranges?: Array<{
+        name: string;
+        value: number;
+        show?: boolean;
+    }>;
     timezone?: string;
-    initRange?: { start: number, end: number };
-    interaction?: { callback?: Callbacks }
-
+    initRange?: {
+        start: number;
+        end: number;
+    };
+    interaction?: {
+        callback?: Callbacks;
+    };
 }

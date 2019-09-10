@@ -1,7 +1,7 @@
 const path = require('path');
 module.exports = {
     entry: {
-        'fgp-graph.min': './src/index.ts'
+        'fgp-graph': './src/index.ts'
     },
     devtool: 'source-map',
     devServer: {
@@ -18,15 +18,12 @@ module.exports = {
     },
     externals:{
         'dygraphs': 'Dygraph',
-        'moment': 'moment'
+        'moment': 'moment',
+        'timezone': 'moment-timezone'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
     },
-    exclude: [
-		"**/__tests__/*",
-		"node_modules"
-	],
     output: {
         filename: '[name].js',
         library: 'lib',

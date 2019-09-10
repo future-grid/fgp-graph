@@ -3,6 +3,7 @@
   "version": "19.6.1",
   "description": "fgp-graph is a chart lib based on Dygraphs",
   "main": "dist/fgp-graph.js",
+  "module": "index.js",
   "scripts": {
     "start": "webpack-dev-server --color --mode development",
     "build:dev": "webpack --mode development --config webpack.config.dev.js",
@@ -21,12 +22,15 @@
     "url": "git+https://github.com/future-grid/fgp-graph.git"
   },
   "devDependencies": {
+    "@types/dygraphs": "^1.1.8",
     "@types/jest": "^24.0.15",
+    "@types/moment-timezone": "^0.5.12",
     "@types/node": "^12.6.8",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.35.3",
     "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2"
