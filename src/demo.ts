@@ -1,4 +1,4 @@
-import { FgpGraph } from "./index";
+import FgpGraph from "./index";
 import { GraphConfig, ViewConfig } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
@@ -6,20 +6,15 @@ import { Formatters } from "./extras/formatters";
 import { Synchronizer } from "./extras/synchronizer";
 
 class DataService implements DataHandler {
-    randomNumber = (min, max) => { // min and max included 
+    randomNumber = (min: number, max: number) => { // min and max included 
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
 
-    intervals = {
-        substation_interval_day: 86400000,
-        substation_interval: 3600000,
-        meter_read_day: 86400000,
-        meter_read: 3600000
-    };
 
-    private rangeData = [];
 
-    private deviceData = [];
+    private rangeData: any[] = [];
+
+    private deviceData: any[] = [];
 
     constructor() {
         this.rangeData = [{ id: "meter1", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter2", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "meter3", data: { first: { timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), voltage: this.randomNumber(252, 255) } } }, { id: "substation1", data: { first: { timestamp: new Date("2019/06/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255) }, last: { timestamp: moment().add(1, 'days').startOf('day').valueOf(), avgConsumptionVah: this.randomNumber(252, 255) } } }]
@@ -38,8 +33,8 @@ class DataService implements DataHandler {
 
     fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
         // console.debug("fetching data from server...");
-        let tempDate = moment(range.start).startOf('day').valueOf(); 
-        let existData = [];
+        let tempDate = moment(range.start).startOf('day').valueOf();
+        let existData: any[] = [];
         ids.forEach(id => {
             let exist = this.deviceData.find((_data) => {
                 return _data.id == id && _data.interval == interval;
@@ -59,7 +54,7 @@ class DataService implements DataHandler {
                     if (_ed.interval == interval) {
                         // find data
                         let recordExist = false;
-                        _ed.data.forEach(_data => {
+                        _ed.data.forEach((_data: any) => {
                             if (_data.timestamp == tempDate) {
                                 // found it
                                 recordExist = true;
@@ -75,7 +70,7 @@ class DataService implements DataHandler {
                     if (_ed.interval == interval) {
                         // find data
                         let recordExist = false;
-                        _ed.data.forEach(_data => {
+                        _ed.data.forEach((_data: any) => {
                             if (_data.timestamp == tempDate) {
                                 // found it
                                 recordExist = true;
@@ -91,7 +86,19 @@ class DataService implements DataHandler {
                     }
                 }
             });
-            tempDate += this.intervals[interval];
+
+            if ("substation_interval_day" === interval) {
+                tempDate += 86400000;
+            } else if ("substation_interval" === interval) {
+                tempDate += 3600000;
+            } else if ("meter_read_day" === interval) {
+                tempDate += 86400000;
+            } else if ("meter_read" === interval) {
+                tempDate += 3600000;
+            }
+
+
+
         }
 
         return new Promise((resolve, reject) => {
@@ -99,15 +106,15 @@ class DataService implements DataHandler {
             // find data for current device and interval
             this.deviceData.forEach(_data => {
                 ids.forEach(_id => {
-                    if(_id == _data.id && _data.interval == interval){
+                    if (_id == _data.id && _data.interval == interval) {
                         // found data
-                        let _records = [];
-                        _data.data.forEach(_d => {
-                            if(_d.timestamp >= range.start && _d.timestamp <= range.end){
+                        let _records: any[] = [];
+                        _data.data.forEach((_d: any) => {
+                            if (_d.timestamp >= range.start && _d.timestamp <= range.end) {
                                 _records.push(_d);
                             }
                         });
-                        sampleData.push({id:_id, data: _records});
+                        sampleData.push({ id: _id, data: _records });
                     }
                 });
             });
@@ -195,8 +202,9 @@ let vdConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
+            highlighCallback: (datetime, series, points): any[] => {
                 // console.debug("selected series: ", series);
+                return [];
             },
             selectCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -267,6 +275,7 @@ let vsConfig: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
+                return [];
             },
             selectCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -339,6 +348,7 @@ let vsConfig2: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
+                return [];
             },
             selectCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -396,7 +406,7 @@ let vsConfig3: ViewConfig = {
     },
     dataService: dataService,
     show: true,
-    ranges: [
+    ranges: [ 
         { name: "7 days", value: 604800000, show: true },
         { name: "1 month", value: 2592000000 }
     ],
@@ -408,6 +418,7 @@ let vsConfig3: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
+                return [];
             },
             selectCallback: (series) => {
                 // console.debug("choosed series: ", series);

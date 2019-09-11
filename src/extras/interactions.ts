@@ -1,45 +1,50 @@
-import Dygraph from 'dygraphs';
-
-
 export class GraphInteractions {
 
 
-    private panEnable: boolean;
+    private panEnable!: boolean;
 
-    private mouseTimer: number;
+    private mouseTimer!: number;
 
     private scrollEnable: boolean;
 
-    private scrollTimer: number;
+    private scrollTimer!: number;
 
-    private preDatewindow: Array<any>;
+    private preDatewindow!: Array<any>;
 
-    private needRefresh: boolean;
+    private needRefresh!: boolean;
 
-    private yAxisRangeChanged: boolean;
+    private yAxisRangeChanged!: boolean;
 
     constructor(public callback: any, public dateRange?: Array<number>) {
         this.panEnable = false;
         this.scrollEnable = false;
     }
 
-    private pageX = (e) => {
+    private LOG_SCALE = 10;
+    private LN_TEN = Math.log(this.LOG_SCALE);
+
+
+    private log10 = (x: number) => {
+        return Math.log(x) / this.LN_TEN;
+    };
+
+    private pageX = (e: MouseEvent) => {
         return !e.pageX || e.pageX < 0 ? 0 : e.pageX;
     }
 
-    private pageY = (e) => {
+    private pageY = (e: MouseEvent) => {
         return !e.pageY || e.pageY < 0 ? 0 : e.pageY;
     }
 
-    private dragGetX_ = (e, context) => {
+    private dragGetX_ = (e: MouseEvent, context: any) => {
         return this.pageX(e) - context.px;
     }
 
-    private dragGetY_ = (e, context) => {
+    private dragGetY_ = (e: MouseEvent, context: any) => {
         return this.pageY(e) - context.py;
     }
 
-    private cancelEvent = (e) => {
+    private cancelEvent = (e: any) => {
         e = e ? e : window.event;
         if (e.stopPropagation) {
             e.stopPropagation();
@@ -53,7 +58,156 @@ export class GraphInteractions {
         return false;
     }
 
-    private offsetToPercentage = (g, offsetX, offsetY) => {
+    private endPan = (event: MouseEvent, g: any, context: any) => {
+        context.dragEndX = this.dragGetX_(event, context);
+        context.dragEndY = this.dragGetY_(event, context);
+        var regionWidth = Math.abs(context.dragEndX - context.dragStartX);
+        var regionHeight = Math.abs(context.dragEndY - context.dragStartY);
+
+        if (regionWidth < 2 && regionHeight < 2 &&
+            g.lastx_ !== undefined && g.lastx_ != -1) {
+            this.treatMouseOpAsClick(g, event, context);
+        }
+
+        context.regionWidth = regionWidth;
+        context.regionHeight = regionHeight;
+    }
+
+    private startPan = (event: MouseEvent, g: any, context: any) => {
+        var i, axis;
+        context.isPanning = true;
+        var xRange = g.xAxisRange();
+
+        if (g.getOptionForAxis("logscale", "x")) {
+            context.initialLeftmostDate = this.log10(xRange[0]);
+            context.dateRange = this.log10(xRange[1]) - this.log10(xRange[0]);
+        } else {
+            context.initialLeftmostDate = xRange[0];
+            context.dateRange = xRange[1] - xRange[0];
+        }
+        context.xUnitsPerPixel = context.dateRange / (g.plotter_.area.w - 1);
+
+        if (g.getNumericOption("panEdgeFraction")) {
+            var maxXPixelsToDraw = g.width_ * g.getNumericOption("panEdgeFraction");
+            var xExtremes = g.xAxisExtremes(); // I REALLY WANT TO CALL THIS xTremes!
+
+            var boundedLeftX = g.toDomXCoord(xExtremes[0]) - maxXPixelsToDraw;
+            var boundedRightX = g.toDomXCoord(xExtremes[1]) + maxXPixelsToDraw;
+
+            var boundedLeftDate = g.toDataXCoord(boundedLeftX);
+            var boundedRightDate = g.toDataXCoord(boundedRightX);
+            context.boundedDates = [boundedLeftDate, boundedRightDate];
+
+            var boundedValues = [];
+            var maxYPixelsToDraw = g.height_ * g.getNumericOption("panEdgeFraction");
+
+            for (i = 0; i < g.axes_.length; i++) {
+                axis = g.axes_[i];
+                var yExtremes = axis.extremeRange;
+
+                var boundedTopY = g.toDomYCoord(yExtremes[0], i) + maxYPixelsToDraw;
+                var boundedBottomY = g.toDomYCoord(yExtremes[1], i) - maxYPixelsToDraw;
+
+                var boundedTopValue = g.toDataYCoord(boundedTopY, i);
+                var boundedBottomValue = g.toDataYCoord(boundedBottomY, i);
+
+                boundedValues[i] = [boundedTopValue, boundedBottomValue];
+            }
+            context.boundedValues = boundedValues;
+        }
+
+        // Record the range of each y-axis at the start of the drag.
+        // If any axis has a valueRange, then we want a 2D pan.
+        // We can't store data directly in g.axes_, because it does not belong to us
+        // and could change out from under us during a pan (say if there's a data
+        // update).
+        context.is2DPan = false;
+        context.axes = [];
+        for (i = 0; i < g.axes_.length; i++) {
+            axis = g.axes_[i];
+            var axis_data = { initialTopValue: 0, dragValueRange: 0, unitsPerPixel: 0 };
+            var yRange = g.yAxisRange(i);
+            // TODO(konigsberg): These values should be in |context|.
+            // In log scale, initialTopValue, dragValueRange and unitsPerPixel are log scale.
+            var logscale = g.attributes_.getForAxis("logscale", i);
+            if (logscale) {
+                axis_data.initialTopValue = this.log10(yRange[1]);
+                axis_data.dragValueRange = this.log10(yRange[1]) - this.log10(yRange[0]);
+            } else {
+                axis_data.initialTopValue = yRange[1];
+                axis_data.dragValueRange = yRange[1] - yRange[0];
+            }
+            axis_data.unitsPerPixel = axis_data.dragValueRange / (g.plotter_.area.h - 1);
+            context.axes.push(axis_data);
+
+            // While calculating axes, set 2dpan.
+            if (axis.valueRange) context.is2DPan = true;
+        }
+    }
+
+
+    private treatMouseOpAsClick = (g: any, event: MouseEvent, context: any) => {
+        var clickCallback = g.getFunctionOption('clickCallback');
+        var pointClickCallback = g.getFunctionOption('pointClickCallback');
+
+        var selectedPoint = null;
+
+        // Find out if the click occurs on a point.
+        var closestIdx = -1;
+        var closestDistance = Number.MAX_VALUE;
+
+        // check if the click was on a particular point.
+        for (var i = 0; i < g.selPoints_.length; i++) {
+            var p = g.selPoints_[i];
+            var distance = Math.pow(p.canvasx - context.dragEndX, 2) +
+                Math.pow(p.canvasy - context.dragEndY, 2);
+            if (!isNaN(distance) &&
+                (closestIdx == -1 || distance < closestDistance)) {
+                closestDistance = distance;
+                closestIdx = i;
+            }
+        }
+
+        // Allow any click within two pixels of the dot.
+        var radius = g.getNumericOption('highlightCircleSize') + 2;
+        if (closestDistance <= radius * radius) {
+            selectedPoint = g.selPoints_[closestIdx];
+        }
+
+        if (selectedPoint) {
+            var e: any = {
+                cancelable: true,
+                point: selectedPoint,
+                canvasx: context.dragEndX,
+                canvasy: context.dragEndY
+            };
+            var defaultPrevented = g.cascadeEvents_('pointClick', e);
+            if (defaultPrevented) {
+                // Note: this also prevents click / clickCallback from firing.
+                return;
+            }
+            if (pointClickCallback) {
+                pointClickCallback.call(g, event, selectedPoint);
+            }
+        }
+
+        var e: any = {
+            cancelable: true,
+            xval: g.lastx_,  // closest point by x value
+            pts: g.selPoints_,
+            canvasx: context.dragEndX,
+            canvasy: context.dragEndY
+        };
+        if (!g.cascadeEvents_('click', e)) {
+            if (clickCallback) {
+                // TODO(danvk): pass along more info about the points, e.g. 'x'
+                clickCallback.call(g, event, g.lastx_, g.selPoints_);
+            }
+        }
+    }
+
+
+    private offsetToPercentage = (g: any, offsetX: number, offsetY: number) => {
         // This is calculating the pixel offset of the leftmost date.
         var xOffset = g.toDomCoords(g.xAxisRange()[0], null)[0];
         var yar0 = g.yAxisRange(0);
@@ -83,7 +237,7 @@ export class GraphInteractions {
         return [xPct, (1 - yPct)];
     }
 
-    private pan = (event, g, context, side) => {
+    private pan = (event: MouseEvent, g: any, context: any, side: string) => {
         context.dragEndX = this.dragGetX_(event, context);
         context.dragEndY = this.dragGetY_(event, context);
 
@@ -133,7 +287,7 @@ export class GraphInteractions {
             } else {
                 //
                 var zoomRange = this.dateRange;
-                if (minDate < zoomRange[0] || maxDate > zoomRange[1]) {
+                if (zoomRange && (minDate < zoomRange[0] || maxDate > zoomRange[1])) {
                     // console.info("return~~~~", new Date(minDate), new Date(zoomRange[0]), new Date(maxDate), new Date(zoomRange[1]));
                     return;
                 }
@@ -147,14 +301,14 @@ export class GraphInteractions {
         g.drawGraph_(false);
     }
 
-    private adjustAxis = (axis, zoomInPercentage, bias) => {
+    private adjustAxis = (axis: any, zoomInPercentage: number, bias: any) => {
         var delta = axis[1] - axis[0];
         var increment = delta * zoomInPercentage;
         var foo = [increment * bias, increment * (1 - bias)];
         return [axis[0] + foo[0], axis[1] - foo[1]];
     }
 
-    private zoom = (g, zoomInPercentage, xBias, yBias, direction, side, e?) => {
+    private zoom = (g: any, zoomInPercentage: number, xBias: any, yBias: any, direction: string, side: string, e?: Event) => {
 
         xBias = xBias || 0.5;
         yBias = yBias || 0.5;
@@ -192,15 +346,15 @@ export class GraphInteractions {
             this.scrollTimer = window.setTimeout(() => {
                 this.callback(e, g.yAxisRanges(), true);
             }, 500);
-            if (newZoomRange[0] < zoomRange[0] && newZoomRange[1] > zoomRange[1]) {
+            if (zoomRange && (newZoomRange[0] < zoomRange[0] && newZoomRange[1] > zoomRange[1])) {
                 return;
             } else if (newZoomRange[0] >= newZoomRange[1]) {
                 return;
-            } else if (newZoomRange[0] <= zoomRange[0] && newZoomRange[1] < zoomRange[1]) {
+            } else if (zoomRange && (newZoomRange[0] <= zoomRange[0] && newZoomRange[1] < zoomRange[1])) {
                 g.updateOptions({
                     dateWindow: [zoomRange[0], newZoomRange[1]]
                 });
-            } else if (newZoomRange[0] > zoomRange[0] && newZoomRange[1] >= zoomRange[1]) {
+            } else if (zoomRange && (newZoomRange[0] > zoomRange[0] && newZoomRange[1] >= zoomRange[1])) {
                 g.updateOptions({
                     dateWindow: [newZoomRange[0], zoomRange[1]]
                 });
@@ -212,7 +366,11 @@ export class GraphInteractions {
         }
     }
 
-    public mouseUp = (e, g, context) => {
+
+
+
+
+    public mouseUp = (e: MouseEvent, g: any, context: any) => {
         // console.debug("mouse up");
         let currentDatewindow = g.dateWindow_;
         if (currentDatewindow[0] instanceof Date) {
@@ -221,7 +379,8 @@ export class GraphInteractions {
         }
 
         context.isPanning = false;
-        Dygraph.endPan(event, g, context);
+        // Dygraph.endPan(event, g, context);
+        this.endPan(e, g, context);
         // call upadte this.panEnable = false;
         if (this.panEnable && this.needRefresh && (this.preDatewindow[0] != currentDatewindow[0] || this.preDatewindow[1] != currentDatewindow[1])) {
             this.callback(e, g.yAxisRanges(), true);
@@ -232,7 +391,7 @@ export class GraphInteractions {
         }
     }
 
-    public mouseDown = (e, g, context) => {
+    public mouseDown = (e: MouseEvent, g: any, context: any) => {
         this.preDatewindow = g.dateWindow_;
         if (this.preDatewindow[0] instanceof Date) {
             this.preDatewindow[0] = this.preDatewindow[0].getTime();
@@ -241,11 +400,11 @@ export class GraphInteractions {
 
         this.panEnable = true;
         context.initializeMouseDown(event, g, context);
-        Dygraph.startPan(event, g, context);
+        this.startPan(e, g, context);
         // console.debug("mouse down", context);
     }
 
-    public mouseMove = (e, g, context) => {
+    public mouseMove = (e: MouseEvent, g: any, context: any) => {
         if (this.panEnable && context.isPanning) {
             if (e.offsetX <= (g.plotter_.area.x)) {
                 this.needRefresh = false;
@@ -262,7 +421,7 @@ export class GraphInteractions {
         }
     }
 
-    public mouseOut = (e, g, context) => {
+    public mouseOut = (e: MouseEvent, g: any, context: any) => {
         // console.debug("mouse out");
         if (this.mouseTimer) {
             window.clearTimeout(this.mouseTimer);
@@ -271,7 +430,7 @@ export class GraphInteractions {
 
     }
 
-    public mouseScroll = (e, g, context) => {
+    public mouseScroll = (e: any, g: any, context: any) => {
         if (this.scrollEnable) {
             //
             var normal;
@@ -302,13 +461,13 @@ export class GraphInteractions {
                 this.zoom(g, percentage, xPct, yPct, 'v', 'r');
             } else {
                 // middle zoom
-                this.zoom(g, percentage, xPct, yPct, 'h', null);
+                this.zoom(g, percentage, xPct, yPct, 'h', 'm');
             }
             this.cancelEvent(e);
         }
     }
 
-    public mouseEnter = (e, g, context) => {
+    public mouseEnter = (e: MouseEvent, g: any, context: any) => {
 
         if (this.mouseTimer) {
             window.clearTimeout(this.mouseTimer);

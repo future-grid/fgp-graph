@@ -8,13 +8,13 @@ export class Formatters {
     }
 
 
-    legendForAllSeries = (data) => {
+    legendForAllSeries = (data: any) => {
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
-            return '<br>' + data.series.map(function (series) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
+            return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
         var html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
-        data.series.forEach(function (series) {
+        data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
             var labeledData = series.labelHTML + ': ' + series.yHTML;
             if (series.isHighlighted) {
@@ -26,15 +26,15 @@ export class Formatters {
     }
 
 
-    legendForSingleSeries = (data) => {
+    legendForSingleSeries = (data: any) => {
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
-            return '<br>' + data.series.map(function (series) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
+            return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
 
         var html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
 
-        data.series.forEach(function (series) {
+        data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
             var labeledData = series.labelHTML + ': ' + series.yHTML;
             if (series.isHighlighted) {
@@ -45,16 +45,23 @@ export class Formatters {
         return html;
     }
 
-    axisLabel = (d, granularity) => {
+    // axisLabelFormatter?: (v: number | Date, granularity: number, opts: (name: string) => any, dygraph: Dygraph) => any; 
+    axisLabel = (d: number | Date, granularity: number, opts?: (name: string) => any, dygraph?: Dygraph): any => {
         // don't put it into formatters.ts becault we need to timezone later
-        let momentDatetime = moment.tz(d.getTime(), this.timezone ? this.timezone : moment.tz.guess());
+        let momentDatetime;
+
+        if (d instanceof Date) {
+            momentDatetime = moment.tz(d.getTime(), this.timezone ? this.timezone : moment.tz.guess());
+        } else {
+            momentDatetime = moment.tz(d, this.timezone ? this.timezone : moment.tz.guess());
+        }
         let SHORT_MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        let zeropad = (x) => {
+        let zeropad = (x: number) => {
             if (x < 10) return "0" + x;
             else return "" + x;
         };
 
-        let hmsString_ = (hh, mm, ss) => {
+        let hmsString_ = (hh: number, mm: number, ss: number) => {
             var ret = zeropad(hh) + ":" + zeropad(mm);
             if (ss) {
                 ret += ":" + zeropad(ss);

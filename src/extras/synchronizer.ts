@@ -5,7 +5,7 @@ export class Synchronizer {
     args: Array<any>;
     graphs: Array<Dygraph>;
 
-    constructor(graphs: Array<Dygraph>) {
+    constructor(graphs: any[]) {
         this.graphs = graphs;
         this.args = graphs.concat([{
             zoom: true,
@@ -19,15 +19,15 @@ export class Synchronizer {
         }
 
         var OPTIONS = ['selection', 'zoom', 'range'];
-        var opts = {
+        var opts: any = {
             selection: true,
             zoom: true,
             range: true
         };
-        var dygraphs = [];
-        var prevCallbacks = [];
+        var dygraphs: any[] = [];
+        var prevCallbacks: any[] = [];
 
-        var parseOpts = function (obj) {
+        var parseOpts = function (obj: any) {
             if (!(obj instanceof Object)) {
                 throw 'Last argument must be either Dygraph or Object.';
             } else {
@@ -38,7 +38,7 @@ export class Synchronizer {
             }
         };
 
-        var arraysAreEqual = (a, b) => {
+        var arraysAreEqual = (a: any, b: any) => {
             if (!Array.isArray(a) || !Array.isArray(b)) return false;
             var i = a.length;
             if (i !== b.length) return false;
@@ -48,12 +48,12 @@ export class Synchronizer {
             return true;
         }
 
-        var attachZoomHandlers = (gs, syncOpts, prevCallbacks) => {
+        var attachZoomHandlers = (gs: Dygraph[], syncOpts: any, prevCallbacks: any) => {
             var block = false;
             for (var i = 0; i < gs.length; i++) {
                 var g = gs[i];
                 g.updateOptions({
-                    drawCallback: function (me, initial) {
+                    drawCallback: function (me: Dygraph, initial: boolean) {
                         if (block || initial) return;
                         block = true;
                         var opts: { dateWindow: any, valueRange?: any } = {
@@ -83,16 +83,16 @@ export class Synchronizer {
             }
         }
 
-        var attachSelectionHandlers = (gs, prevCallbacks) => {
+        var attachSelectionHandlers = (gs: any[], prevCallbacks: any) => {
             var block = false;
             for (var i = 0; i < gs.length; i++) {
                 var g = gs[i];
 
                 g.updateOptions({
-                    highlightCallback: function (event, x, points, row, seriesName) {
+                    highlightCallback: function (event: Event, x: any, points: any[], row: any, seriesName: any) {
                         if (block) return;
                         block = true;
-                        var me = this;
+                        var me: any = this;
                         for (var i = 0; i < gs.length; i++) {
                             if (me == gs[i]) {
                                 if (prevCallbacks[i] && prevCallbacks[i].highlightCallback) {
@@ -107,7 +107,7 @@ export class Synchronizer {
                         }
                         block = false;
                     },
-                    unhighlightCallback: function (event) {
+                    unhighlightCallback: function (e: Event) {
                         if (block) return;
                         block = true;
                         var me = this;
@@ -206,9 +206,9 @@ export class Synchronizer {
                     }
                 }
                 // release references & make subsequent calls throw.
-                dygraphs = null;
+                dygraphs = [];
                 opts = null;
-                prevCallbacks = null;
+                prevCallbacks = [];
             },
             graphs: [this.graphs]
         };
