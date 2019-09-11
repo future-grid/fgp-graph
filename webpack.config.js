@@ -1,35 +1,37 @@
-const path = require('path');
+var path = require('path');
+
 module.exports = {
     entry: {
-        'fgp-graph': './src/demo.ts'
+        'fgp-graph-demo': './src/demo.ts',
+        'fgp-graph': './src/index.ts'
     },
     devtool: 'source-map',
     devServer: {
-        contentBase: path.join(__dirname, 'dist'),
+        contentBase: [path.join(__dirname, 'demo')],
         compress: true,
-        port: 8000,
+        port: 4000,
         clientLogLevel: 'debug',
-        open: true
+        open: false,
+        filename: '[name].bundle.js'
     },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/
-            }
-        ]
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].bundle.js',
+    },
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js', '.json']
     },
     externals:{
         'dygraphs': 'Dygraph',
         'moment': 'moment',
         'timezone': 'moment-timezone'
     },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js']
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'dist')
+    module: {
+        rules: [{
+            // Include ts, tsx, js, and jsx files.
+            test: /\.(ts|js)x?$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+        }],
     }
 };
