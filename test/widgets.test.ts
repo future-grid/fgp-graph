@@ -2,26 +2,6 @@ import { DomElementOperator } from "../src/widgets/DomElements";
 import { DomAttrs } from "../src/metadata/configurations";
 
 
-describe('DropdownButton Element Creation Test Cases！', () => {
-
-
-
-
-
-});
-
-
-describe('DropdownCheckbox Element Creation Test Cases！', () => {
-
-
-
-
-
-
-
-});
-
-
 describe('Element Creation Test Cases！', () => {
 
     let dom: HTMLElement;
