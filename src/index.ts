@@ -38,9 +38,13 @@ export default class FgpGraph {
     // store locally
     private rangeBarData: any = [];
 
+    private currentDateWindow: number[] = [];
+
     public serialnumber = -1;
 
     private operator!: GraphOperator;
+
+    private callbackDelayTimer: any = 0;
 
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
@@ -84,12 +88,23 @@ export default class FgpGraph {
         this.viewConfigs = viewConfigs;
     }
 
-    private datewindowHandler = (datewindow: Array<number>) => {
+    private dateWindowHandler = (dateWindow: Array<number>, currentView?: ViewConfig) => {
+
+        if (this.callbackDelayTimer) {
+            clearTimeout(this.callbackDelayTimer);
+        }
+        this.callbackDelayTimer = setTimeout(() => {
+            if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
+                currentView.interaction.callback.syncDateWindow(dateWindow);
+            }
+        }, 100);
+
+        this.currentDateWindow = dateWindow;
 
         this.childrenGraphs.forEach(graph => {
             // call updateDatewinow
             if (graph.serialnumber != this.serialnumber) {
-                graph.updateDatewinow(datewindow);
+                graph.updateDatewinow(dateWindow);
             }
         });
 
@@ -104,7 +119,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public initGraph = () => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.datewindowHandler);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;

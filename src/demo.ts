@@ -189,6 +189,7 @@ let vdConfig: ViewConfig = {
                 fill: false
             }
         ]
+        
     },
     dataService: dataService,
     show: true,
@@ -202,12 +203,14 @@ let vdConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points): any[] => {
+            highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
             selectCallback: (series) => {
                 // console.debug("choosed series: ", series);
+            },
+            syncDateWindow: (dateWindow) => {
+                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },

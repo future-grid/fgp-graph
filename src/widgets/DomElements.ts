@@ -573,11 +573,6 @@ export class GraphOperator {
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
 
-
-
-
-
-
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
                 ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
@@ -621,7 +616,7 @@ export class GraphOperator {
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                     }
                     // update datewindow
-                    this.datewindowCallback(xAxisRange);
+                    this.datewindowCallback(xAxisRange, this.currentView);
                 }
             });
 
@@ -695,7 +690,7 @@ export class GraphOperator {
                         const xAxisRange: Array<number> = dygraph.xAxisRange();
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        this.datewindowCallback(xAxisRange);
+                        this.datewindowCallback(xAxisRange, this.currentView);
                     }
                 });
 

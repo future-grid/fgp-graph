@@ -81,9 +81,10 @@ export interface GraphConfig {
 
 
 export interface Callbacks {
-    dataCallback?(data: any): any[];
-    highlighCallback?(datetime: any, series: any, points: any[]): any[];
-    selectCallback?(series: any): any;
+    dataCallback?(data: any): void;
+    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    selectCallback?(series: any): void;
+    syncDateWindow?(dateWindow: number[]): void;
 }
 /**
  * View config
