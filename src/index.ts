@@ -90,14 +90,17 @@ export default class FgpGraph {
 
     private dateWindowHandler = (dateWindow: Array<number>, currentView?: ViewConfig) => {
 
-        if (this.callbackDelayTimer) {
-            clearTimeout(this.callbackDelayTimer);
-        }
-        this.callbackDelayTimer = setTimeout(() => {
-            if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
-                currentView.interaction.callback.syncDateWindow(dateWindow);
+
+        if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
+            if (this.callbackDelayTimer) {
+                clearTimeout(this.callbackDelayTimer);
             }
-        }, 100);
+            this.callbackDelayTimer = setTimeout(() => {
+                if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
+                    currentView.interaction.callback.syncDateWindow(dateWindow);
+                }
+            }, 100);
+        }
 
         this.currentDateWindow = dateWindow;
 
