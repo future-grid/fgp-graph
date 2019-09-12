@@ -596,8 +596,8 @@ export class GraphOperator {
                     currentSelection = seriesName;
                 },
                 clickCallback: (e, x, points) => {
-                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.selectCallback) {
-                        this.currentView.interaction.callback.selectCallback(currentSelection);
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.clickCallback) {
+                        this.currentView.interaction.callback.clickCallback(currentSelection);
                     }
                 },
                 interactionModel: {

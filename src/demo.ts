@@ -206,9 +206,6 @@ let vdConfig: ViewConfig = {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
             },
-            selectCallback: (series) => {
-                // console.debug("choosed series: ", series);
-            },
             syncDateWindow: (dateWindow) => {
                 console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
@@ -280,8 +277,8 @@ let vsConfig: ViewConfig = {
                 // console.debug("selected series: ", series);
                 return [];
             },
-            selectCallback: (series) => {
-                // console.debug("choosed series: ", series);
+            clickCallback: (series) => {
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -353,7 +350,7 @@ let vsConfig2: ViewConfig = {
                 // console.debug("selected series: ", series);
                 return [];
             },
-            selectCallback: (series) => {
+            clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
             }
         }
@@ -423,7 +420,7 @@ let vsConfig3: ViewConfig = {
                 // console.debug("selected series: ", series);
                 return [];
             },
-            selectCallback: (series) => {
+            clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
             }
         }
