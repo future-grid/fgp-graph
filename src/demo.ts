@@ -118,7 +118,12 @@ class DataService implements DataHandler {
                     }
                 });
             });
-            resolve(sampleData);
+
+            // show loading 
+            setTimeout(() => {
+                resolve(sampleData); 
+            }, 3000);
+            
         });
     }
 

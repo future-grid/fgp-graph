@@ -2,7 +2,7 @@ import Dygraph from 'dygraphs';
 import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
-import { DataHandler, ExportUtils } from '../services/dataService';
+import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
 import { GraphInteractions } from '../extras/interactions';
 import { Formatters } from '../extras/formatters';
 
@@ -182,6 +182,8 @@ export class GraphOperator {
     private intervalsDropdown: HTMLElement;
     private header: HTMLElement;
 
+    private spinner: LoadingSpinner;
+
     private yAxisRanges = [];
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
@@ -193,6 +195,13 @@ export class GraphOperator {
         this.intervalsDropdown = intervalsDropdown;
         this.header = header;
         this.currentGraphData = [];
+        this.spinner = new LoadingSpinner(this.graphContainer);
+    }
+
+    public showSpinner = () => {
+        if(this.spinner){
+            this.spinner.show();
+        }
     }
 
     /**
@@ -690,6 +699,10 @@ export class GraphOperator {
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                     }
+                    if(this.spinner && this.spinner.isLoading){
+                        // remove spinner from container
+                        this.spinner.done();
+                    }
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
                 }
@@ -863,9 +876,6 @@ export class GraphOperator {
             let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
             Object.assign(collection, this.currentCollection);
             // check initScale
-
-
-
             this.update();
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
@@ -875,6 +885,7 @@ export class GraphOperator {
 
 
     update = (first?: number, last?: number) => {
+        
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
         let graphCollection = this.currentCollection;
@@ -1087,8 +1098,9 @@ export class GraphOperator {
 
             return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
         }
-
+        
         if (graphCollection) {
+            this.spinner.show();
             // get data for 
             view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
@@ -1145,7 +1157,6 @@ export class GraphOperator {
                         }
                     }
                 });
-
             });
         }
 
@@ -1167,10 +1178,8 @@ export class GraphOperator {
                     fieldsForRangebarGraph = fieldsForRangebarGraph.concat(_tempFields);
                 }
             });
-
             // for range
             view.dataService.fetchdata(rangeEntities, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
-
                 // merge data
                 const currentDatewindowData = prepareGraphData(resp, rangeEntities, rangeCollection);
                 let preData: Array<any> = rangebarGraph.file_;
