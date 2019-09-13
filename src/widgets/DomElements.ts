@@ -2,10 +2,9 @@ import Dygraph from 'dygraphs';
 import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
-import { DataHandler, CsvUtil } from '../services/dataService';
+import { DataHandler, ExportUtils } from '../services/dataService';
 import { GraphInteractions } from '../extras/interactions';
 import { Formatters } from '../extras/formatters';
-import { arrayExpression } from '@babel/types';
 
 export class DropdownButton {
 
@@ -314,7 +313,7 @@ export class GraphOperator {
                                     });
                                 });
                             }
-                            CsvUtil.exportCsv(csvStr, _fileName);
+                            ExportUtils.exportCsv(csvStr, _fileName);
                         }
                     });
                     buttons[0].appendChild(btnData);
@@ -322,7 +321,14 @@ export class GraphOperator {
                     let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-image" }];
                     let btnImage = DomElementOperator.createElement('button', btnAttrs);
                     btnImage.addEventListener("click", (event) => {
-                        debugger;
+                        const graphContainer = this.graphContainer;
+                        if (graphContainer) {
+                            const mainGraphContainer = graphContainer.getElementsByClassName("fgp-graph-body");
+                            if (mainGraphContainer[0] && this.currentCollection) {
+                                // first one
+                                ExportUtils.saveAsImage(mainGraphContainer[0] as HTMLElement, this.currentCollection.label + "_" + moment().toISOString() + '.png');
+                            }
+                        }
                     });
                     buttons[0].appendChild(btnImage);
                 }
