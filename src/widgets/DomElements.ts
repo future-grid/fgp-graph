@@ -178,8 +178,11 @@ export class GraphOperator {
     private currentGraphData: { id: string, data: any[] }[];
 
     private graphContainer: HTMLElement;
+
     private graphBody: HTMLElement;
+    
     private intervalsDropdown: HTMLElement;
+
     private header: HTMLElement;
 
     private spinner: LoadingSpinner;
@@ -199,8 +202,64 @@ export class GraphOperator {
     }
 
     public showSpinner = () => {
-        if(this.spinner){
+        if (this.spinner) {
             this.spinner.show();
+        }
+    }
+
+
+    public highlightSeries = (series: string[], duration: number) => {
+
+        if (series) {
+            // hide all the others 
+            let visibility: boolean[] = this.mainGraph.getOption("visibility");
+            let _updateVisibility: boolean[] = [];
+            if (this.currentCollection) {
+                const _graphSeries = this.currentCollection.series;
+                // get indexes
+                let _indexsShow: number[] = [];
+                _graphSeries.forEach((_series, _index) => {
+                    //
+                    series.forEach((_showSeries, _showIndex) => {
+                        if (_showSeries === _series.label) {
+                            _indexsShow.push(_index);
+                        }
+                    });
+                });
+                // set visibility
+                visibility.forEach((_v, _i) => {
+                    if (_indexsShow.indexOf(_i) == -1) {
+                        _v = false;
+                    }
+                    let exist: boolean = false;
+                    _indexsShow.forEach(_ei => {
+                        if (_ei === _i) {
+                            // found it
+                            exist = true;
+                        }
+                    });
+                    if (!exist) {
+                        _updateVisibility.push(false);
+                    } else {
+                        _updateVisibility.push(true);
+                    }
+                });
+                this.mainGraph.updateOptions({
+                    visibility: _updateVisibility
+                });
+                if (duration > 0) {
+                    // take all visibility back
+                    setTimeout(() => {
+                        _updateVisibility = [];
+                        visibility.forEach(_v => {
+                            _updateVisibility.push(true);
+                        });
+                        this.mainGraph.updateOptions({
+                            visibility: _updateVisibility
+                        });
+                    }, duration * 1000);
+                }
+            }
         }
     }
 
@@ -699,7 +758,7 @@ export class GraphOperator {
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                     }
-                    if(this.spinner && this.spinner.isLoading){
+                    if (this.spinner && this.spinner.isLoading) {
                         // remove spinner from container
                         this.spinner.done();
                     }
@@ -885,7 +944,7 @@ export class GraphOperator {
 
 
     update = (first?: number, last?: number) => {
-        
+
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
         let graphCollection = this.currentCollection;
@@ -1098,7 +1157,7 @@ export class GraphOperator {
 
             return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
         }
-        
+
         if (graphCollection) {
             this.spinner.show();
             // get data for 

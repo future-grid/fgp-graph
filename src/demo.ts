@@ -446,3 +446,16 @@ graph1.setChildren([graph2, graph3]);
 graph2.setChildren([graph1]);   // problem with right and left axis 
 
 
+// highlight on first graph
+
+
+setTimeout(() => {
+
+    graph1.highlightSeries(["Avg"], 0);
+
+    setTimeout(() => {
+        graph1.highlightSeries(["Max","Min"], 2);
+    }, 2000);
+
+}, 10000);
+
