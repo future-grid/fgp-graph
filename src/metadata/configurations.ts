@@ -1,5 +1,11 @@
 import { DataHandler } from "../services/dataService";
 
+
+export enum GraphExports {
+    Image = "image",
+    Data = "data"
+}
+
 /**
  *
  *
@@ -12,7 +18,7 @@ export interface Features {
     rangeBar: boolean;
     connectPoints?: boolean;
     legend?: any;
-    export?: { pic: boolean, data: boolean };
+    exports?: GraphExports[]; // png
 }
 
 /**
@@ -74,7 +80,6 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-
 }
 
 

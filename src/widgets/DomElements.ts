@@ -1,8 +1,8 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
-import { DataHandler } from '../services/dataService';
+import { DataHandler, CsvUtil } from '../services/dataService';
 import { GraphInteractions } from '../extras/interactions';
 import { Formatters } from '../extras/formatters';
 import { arrayExpression } from '@babel/types';
@@ -176,6 +176,8 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
+    private currentGraphData: { id: string, data: any[] }[];
+
     private graphContainer: HTMLElement;
     private graphBody: HTMLElement;
     private intervalsDropdown: HTMLElement;
@@ -190,7 +192,8 @@ export class GraphOperator {
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
         this.intervalsDropdown = intervalsDropdown;
-        this.header = header
+        this.header = header;
+        this.currentGraphData = [];
     }
 
     /**
@@ -244,8 +247,6 @@ export class GraphOperator {
             );
         });
 
-        // new SelectWithCheckbox(select, opts).render();
-
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
             let visibility: Array<boolean> = graph.getOption('visibility');
             let labels: Array<string> = graph.getLabels();
@@ -262,11 +263,79 @@ export class GraphOperator {
         }).render();
     }
 
+    private updateExportButtons = (view: ViewConfig) => {
+        if (view.graphConfig.features && view.graphConfig.features.exports) {
+            // find button area
+            let buttons = this.header.getElementsByClassName("fgp-buttons");
+            if (buttons && buttons[0]) {
+                buttons[0].innerHTML = "";
+            }
+            // check each of them
+            view.graphConfig.features.exports.forEach(_export => {
+                if (_export === GraphExports.Data) {
+                    // create button and add it into header
+                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-data" }];
+                    let btnData = DomElementOperator.createElement('button', btnAttrs);
+                    btnData.addEventListener("click", (event) => {
+                        // export data
+                        // check data (1 or more)
+                        if (this.currentGraphData && this.currentGraphData.length > 0 && this.currentCollection) {
+                            let csvStr: string = "";
+                            // single device
+                            const currentData = this.currentGraphData;
+                            const currentCollection = this.currentCollection;
+                            // prepare the file name
+                            const _fileName = currentCollection.label + "_" + moment().toISOString() + ".csv";
+                            let _columns: string[] = ["timestamp"];
+                            const graph: Dygraph = this.mainGraph;
+                            const _series = graph.getLabels();
+                            _series.forEach((_s, _index) => {
+                                if (_index > 0) {
+                                    _columns.push(_s);
+                                }
+                            });
+                            // add titles first
+                            _columns.forEach((title, _index) => {
+                                if (_index < _columns.length - 1) {
+                                    csvStr += title + ',';
+                                } else {
+                                    csvStr += title + '\n';
+                                }
+                            });
+                            // prepare data
+                            if (currentData) {
+                                currentData.forEach((_d: any) => {
+                                    _columns.forEach((title, _index) => {
+                                        if (_index < _columns.length - 1) {
+                                            csvStr += _d[_index] + ',';
+                                        } else {
+                                            csvStr += _d[_index] + '\n';
+                                        }
+                                    });
+                                });
+                            }
+                            CsvUtil.exportCsv(csvStr, _fileName);
+                        }
+                    });
+                    buttons[0].appendChild(btnData);
+                } else if (_export === GraphExports.Image) {
+                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-image" }];
+                    let btnImage = DomElementOperator.createElement('button', btnAttrs);
+                    btnImage.addEventListener("click", (event) => {
+                        debugger;
+                    });
+                    buttons[0].appendChild(btnImage);
+                }
+            });
+        }
 
+
+    }
 
 
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
+        this.updateExportButtons(view);
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
         let bottomAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-bottom' }];
@@ -1016,7 +1085,6 @@ export class GraphOperator {
         if (graphCollection) {
             // get data for 
             view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
-
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = { valueRange: [] };
                 let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
@@ -1043,6 +1111,10 @@ export class GraphOperator {
                 }
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
+
+                if (graphData.data) {
+                    this.currentGraphData = graphData.data;
+                }
                 // update main graph
                 mainGraph.updateOptions({
                     file: graphData.data,

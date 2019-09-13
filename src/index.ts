@@ -1,6 +1,6 @@
 import Dygraph from "dygraphs";
 
-import { DomAttrs, GraphConfig, ViewConfig, GraphCollection } from "./metadata/configurations";
+import { DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports } from "./metadata/configurations";
 import { DropdownButton, DomElementOperator, GraphOperator } from "./widgets/DomElements";
 
 export default class FgpGraph {
@@ -31,6 +31,8 @@ export default class FgpGraph {
 
     private seriesDropdown: HTMLElement;
 
+    private exportButtons!: HTMLElement[];
+
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
     private childrenGraphs: Array<FgpGraph> = [];
@@ -56,7 +58,6 @@ export default class FgpGraph {
         this.parentDom = dom;
 
         this.serialnumber = (Math.random() * 10000 | 0) + 1;
-        // console.debug("serialNumber", this.serialnumber);
 
         let viewsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-views-dropdown" }];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
@@ -70,8 +71,13 @@ export default class FgpGraph {
         let seriesDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-series-dropdown" }];
         this.seriesDropdown = DomElementOperator.createElement('div', seriesDropdownAttrs);
 
+
+        let buttonsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-buttons" }];
+        const buttonsArea = DomElementOperator.createElement('div', buttonsAttrs);
+
         let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
         this.header = DomElementOperator.createElement('div', headerAttrs);
+        this.header.appendChild(buttonsArea);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
         this.header.appendChild(this.seriesDropdown);
@@ -141,7 +147,6 @@ export default class FgpGraph {
             this.viewsDropdown.onchange = (e) => {
                 const choosedView = (<HTMLSelectElement>e.target).value;
                 // change view
-                // console.debug("Current View: ", choosedView);
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {

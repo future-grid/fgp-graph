@@ -1,5 +1,5 @@
 import FgpGraph from "./index";
-import { GraphConfig, ViewConfig } from "./metadata/configurations";
+import { GraphConfig, ViewConfig, GraphExports } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
@@ -132,8 +132,6 @@ let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivEl
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
 let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
 let formatters: Formatters = new Formatters("Australia/Melbourne");
-// let formatters:Formatters = new Formatters("Pacific/Auckland");
-
 // data not needed in the future
 const dataService: DataHandler = new DataService();
 dataService.source = "store";
@@ -144,7 +142,8 @@ let vdConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: true,
-            legend: formatters.legendForAllSeries
+            legend: formatters.legendForAllSeries,
+            exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
             { id: "substation1", type: "substation", name: "**F**substation" },
@@ -189,7 +188,7 @@ let vdConfig: ViewConfig = {
                 fill: false
             }
         ]
-        
+
     },
     dataService: dataService,
     show: true,
@@ -214,7 +213,6 @@ let vdConfig: ViewConfig = {
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
-
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -222,7 +220,8 @@ let vsConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: true,
-            legend: formatters.legendForSingleSeries
+            legend: formatters.legendForSingleSeries,
+            exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -274,8 +273,7 @@ let vsConfig: ViewConfig = {
     interaction: {
         callback: {
             highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
-                return [];
+                // console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
                 console.debug("choosed series: ", series);
@@ -285,9 +283,6 @@ let vsConfig: ViewConfig = {
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
-
-
-
 let vsConfig2: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -406,7 +401,7 @@ let vsConfig3: ViewConfig = {
     },
     dataService: dataService,
     show: true,
-    ranges: [ 
+    ranges: [
         { name: "7 days", value: 604800000, show: true },
         { name: "1 month", value: 2592000000 }
     ],
