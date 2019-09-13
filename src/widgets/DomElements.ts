@@ -1,11 +1,10 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
-import { DataHandler } from '../services/dataService';
+import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
 import { GraphInteractions } from '../extras/interactions';
 import { Formatters } from '../extras/formatters';
-import { arrayExpression } from '@babel/types';
 
 export class DropdownButton {
 
@@ -176,10 +175,17 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
+    private currentGraphData: { id: string, data: any[] }[];
+
     private graphContainer: HTMLElement;
+
     private graphBody: HTMLElement;
+    
     private intervalsDropdown: HTMLElement;
+
     private header: HTMLElement;
+
+    private spinner: LoadingSpinner;
 
     private yAxisRanges = [];
 
@@ -190,7 +196,71 @@ export class GraphOperator {
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
         this.intervalsDropdown = intervalsDropdown;
-        this.header = header
+        this.header = header;
+        this.currentGraphData = [];
+        this.spinner = new LoadingSpinner(this.graphContainer);
+    }
+
+    public showSpinner = () => {
+        if (this.spinner) {
+            this.spinner.show();
+        }
+    }
+
+
+    public highlightSeries = (series: string[], duration: number) => {
+
+        if (series) {
+            // hide all the others 
+            let visibility: boolean[] = this.mainGraph.getOption("visibility");
+            let _updateVisibility: boolean[] = [];
+            if (this.currentCollection) {
+                const _graphSeries = this.currentCollection.series;
+                // get indexes
+                let _indexsShow: number[] = [];
+                _graphSeries.forEach((_series, _index) => {
+                    //
+                    series.forEach((_showSeries, _showIndex) => {
+                        if (_showSeries === _series.label) {
+                            _indexsShow.push(_index);
+                        }
+                    });
+                });
+                // set visibility
+                visibility.forEach((_v, _i) => {
+                    if (_indexsShow.indexOf(_i) == -1) {
+                        _v = false;
+                    }
+                    let exist: boolean = false;
+                    _indexsShow.forEach(_ei => {
+                        if (_ei === _i) {
+                            // found it
+                            exist = true;
+                        }
+                    });
+                    if (!exist) {
+                        _updateVisibility.push(false);
+                    } else {
+                        _updateVisibility.push(true);
+                    }
+                });
+                this.mainGraph.updateOptions({
+                    visibility: _updateVisibility
+                });
+                if (duration > 0) {
+                    // take all visibility back
+                    setTimeout(() => {
+                        _updateVisibility = [];
+                        visibility.forEach(_v => {
+                            _updateVisibility.push(true);
+                        });
+                        this.mainGraph.updateOptions({
+                            visibility: _updateVisibility
+                        });
+                    }, duration * 1000);
+                }
+            }
+        }
     }
 
     /**
@@ -244,8 +314,6 @@ export class GraphOperator {
             );
         });
 
-        // new SelectWithCheckbox(select, opts).render();
-
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
             let visibility: Array<boolean> = graph.getOption('visibility');
             let labels: Array<string> = graph.getLabels();
@@ -262,11 +330,86 @@ export class GraphOperator {
         }).render();
     }
 
+    private updateExportButtons = (view: ViewConfig) => {
+        if (view.graphConfig.features && view.graphConfig.features.exports) {
+            // find button area
+            let buttons = this.header.getElementsByClassName("fgp-buttons");
+            if (buttons && buttons[0]) {
+                buttons[0].innerHTML = "";
+            }
+            // check each of them
+            view.graphConfig.features.exports.forEach(_export => {
+                if (_export === GraphExports.Data) {
+                    // create button and add it into header
+                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-data" }];
+                    let btnData = DomElementOperator.createElement('button', btnAttrs);
+                    btnData.addEventListener("click", (event) => {
+                        // export data
+                        // check data (1 or more)
+                        if (this.currentGraphData && this.currentGraphData.length > 0 && this.currentCollection) {
+                            let csvStr: string = "";
+                            // single device
+                            const currentData = this.currentGraphData;
+                            const currentCollection = this.currentCollection;
+                            // prepare the file name
+                            const _fileName = currentCollection.label + "_" + moment().toISOString() + ".csv";
+                            let _columns: string[] = ["timestamp"];
+                            const graph: Dygraph = this.mainGraph;
+                            const _series = graph.getLabels();
+                            _series.forEach((_s, _index) => {
+                                if (_index > 0) {
+                                    _columns.push(_s);
+                                }
+                            });
+                            // add titles first
+                            _columns.forEach((title, _index) => {
+                                if (_index < _columns.length - 1) {
+                                    csvStr += title + ',';
+                                } else {
+                                    csvStr += title + '\n';
+                                }
+                            });
+                            // prepare data
+                            if (currentData) {
+                                currentData.forEach((_d: any) => {
+                                    _columns.forEach((title, _index) => {
+                                        if (_index < _columns.length - 1) {
+                                            csvStr += _d[_index] + ',';
+                                        } else {
+                                            csvStr += _d[_index] + '\n';
+                                        }
+                                    });
+                                });
+                            }
+                            ExportUtils.exportCsv(csvStr, _fileName);
+                        }
+                    });
+                    buttons[0].appendChild(btnData);
+                } else if (_export === GraphExports.Image) {
+                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-image" }];
+                    let btnImage = DomElementOperator.createElement('button', btnAttrs);
+                    btnImage.addEventListener("click", (event) => {
+                        const graphContainer = this.graphContainer;
+                        if (graphContainer) {
+                            const mainGraphContainer = graphContainer.getElementsByClassName("fgp-graph-body");
+                            if (mainGraphContainer[0] && this.currentCollection) {
+                                // first one
+                                ExportUtils.saveAsImage(mainGraphContainer[0] as HTMLElement, this.currentCollection.label + "_" + moment().toISOString() + '.png');
+                            }
+                        }
+                    });
+                    buttons[0].appendChild(btnImage);
+                }
+            });
+        }
 
+
+    }
 
 
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
+        this.updateExportButtons(view);
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
         let bottomAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-bottom' }];
@@ -573,11 +716,6 @@ export class GraphOperator {
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
 
-
-
-
-
-
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
                 ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
@@ -601,8 +739,8 @@ export class GraphOperator {
                     currentSelection = seriesName;
                 },
                 clickCallback: (e, x, points) => {
-                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.selectCallback) {
-                        this.currentView.interaction.callback.selectCallback(currentSelection);
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.clickCallback) {
+                        this.currentView.interaction.callback.clickCallback(currentSelection);
                     }
                 },
                 interactionModel: {
@@ -620,8 +758,12 @@ export class GraphOperator {
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                     }
+                    if (this.spinner && this.spinner.isLoading) {
+                        // remove spinner from container
+                        this.spinner.done();
+                    }
                     // update datewindow
-                    this.datewindowCallback(xAxisRange);
+                    this.datewindowCallback(xAxisRange, this.currentView);
                 }
             });
 
@@ -695,7 +837,7 @@ export class GraphOperator {
                         const xAxisRange: Array<number> = dygraph.xAxisRange();
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        this.datewindowCallback(xAxisRange);
+                        this.datewindowCallback(xAxisRange, this.currentView);
                     }
                 });
 
@@ -793,9 +935,6 @@ export class GraphOperator {
             let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
             Object.assign(collection, this.currentCollection);
             // check initScale
-
-
-
             this.update();
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
@@ -805,6 +944,7 @@ export class GraphOperator {
 
 
     update = (first?: number, last?: number) => {
+
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
         let graphCollection = this.currentCollection;
@@ -1019,9 +1159,9 @@ export class GraphOperator {
         }
 
         if (graphCollection) {
+            this.spinner.show();
             // get data for 
             view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
-
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = { valueRange: [] };
                 let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
@@ -1048,6 +1188,10 @@ export class GraphOperator {
                 }
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
+
+                if (graphData.data) {
+                    this.currentGraphData = graphData.data;
+                }
                 // update main graph
                 mainGraph.updateOptions({
                     file: graphData.data,
@@ -1072,7 +1216,6 @@ export class GraphOperator {
                         }
                     }
                 });
-
             });
         }
 
@@ -1094,10 +1237,8 @@ export class GraphOperator {
                     fieldsForRangebarGraph = fieldsForRangebarGraph.concat(_tempFields);
                 }
             });
-
             // for range
             view.dataService.fetchdata(rangeEntities, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
-
                 // merge data
                 const currentDatewindowData = prepareGraphData(resp, rangeEntities, rangeCollection);
                 let preData: Array<any> = rangebarGraph.file_;

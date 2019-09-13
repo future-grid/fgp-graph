@@ -1,5 +1,11 @@
 import { DataHandler } from "../services/dataService";
 
+
+export enum GraphExports {
+    Image = "image",
+    Data = "data"
+}
+
 /**
  *
  *
@@ -12,7 +18,7 @@ export interface Features {
     rangeBar: boolean;
     connectPoints?: boolean;
     legend?: any;
-    export?: { pic: boolean, data: boolean };
+    exports?: GraphExports[]; // png
 }
 
 /**
@@ -74,16 +80,16 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-
 }
 
 
 
 
 export interface Callbacks {
-    dataCallback?(data: any): any[];
-    highlighCallback?(datetime: any, series: any, points: any[]): any[];
-    selectCallback?(series: any): any;
+    dataCallback?(data: any): void;
+    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    clickCallback?(series: string): void;
+    syncDateWindow?(dateWindow: number[]): void;
 }
 /**
  * View config
