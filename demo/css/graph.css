@@ -202,10 +202,10 @@
     stroke-linejoin: round;
 }
 .indicator svg polyline#back {
-    stroke: rgba(59, 211, 171, 0.3);
+    stroke: rgba(25, 145, 14, 0.3);
 }
 .indicator svg polyline#front {
-    stroke: #3bd3ab;
+    stroke: #f5a104;
     stroke-dasharray: 12, 36;
     stroke-dashoffset: 48;
     animation: dash 1s linear infinite;

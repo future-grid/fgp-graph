@@ -1,9 +1,8 @@
 import FgpGraph from "./index";
-import { GraphConfig, ViewConfig, GraphExports } from "./metadata/configurations";
+import { ViewConfig, GraphExports } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
-import { Synchronizer } from "./extras/synchronizer";
 
 class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included 
@@ -23,8 +22,6 @@ class DataService implements DataHandler {
 
 
     fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
-        // console.debug("fetching data for first and last~");
-
         return new Promise((resolve, reject) => {
             // sample data for first and last
             resolve(this.rangeData);
@@ -122,7 +119,8 @@ class DataService implements DataHandler {
             // show loading 
             setTimeout(() => {
                 resolve(sampleData); 
-            }, 3000);
+                console.debug("data has been sent to graph!");
+            }, 2000);
             
         });
     }
@@ -457,5 +455,5 @@ setTimeout(() => {
         graph1.highlightSeries(["Max","Min"], 2);
     }, 2000);
 
-}, 10000);
+}, 5000);
 
