@@ -210,5 +210,19 @@ export default class FgpGraph {
         this.childrenGraphs = this.childrenGraphs.concat(graphs);
     }
 
+    /**
+     * highlight line on graph
+     * 
+     * Multiple lines each time
+     * @param series  name of lines
+     * @param duration unhighlight after <duration> seconds  0 means highlight forever
+     * 
+     * @memberof FgpGraph
+     */
+    public highlightSeries = (series: string[], duration: number) => {
+        //
+        this.operator.highlightSeries(series, duration);
+    }
+
 
 }

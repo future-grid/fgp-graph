@@ -19,7 +19,6 @@ export interface DataHandler {
 
 export class LoadingSpinner {
 
-
     private spinner: HTMLElement;
 
     private spinnerHtml: string = `
@@ -29,7 +28,6 @@ export class LoadingSpinner {
             </svg>
         `;
     public isLoading: boolean = false;
-
 
     constructor(public container: HTMLElement) {
         this.spinner = document.createElement('div');
@@ -42,7 +40,6 @@ export class LoadingSpinner {
         this.container.append(this.spinner);
         this.isLoading = true;
     }
-
 
     public done(): void {
         this.container.removeChild(this.spinner);
