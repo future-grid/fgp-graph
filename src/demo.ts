@@ -346,7 +346,6 @@ let vsConfig2: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
             clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -416,7 +415,6 @@ let vsConfig3: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
             clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
