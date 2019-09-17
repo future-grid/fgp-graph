@@ -1,9 +1,8 @@
 import FgpGraph from "./index";
-import { GraphConfig, ViewConfig } from "./metadata/configurations";
+import { ViewConfig, GraphExports } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
-import { Synchronizer } from "./extras/synchronizer";
 
 class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included 
@@ -23,8 +22,6 @@ class DataService implements DataHandler {
 
 
     fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
-        // console.debug("fetching data for first and last~");
-
         return new Promise((resolve, reject) => {
             // sample data for first and last
             resolve(this.rangeData);
@@ -118,7 +115,13 @@ class DataService implements DataHandler {
                     }
                 });
             });
-            resolve(sampleData);
+
+            // show loading 
+            setTimeout(() => {
+                resolve(sampleData); 
+                console.debug("data has been sent to graph!");
+            }, 2000);
+            
         });
     }
 
@@ -132,8 +135,6 @@ let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivEl
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
 let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
 let formatters: Formatters = new Formatters("Australia/Melbourne");
-// let formatters:Formatters = new Formatters("Pacific/Auckland");
-
 // data not needed in the future
 const dataService: DataHandler = new DataService();
 dataService.source = "store";
@@ -144,7 +145,8 @@ let vdConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: true,
-            legend: formatters.legendForAllSeries
+            legend: formatters.legendForAllSeries,
+            exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
             { id: "substation1", type: "substation", name: "**F**substation" },
@@ -189,6 +191,7 @@ let vdConfig: ViewConfig = {
                 fill: false
             }
         ]
+
     },
     dataService: dataService,
     show: true,
@@ -202,19 +205,17 @@ let vdConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points): any[] => {
+            highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
-            selectCallback: (series) => {
-                // console.debug("choosed series: ", series);
+            syncDateWindow: (dateWindow) => {
+                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
-
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -222,7 +223,8 @@ let vsConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: true,
-            legend: formatters.legendForSingleSeries
+            legend: formatters.legendForSingleSeries,
+            exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -274,20 +276,16 @@ let vsConfig: ViewConfig = {
     interaction: {
         callback: {
             highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
-                return [];
+                // console.debug("selected series: ", series);    // too many messages in console
             },
-            selectCallback: (series) => {
-                // console.debug("choosed series: ", series);
+            clickCallback: (series) => {
+                console.debug("choosed series: ", series);
             }
         }
     },
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
-
-
-
 let vsConfig2: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -348,9 +346,8 @@ let vsConfig2: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
-            selectCallback: (series) => {
+            clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
             }
         }
@@ -406,7 +403,7 @@ let vsConfig3: ViewConfig = {
     },
     dataService: dataService,
     show: true,
-    ranges: [ 
+    ranges: [
         { name: "7 days", value: 604800000, show: true },
         { name: "1 month", value: 2592000000 }
     ],
@@ -418,9 +415,8 @@ let vsConfig3: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
-            selectCallback: (series) => {
+            clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
             }
         }
@@ -445,4 +441,17 @@ graph1.setChildren([graph2, graph3]);
 
 graph2.setChildren([graph1]);   // problem with right and left axis 
 
+
+// highlight on first graph
+
+
+setTimeout(() => {
+
+    graph1.highlightSeries(["Avg"], 0);
+
+    setTimeout(() => {
+        graph1.highlightSeries(["Max","Min"], 2);
+    }, 2000);
+
+}, 5000);
 

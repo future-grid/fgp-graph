@@ -1,7 +1,19 @@
 import { DataHandler } from "../services/dataService";
 
+
 /**
+ *2 types of exporting graph data and save as image 
  *
+ * @export
+ * @enum {number}
+ */
+export enum GraphExports {
+    Image = "image",
+    Data = "data"
+}
+
+/**
+ *enable or disable graph features
  *
  * @export
  * @interface Features
@@ -12,7 +24,7 @@ export interface Features {
     rangeBar: boolean;
     connectPoints?: boolean;
     legend?: any;
-    export?: { pic: boolean, data: boolean };
+    exports?: GraphExports[]; // png
 }
 
 /**
@@ -41,7 +53,12 @@ export interface DomAttrs {
 }
 
 
-
+/**
+ *graph series configuration
+ *
+ * @export
+ * @interface GraphSeries
+ */
 export interface GraphSeries {
     label: string;
     color?: string;
@@ -50,6 +67,12 @@ export interface GraphSeries {
     yIndex?: string;
 }
 
+/**
+ *graph collection
+ *
+ * @export
+ * @interface GraphCollection
+ */
 export interface GraphCollection {
     label: string;
     name: string;
@@ -74,16 +97,21 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-
 }
 
 
 
-
+/**
+ *graph callback configuraiton
+ *
+ * @export
+ * @interface Callbacks
+ */
 export interface Callbacks {
-    dataCallback?(data: any): any[];
-    highlighCallback?(datetime: any, series: any, points: any[]): any[];
-    selectCallback?(series: any): any;
+    dataCallback?(data: any): void;
+    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    clickCallback?(series: string): void;
+    syncDateWindow?(dateWindow: number[]): void;
 }
 /**
  * View config

@@ -1,6 +1,6 @@
 import Dygraph from "dygraphs";
 
-import { DomAttrs, GraphConfig, ViewConfig, GraphCollection } from "./metadata/configurations";
+import { DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports } from "./metadata/configurations";
 import { DropdownButton, DomElementOperator, GraphOperator } from "./widgets/DomElements";
 
 export default class FgpGraph {
@@ -31,6 +31,8 @@ export default class FgpGraph {
 
     private seriesDropdown: HTMLElement;
 
+    private exportButtons!: HTMLElement[];
+
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
     private childrenGraphs: Array<FgpGraph> = [];
@@ -38,10 +40,22 @@ export default class FgpGraph {
     // store locally
     private rangeBarData: any = [];
 
+    private currentDateWindow: number[] = [];
+
     public serialnumber = -1;
 
     private operator!: GraphOperator;
 
+    private callbackDelayTimer: any = 0;
+
+    /**
+     *Creates an instance of FgpGraph.
+     * @param {HTMLElement} dom 
+     * graph container
+     * @param {Array<ViewConfig>} viewConfigs
+     * graph configuration
+     * @memberof FgpGraph
+     */
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
         this.defaultGraphRanges = [
@@ -52,7 +66,6 @@ export default class FgpGraph {
         this.parentDom = dom;
 
         this.serialnumber = (Math.random() * 10000 | 0) + 1;
-        // console.debug("serialNumber", this.serialnumber);
 
         let viewsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-views-dropdown" }];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
@@ -66,8 +79,13 @@ export default class FgpGraph {
         let seriesDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-series-dropdown" }];
         this.seriesDropdown = DomElementOperator.createElement('div', seriesDropdownAttrs);
 
+
+        let buttonsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-buttons" }];
+        const buttonsArea = DomElementOperator.createElement('div', buttonsAttrs);
+
         let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
         this.header = DomElementOperator.createElement('div', headerAttrs);
+        this.header.appendChild(buttonsArea);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
         this.header.appendChild(this.seriesDropdown);
@@ -84,12 +102,33 @@ export default class FgpGraph {
         this.viewConfigs = viewConfigs;
     }
 
-    private datewindowHandler = (datewindow: Array<number>) => {
+    /**
+     *update datewindow for children graphs
+     * @param datewindow 
+     * @param currentView
+     * @private
+     * @memberof FgpGraph
+     */
+    private dateWindowHandler = (dateWindow: Array<number>, currentView?: ViewConfig) => {
+
+
+        if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
+            if (this.callbackDelayTimer) {
+                clearTimeout(this.callbackDelayTimer);
+            }
+            this.callbackDelayTimer = setTimeout(() => {
+                if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
+                    currentView.interaction.callback.syncDateWindow(dateWindow);
+                }
+            }, 100);
+        }
+
+        this.currentDateWindow = dateWindow;
 
         this.childrenGraphs.forEach(graph => {
             // call updateDatewinow
             if (graph.serialnumber != this.serialnumber) {
-                graph.updateDatewinow(datewindow);
+                graph.updateDatewinow(dateWindow);
             }
         });
 
@@ -99,12 +138,12 @@ export default class FgpGraph {
 
     /**
      * init graph with configuration
-     *
+     * 
      * @private
      * @memberof FgpGraph
      */
     public initGraph = () => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.datewindowHandler);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
@@ -123,7 +162,6 @@ export default class FgpGraph {
             this.viewsDropdown.onchange = (e) => {
                 const choosedView = (<HTMLSelectElement>e.target).value;
                 // change view
-                // console.debug("Current View: ", choosedView);
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
@@ -170,6 +208,11 @@ export default class FgpGraph {
 
 
 
+    /**
+     *update currrent graph datewindow
+     * @param datewindow
+     * @memberof FgpGraph
+     */
     public updateDatewinow = (datewindow: Array<number>) => {
         // update graph 
         if (this.graph) {
@@ -183,8 +226,28 @@ export default class FgpGraph {
         }
     }
 
+    /**
+     *bind children graphs
+     * @param graphs 
+     * children graphs
+     * @memberof FgpGraph
+     */
     public setChildren = (graphs: Array<FgpGraph>) => {
         this.childrenGraphs = this.childrenGraphs.concat(graphs);
+    }
+
+    /**
+     * highlight line on graph
+     * @param series  
+     * name of lines
+     * @param duration 
+     * unhighlight after <duration> seconds  0 means highlight forever
+     * 
+     * @memberof FgpGraph
+     */
+    public highlightSeries = (series: string[], duration: number) => {
+        //
+        this.operator.highlightSeries(series, duration);
     }
 
 

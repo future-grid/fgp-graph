@@ -1,0 +1,580 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@future-grid/fgp-graph</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@future-grid/fgp-graph</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @future-grid/fgp-graph</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#fgp-graph" id="fgp-graph" style="color: inherit; text-decoration: none;">
+					<h1>fgp-graph</h1>
+				</a>
+				<p>fgp-graph bases on dygraphs and uses typescript as development langulage. It allows future-grid customer to explore their timeseries aggregations data sets.
+				Here&#39;s how the fgp-graphs works:</p>
+				<p><img src="docs/assets/images/fgp-graph.png" alt="fgp-graph"></p>
+				<ol>
+					<li><strong>Typescript</strong><pre><code class="language-javascript">   <span class="hljs-keyword">let</span> graphDiv: HTMLDivElement = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"graphArea"</span>) <span class="hljs-keyword">as</span> HTMLDivElement;
+   <span class="hljs-keyword">let</span> fgpGraph = <span class="hljs-keyword">new</span> FgpGraph(graphDiv, [vsConfig]);
+   fgpGraph.initGraph();</code></pre>
+					</li>
+					<li><strong>React</strong><pre><code class="language-javascript">   <span class="hljs-keyword">let</span> fgpGraph = <span class="hljs-keyword">new</span> FgpGraph(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'graphArea'</span>), [
+         vdConfig,
+         vsConfig
+   ]);
+   fgpGraph.initGraph();</code></pre>
+					</li>
+					<li><strong>Angular2</strong><pre><code>   <span class="hljs-attribute">coming</span> soon~</code></pre></li>
+				</ol>
+				<p>This graph is interactive as same as dygraphs, but some changes are made to meet the needs of futuregrid customer requirements. You can scroll up and down on both left and right axis to scale the y-ranges. You can also zoom-in &amp; zoom-out on graph in the same way. Panning on those area has same effect.  </p>
+				<p>This graph is highly configurable. You can put mulitple &quot;VIEW&quot;(datasource) to this graph and swap them with the &quot;dropdown&quot; easily. You can download data and save current graph as a image. There are &quot;callbacks&quot; can be used to monitoring the date window and highlighting(selection) events.</p>
+				<a href="#geeting-started" id="geeting-started" style="color: inherit; text-decoration: none;">
+					<h2>Geeting Started</h2>
+				</a>
+				<p>Once you`ve got ready to put it in your project, please check the demos or check out our github wiki.</p>
+				<p>If you&#39;re using npm and a bundler like webpack, browserify or rollup, you can install fgp-graph via:</p>
+				<pre><code><span class="hljs-selector-tag">npm</span> <span class="hljs-selector-tag">install</span> <span class="hljs-selector-tag">--save</span> @<span class="hljs-keyword">futuregrid</span>/<span class="hljs-keyword">fgp</span>-<span class="hljs-keyword">graph</span></code></pre><p>and use it via:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> FgpGraph <span class="hljs-keyword">from</span> <span class="hljs-string">'@future-grid/fgp-graph'</span>;
+    <span class="hljs-comment">//...... your code ......//</span>
+
+    <span class="hljs-keyword">let</span> fgpGraph = <span class="hljs-keyword">new</span> FgpGraph(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'graphArea'</span>), [
+          vdConfig,
+          vsConfig
+    ]);
+    fgpGraph.initGraph();
+
+    <span class="hljs-comment">//...... your code ......//</span></code></pre>
+				<p>Check out the <a href="https://github.com/flexdeviser/fgp-graph-react">React demo</a> for more details.</p>
+				<a href="#options-reference" id="options-reference" style="color: inherit; text-decoration: none;">
+					<h2>Options Reference</h2>
+				</a>
+				<p>If you are a dygrpahs user, please don&#39;t put dygraphs options in fgp-graph. fgp-graph has its own options and different formats.</p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h3>Usage</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> vdConfig: ViewConfig = {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">"device view"</span>,
+    <span class="hljs-attr">graphConfig</span>: {
+        <span class="hljs-attr">features</span>: {
+            <span class="hljs-attr">zoom</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">scroll</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">rangeBar</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">legend</span>: formatters.legendForAllSeries,
+            <span class="hljs-attr">exports</span>: [GraphExports.Data, GraphExports.Image]
+        },
+        <span class="hljs-attr">entities</span>: [
+            { <span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"**F**substation"</span> },
+        ],
+        <span class="hljs-attr">rangeEntity</span>: { <span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"**F**substation"</span> },
+        <span class="hljs-attr">rangeCollection</span>: {
+            <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
+            <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
+            <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
+            <span class="hljs-attr">series</span>: [
+                { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span> }
+            ]
+        },
+        <span class="hljs-attr">collections</span>: [
+            {
+                <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_raw'</span>,
+                <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval'</span>,
+                <span class="hljs-attr">interval</span>: <span class="hljs-number">3600000</span>,
+                <span class="hljs-attr">series</span>: [
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#058902'</span> },
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#d80808'</span> },
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.minConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#210aa8'</span> }
+                ],
+                <span class="hljs-attr">threshold</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>) },    <span class="hljs-comment">//  0 ~ 10 days</span>
+                yLabel: <span class="hljs-string">'voltage'</span>,
+                <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
+                <span class="hljs-attr">initScales</span>: { <span class="hljs-attr">left</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">245</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span> } },
+                <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
+            }, {
+                <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
+                <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
+                <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
+                <span class="hljs-attr">series</span>: [
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> },
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> },
+                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.minConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> }
+                ],
+                <span class="hljs-attr">threshold</span>: { <span class="hljs-attr">min</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>), <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">7</span> * <span class="hljs-number">52</span> * <span class="hljs-number">10</span>) },    <span class="hljs-comment">// 7 days ~ 3 weeks</span>
+                yLabel: <span class="hljs-string">'voltage'</span>,
+                <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
+                <span class="hljs-attr">initScales</span>: { <span class="hljs-attr">left</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">230</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span> } },
+                <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
+            }
+        ]
+
+    },
+    <span class="hljs-attr">dataService</span>: dataService,
+    <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">ranges</span>: [
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">"7 days"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">604800000</span>, <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span> },
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">"1 month"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">2592000000</span> }
+    ],
+    <span class="hljs-attr">initRange</span>: {
+        <span class="hljs-attr">start</span>: moment().subtract(<span class="hljs-number">10</span>, <span class="hljs-string">'days'</span>).startOf(<span class="hljs-string">'day'</span>).valueOf(),
+        <span class="hljs-attr">end</span>: moment().add(<span class="hljs-number">1</span>, <span class="hljs-string">'days'</span>).valueOf()
+    },
+    <span class="hljs-attr">interaction</span>: {
+        <span class="hljs-attr">callback</span>: {
+            <span class="hljs-attr">highlighCallback</span>: <span class="hljs-function">(<span class="hljs-params">datetime, series, points</span>) =&gt;</span> {
+                <span class="hljs-comment">// console.debug("selected series: ", series);</span>
+            },
+            <span class="hljs-attr">syncDateWindow</span>: <span class="hljs-function">(<span class="hljs-params">dateWindow</span>) =&gt;</span> {
+                <span class="hljs-built_in">console</span>.debug(moment(dateWindow[<span class="hljs-number">0</span>]), moment(dateWindow[<span class="hljs-number">1</span>]));
+            }
+        }
+    },
+    <span class="hljs-attr">timezone</span>: <span class="hljs-string">'Australia/Melbourne'</span>
+};
+
+<span class="hljs-keyword">let</span> fgpGraph = <span class="hljs-keyword">new</span> FgpGraph(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'graphArea'</span>), [
+          vdConfig
+    ]);</code></pre>
+				<a href="#viewconfig" id="viewconfig" style="color: inherit; text-decoration: none;">
+					<h3>ViewConfig</h3>
+				</a>
+				<a href="#display" id="display" style="color: inherit; text-decoration: none;">
+					<h4>Display</h4>
+				</a>
+				<a href="#name" id="name" style="color: inherit; text-decoration: none;">
+					<h6>name</h6>
+				</a>
+				<p>All views configuration has a name and you will find it in the &quot;views&quot; dropdownd list. It&#39;s a key of view and should be exclusive.
+					type: string
+				default: none</p>
+				<a href="#timezone" id="timezone" style="color: inherit; text-decoration: none;">
+					<h6>timezone</h6>
+				</a>
+				<p>You should let the graphs know what timezone that data blongs to. You can find the right timezone for your data by googling</p>
+				<p>type: string
+				default: none</p>
+				<pre><code>Australia<span class="hljs-regexp">/Melbourne     Pacific/</span>Auckland</code></pre>
+				<a href="#show" id="show" style="color: inherit; text-decoration: none;">
+					<h6>show</h6>
+				</a>
+				<p>fgp-graph will find the last view config with &quot;show: true&quot;, then show it first.</p>
+				<p>type: boolean
+				default: false</p>
+				<a href="#ranges" id="ranges" style="color: inherit; text-decoration: none;">
+					<h6>ranges</h6>
+				</a>
+				<p>array of configuration to let you change datewindow easier.</p>
+				<pre><code class="language-json">[{ name: &quot;7 days&quot;, value: 604800000, show: true },{ name: &quot;1 month&quot;, value: 2592000000 }]</code></pre>
+				<ul>
+					<li><strong>name</strong>
+						show this name in range dropdown list</br>
+						type: string
+					default: none</li>
+					<li><strong>value</strong>
+						gap in milliseconds</br>
+						type: number
+					default: none</li>
+					<li><strong>show</strong>
+						tells graph which one should show first</br>
+						type: boolean
+					default: false</li>
+				</ul>
+				<a href="#initrange" id="initrange" style="color: inherit; text-decoration: none;">
+					<h6>initRange</h6>
+				</a>
+				<p>this is another way to tell graph what timewindow you want to show first. graph will ignore &quot;ranges&quot; configuration with this attribute.</p>
+				<pre><code class="language-json">{start: moment().subtract(10, &#39;days&#39;).startOf(&#39;day&#39;).valueOf(),end: moment().add(1, &#39;days&#39;).valueOf()}</code></pre>
+				<ul>
+					<li><p><strong>start</strong>
+							type: number(timestamp)
+						default: none</p>
+					</li>
+					<li><p><strong>end</strong>
+							type: number(timestamp)
+						default: none</p>
+						<a href="#graph" id="graph" style="color: inherit; text-decoration: none;">
+							<h4>Graph</h4>
+						</a>
+						<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+							<h6>features</h6>
+						</a>
+					</li>
+					<li><p><strong>zoom</strong>
+							enable/disable zoom</br>
+							type: boolean
+						default: false</br></p>
+					</li>
+					<li><p><strong>scroll</strong>
+							enable/disable scroll</br>
+							type: boolean
+						default: false</br></p>
+					</li>
+					<li><p><strong>rangebar</strong>
+							show/hide rangebar</br>
+							type: boolean
+						default: false</br></p>
+					</li>
+					<li><p><strong>legend</strong>
+							legend formatter, there are 2 formatters included in @future-grid/fgp-graph/lib/extras/formatters</br>
+							type: function(data):htmlstr
+							default: none
+						provider: legendForAllSeries(device view) legendForSingleSeries(children view)</br></p>
+					</li>
+					<li><p><strong>exports</strong>
+							enable/disable export buttons</br>
+							type: Array<string>
+								default: none
+						provider: GraphExports.Data and GraphExports.Image</p>
+					</li>
+				</ul>
+				<a href="#entities" id="entities" style="color: inherit; text-decoration: none;">
+					<h6>Entities</h6>
+				</a>
+				<p>array of devices</p>
+				<ul>
+					<li><strong>id</strong>
+					device name from futuregrid platform</li>
+					<li><strong>type</strong>
+					device type from futuregrid platform</li>
+					<li><strong>name</strong>
+					device description(extension) from futuregrid platform</li>
+				</ul>
+				<p>sample:</p>
+				<pre><code class="language-json">[{ id: &quot;meter1&quot;, type: &quot;meter&quot;, name: &quot;meter1&quot; },{ id: &quot;meter2&quot;, type: &quot;meter&quot;, name: &quot;meter2&quot; }]</code></pre>
+				<a href="#rangeentity" id="rangeentity" style="color: inherit; text-decoration: none;">
+					<h6>RangeEntity</h6>
+				</a>
+				<p>single device and should always be the parent of &quot;entities&quot;</p>
+				<ul>
+					<li><strong>id</strong>
+					device id from futuregrid platform, you can put device name here</li>
+					<li><strong>type</strong>
+					device type from futuregrid platform</li>
+					<li><strong>name</strong>
+					device name from futuregrid platform</li>
+				</ul>
+				<p>sample:</p>
+				<pre><code class="language-json">{ id: &quot;substation1&quot;, type: &quot;substation&quot;, name: &quot;substation1&quot; }</code></pre>
+				<a href="#rangecollection" id="rangecollection" style="color: inherit; text-decoration: none;">
+					<h6>RangeCollection</h6>
+				</a>
+				<p>this &quot;collection&quot; is a futuregrid interval configuration. Graph will call &quot;dataservice&quot; to get the frist and last record and render the rangebar with that timewindow. But most time insted of last record with current datetime.</p>
+				<ul>
+					<li><strong>label</strong>
+						label of the &quot;interval&quot;, different or same to interval name</br>
+						type: string
+					default: none</li>
+				</ul>
+				<ul>
+					<li><p><strong>name</strong>
+							name of the &quot;interval&quot;</br>
+							type: string
+						default: none</p>
+					</li>
+					<li><p><strong>interval</strong>
+							interval in milliseconds</br>
+							type: numnber
+						default: none</p>
+					</li>
+					<li><p><strong>series</strong>
+						Array of series configuration, but only one needed. we just need one line in the rangebar.</p>
+						<ul>
+							<li><strong>label</strong>
+							show this label when hover the line </li>
+							<li><strong>type</strong>
+							&quot;line&quot;, &quot;bar&quot; or any other types supported by graph. Right now only &quot;line&quot; worked.</li>
+							<li><strong>exp</strong>
+							expression for data calculation. <pre><code><span class="hljs-string">"data.avgConsumptionVah * 10"</span></code></pre>&quot;data.&quot; is a prefix for the attribute from data</li>
+						</ul>
+					</li>
+				</ul>
+				<a href="#collection" id="collection" style="color: inherit; text-decoration: none;">
+					<h6>Collection</h6>
+				</a>
+				<p>this &quot;collection&quot; is similar to RangeCollection, but shown on main graph. you can put multiple collections there and graph will swap them base on &quot;threshold&quot;</p>
+				<ul>
+					<li><strong>label</strong>
+						label of the &quot;interval&quot;, different or same to interval name</br>
+						type: string
+					default: none</li>
+				</ul>
+				<ul>
+					<li><p><strong>name</strong>
+							name of the &quot;interval&quot;</br>
+							type: string
+						default: none</p>
+					</li>
+					<li><p><strong>interval</strong>
+							interval in milliseconds</br>
+							type: numnber
+						default: none</p>
+					</li>
+					<li><p><strong>series</strong>
+						Array of series configuration, but only one needed.</br></p>
+						<pre><code class="language-json">[{ label: &quot;Voltage&quot;, type: &#39;line&#39;, exp: &quot;data.voltage&quot;, yIndex: &#39;left&#39; }]</code></pre>
+						<ul>
+							<li><strong>label</strong>
+							show this label when hover the line </li>
+							<li><strong>type</strong>
+							&quot;line&quot;, &quot;bar&quot; or any other types supported by graph. Right now only &quot;line&quot; worked.</li>
+							<li><strong>exp</strong>
+							expression for data calculation. <pre><code><span class="hljs-string">"data.avgConsumptionVah * 10"</span></code></pre>&quot;data.&quot; is a prefix for the attribute from data</li>
+							<li><strong>yIndex</strong>
+							left(0) or right(1) axes</li>
+						</ul>
+					</li>
+					<li><p><strong>threshold</strong>
+						Tells graph to show it in a particular datetime range.</br></p>
+						<pre><code class="language-json">{ min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) }</code></pre>
+						<ul>
+							<li><strong>min</strong>
+								type: number(timestamp)
+							default: none</li>
+							<li><strong>max</strong>
+								type: number(timestamp)
+							default: none</li>
+						</ul>
+					</li>
+					<li><p><strong>initScales</strong>
+						value ranges for left and right Y-Axes. leave it empty the graph will calculate with max and min from value, then add 10% offset to min and max.</p>
+						<pre><code class="language-json">{ left: { min: 245, max: 260 }, right: { min:10, max:30 } }</code></pre>
+						<ul>
+							<li><strong>left</strong><ul>
+									<li><strong>min</strong>
+										type: number
+									default: none</li>
+									<li><strong>max</strong>
+										type: number
+									default: none</li>
+								</ul>
+							</li>
+							<li><strong>right</strong> <ul>
+									<li><strong>min</strong>
+										type: number
+									default: none</li>
+									<li><strong>max</strong>
+										type: number
+									default: none</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><p><strong>yLabel</strong>
+							label of y-axes</br>
+							type: string
+						default: none</p>
+					</li>
+				</ul>
+				<a href="#datasource" id="datasource" style="color: inherit; text-decoration: none;">
+					<h4>Datasource</h4>
+				</a>
+				<p>You need to provide a datasource base on &quot;DataHandler&quot; interface. There are two methods with &quot;Promise&quot; return value.</p>
+				<ul>
+					<li><p><strong>fetchFirstNLast</strong></p>
+						<pre><code class="language-javascript">fetchdata(ids: <span class="hljs-built_in">Array</span>&lt;string&gt;, <span class="hljs-attr">interval</span>: string, <span class="hljs-attr">range</span>: { <span class="hljs-attr">start</span>: number; end: number }, fields?: <span class="hljs-built_in">Array</span>&lt;string&gt;): <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">Array</span>&lt;{ <span class="hljs-attr">id</span>: string, <span class="hljs-attr">data</span>: <span class="hljs-built_in">Array</span>&lt;any&gt; }&gt;&gt;;</code></pre>
+					</li>
+					<li><p><strong>fetchdata</strong></p>
+						<pre><code class="language-javascript">fetchFirstNLast(ids: <span class="hljs-built_in">Array</span>&lt;string&gt;, <span class="hljs-attr">interval</span>: string, fields?: <span class="hljs-built_in">Array</span>&lt;string&gt;): <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">Array</span>&lt;{ <span class="hljs-attr">id</span>: string, <span class="hljs-attr">data</span>: { <span class="hljs-attr">first</span>: any, <span class="hljs-attr">last</span>: any } }&gt;&gt;;</code></pre>
+						<p> All date that you provided should have the attributes in series coniguration and &quot;timestamp&quot; attribute as timeseries field.
+						check the react demo for more details</p>
+					</li>
+				</ul>
+				<a href="#interactions" id="interactions" style="color: inherit; text-decoration: none;">
+					<h4>Interactions</h4>
+				</a>
+				<p>Every time you change the datetime range or highlighting series on graph, the graph will call &quot;callback&quot; that you provided. You can do what you want, just like highlight something on map or redirect to another page.</p>
+				<ul>
+					<li><strong>callback</strong><ul>
+							<li><strong>highlighCallback</strong><pre><code class="language-js">(datetime, series, points) =&gt; {
+  <span class="hljs-comment">// console.debug("selected series: ", series);</span>
+}</code></pre>
+								<ul>
+									<li><strong>datetime</strong>
+									timestamp of the points</li>
+									<li><strong>series</strong>
+									series name</li>
+									<li><strong>points</strong>
+									points value</li>
+								</ul>
+							</li>
+							<li><strong>clickCallback</strong><pre><code class="language-js">(series) =&gt; {
+  <span class="hljs-comment">// console.debug("choosed series: ", series);</span>
+}</code></pre>
+								<ul>
+									<li><strong>series</strong>
+									series name</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_demo_.html">"src/demo"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_extras_formatters_.html">"src/extras/formatters"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_extras_interactions_.html">"src/extras/interactions"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_extras_synchronizer_.html">"src/extras/synchronizer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_index_.html">"src/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_metadata_configurations_.html">"src/metadata/configurations"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_services_dataservice_.html">"src/services/data<wbr>Service"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_widgets_domelements_.html">"src/widgets/<wbr>Dom<wbr>Elements"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_services_test_.html">"test/services.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_widgets_test_.html">"test/widgets.test"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

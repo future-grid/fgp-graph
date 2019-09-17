@@ -3,11 +3,30 @@ import moment from 'moment-timezone';
 
 export class Formatters {
 
-    constructor(public timezone: string) {
+    /**
+     *show graph timestamp with this timezone
+     * @type {string}
+     * @memberof Formatters
+     */
+    public timezone: string;
 
+    /**
+     *Creates an instance of Formatters.
+     * @param {string} timezone  show graph timestamp with this timezone
+     * @memberof Formatters
+     */
+    constructor(timezone: string) {
+        this.timezone = timezone;
     }
 
 
+    /**
+     * 
+     * legend formatter for multiple series
+     * @param {any} data  this data comes from graph 
+     *
+     * @memberof Formatters
+     */
     legendForAllSeries = (data: any) => {
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
@@ -25,7 +44,13 @@ export class Formatters {
         return html;
     }
 
-
+    /**
+     * 
+     * legend formatter for single series
+     * @param {any} data  this data comes from graph 
+     *
+     * @memberof Formatters
+     */
     legendForSingleSeries = (data: any) => {
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
@@ -45,7 +70,15 @@ export class Formatters {
         return html;
     }
 
-    // axisLabelFormatter?: (v: number | Date, granularity: number, opts: (name: string) => any, dygraph: Dygraph) => any; 
+    /**
+     *formatter for axis label 
+     * @param {number|date} d 
+     * @param {number} granularity
+     * @param {function} opts 
+     * @param {Dygraph} dygraph 
+     * @returns {string} 
+     * @memberof Formatters
+     */
     axisLabel = (d: number | Date, granularity: number, opts?: (name: string) => any, dygraph?: Dygraph): any => {
         // don't put it into formatters.ts becault we need to timezone later
         let momentDatetime;
