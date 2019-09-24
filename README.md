@@ -31,7 +31,7 @@ Once you`ve got ready to put it in your project, please check the demos or check
 
 If you're using npm and a bundler like webpack, browserify or rollup, you can install fgp-graph via:
 ```
-npm install --save @futuregrid/fgp-graph
+npm install --save @future-grid/fgp-graph
 ```
 and use it via:
 ```javascript
