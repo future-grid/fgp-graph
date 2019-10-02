@@ -105,12 +105,12 @@ export class Formatters {
         if (granularity >= Dygraph.DECADAL) {
             return '' + momentDatetime.year();
         } else if (granularity >= Dygraph.MONTHLY) {
-            return SHORT_MONTH_NAMES[momentDatetime.month() + 1] + '&#160;' + momentDatetime.year();
+            return SHORT_MONTH_NAMES[momentDatetime.month()] + '&#160;' + momentDatetime.year();
         } else {
             var frac = momentDatetime.hours() * 3600 + momentDatetime.minutes() * 60 + momentDatetime.seconds() + 1e-3 * momentDatetime.milliseconds();
             if (frac === 0 || granularity >= Dygraph.DAILY) {
                 // e.g. '21 Jan' (%d%b)
-                return zeropad(momentDatetime.date()) + '&#160;' + SHORT_MONTH_NAMES[momentDatetime.month() + 1];
+                return zeropad(momentDatetime.date()) + '&#160;' + SHORT_MONTH_NAMES[momentDatetime.month()];
             } else {
                 return hmsString_(momentDatetime.hours(), momentDatetime.minutes(), momentDatetime.seconds());
             }
