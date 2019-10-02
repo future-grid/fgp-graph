@@ -181,7 +181,7 @@ let vdConfig: ViewConfig = {
                 interval: 86400000,
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
+                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'right' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
@@ -201,7 +201,7 @@ let vdConfig: ViewConfig = {
     ],
     initRange: {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
-        end: moment().add(1, 'days').valueOf()
+        end: moment().add(2, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {

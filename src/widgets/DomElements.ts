@@ -180,7 +180,7 @@ export class GraphOperator {
     private graphContainer: HTMLElement;
 
     private graphBody: HTMLElement;
-    
+
     private intervalsDropdown: HTMLElement;
 
     private header: HTMLElement;
@@ -422,6 +422,7 @@ export class GraphOperator {
         // find fields from configuration
         let timewindowEnd: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).add(1, 'days').startOf('day').valueOf();
         let timewindowStart: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).subtract(7, 'days').startOf('day').valueOf();   // default 7 days
+
         const ranges: Array<{ name: string, value: number, show?: boolean }> | undefined = this.currentView.ranges;
         if (ranges && ranges.length > 0) {
             // get first "show" == true
@@ -437,6 +438,12 @@ export class GraphOperator {
             } else {
                 timewindowStart = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).add(1, 'days').startOf('day').valueOf() - selected.value;
             }
+        }
+
+        // set init range
+        if (view.initRange) {
+            timewindowEnd = moment(view.initRange.end).tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf();
+            timewindowStart = moment(view.initRange.start).tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf();
         }
 
         // which one should be shown first? base on current window size? or base on the collection config?
@@ -547,9 +554,8 @@ export class GraphOperator {
                 // if there is a config for what level need to show.
                 if (collection.threshold && firstRanges.value) {
                     //  >= && <    [ in the middle  )
-                    if (firstRanges.value >= collection.threshold.min && firstRanges.value < collection.threshold.max) {
+                    if (firstRanges.value > collection.threshold.min && firstRanges.value <= collection.threshold.max) {
                         this.currentCollection = choosedCollection = collection;
-
                     }
                 }
             });
@@ -572,7 +578,19 @@ export class GraphOperator {
                 });
             }
 
-            let initialData = [[new Date(first.timestamp)], [new Date(last.timestamp)]];
+            let initialData = [[first.timestamp], [last.timestamp]];
+
+
+            if (this.currentView.initRange) {
+                if (this.currentView.initRange.start < first.timestamp) {
+                    initialData[0] = [this.currentView.initRange.start];
+                }
+
+                if (this.currentView.initRange.end > last.timestamp) {
+                    initialData[1] = [this.currentView.initRange.end];
+                }
+            }
+
             let isY2: boolean = false;
             let mainGraphLabels: Array<string> = [];
 
@@ -638,6 +656,8 @@ export class GraphOperator {
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                         return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
                     });
+
+
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
                     Object.assign(collection, choosedCollection);
 
@@ -724,9 +744,11 @@ export class GraphOperator {
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
+                // drawAxesAtZero: true,
                 axes: {
                     x: {
-                        axisLabelFormatter: formatters.axisLabel
+                        axisLabelFormatter: formatters.axisLabel,
+                        ticker: formatters.DateTickerTZ
                     },
                     y: yScale,
                     y2: y2Scale
@@ -777,8 +799,19 @@ export class GraphOperator {
             // range-bar?
             if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
                 let labels: Array<string> = [];
-                let firstData: any[] = [new Date(first.timestamp)];
-                let lastData: any[] = [new Date(last.timestamp)];
+                let firstData: any[] = [first.timestamp];
+                let lastData: any[] = [last.timestamp];
+
+                if (this.currentView.initRange) {
+                    if (this.currentView.initRange.start < first.timestamp) {
+                        firstData = [this.currentView.initRange.start];
+                    }
+
+                    if (this.currentView.initRange.end > last.timestamp) {
+                        lastData = [this.currentView.initRange.end];
+                    }
+                }
+
                 let rangeSeries: any = null;
                 this.rangeCollection = this.currentView.graphConfig.rangeCollection;
                 // range device always one
@@ -1043,13 +1076,13 @@ export class GraphOperator {
                     // generate data for this column
                     _dates.forEach(date => {
                         // find date in finalData
-                        let point = finalData.find(record => record[0].getTime() == date);
+                        let point = finalData.find(record => record[0] == date);
                         let record = graphData[0].find((data: any) => data.timestamp == date);
 
                         if (point) {
                             point[_index + 1] = record ? f(record) : null;
                         } else {
-                            point = [new Date(date)];
+                            point = [date];
                             point[_index + 1] = record ? f(record) : null;
                             finalData.push(point);
                         }
@@ -1101,10 +1134,10 @@ export class GraphOperator {
                 var f = new Function("data", "with(data) { if(" + exp + "!=null)return " + exp + ";return null;}");
                 _dates.forEach(date => {
                     // get the record
-                    let point = finalData.find(record => record[0].getTime() == date);
+                    let point = finalData.find(record => record[0] == date);
                     // if not found just add it as new one.
                     if (!point) {
-                        point = [new Date(date)];
+                        point = [date];
                         finalData.push(point);
                     }
 
@@ -1190,11 +1223,15 @@ export class GraphOperator {
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
 
                 if (graphData.data) {
-                    this.currentGraphData = graphData.data;
+                    this.currentGraphData = [];
+                    graphData.data.forEach(_data => {
+                        _data[0] = new Date(_data[0])
+                        this.currentGraphData.push(_data);
+                    });
                 }
                 // update main graph
                 mainGraph.updateOptions({
-                    file: graphData.data,
+                    file: this.currentGraphData,
                     series: mainGraphSeries,
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
@@ -1245,7 +1282,7 @@ export class GraphOperator {
                 currentDatewindowData.data.forEach(_data => {
                     let _exist: number = -1;
                     preData.forEach((_oldData, _index) => {
-                        if (_oldData[0].getTime() == _data[0].getTime()) {
+                        if (_oldData[0] == _data[0]) {
                             _exist = _index;
                         }
                     });
@@ -1259,7 +1296,7 @@ export class GraphOperator {
                 });
                 // sorting
                 preData.sort((a, b) => {
-                    return a[0].getTime() > b[0].getTime() ? 1 : -1;
+                    return a[0] > b[0] ? 1 : -1;
                 });
 
                 let rangeSeries: any = {};
