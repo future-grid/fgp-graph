@@ -48,8 +48,6 @@ export class LoadingSpinner {
 
 }
 
-
-
 export class ExportUtils {
     public static exportCsv(content: string, fileName: string) {
         // simulate click "<a>"
@@ -85,7 +83,6 @@ export class ExportUtils {
                     }
                 });
             });
-
         }
     }
 
