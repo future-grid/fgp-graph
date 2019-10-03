@@ -117,7 +117,7 @@ class DataService implements DataHandler {
             // show loading 
             setTimeout(() => {
                 resolve(sampleData); 
-                console.debug("data has been sent to graph!");
+                // console.debug("data has been sent to graph!");
             }, 200);
             
         });
@@ -172,7 +172,7 @@ let vdConfig: ViewConfig = {
                 yLabel: 'voltage',
                 y2Label: 'voltage',
                 initScales: { left: { min: 245, max: 260 } },
-                fill: false
+                fill: true
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
@@ -207,7 +207,7 @@ let vdConfig: ViewConfig = {
                 // console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
@@ -277,7 +277,7 @@ let vsConfig: ViewConfig = {
                 // console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },

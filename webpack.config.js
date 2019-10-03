@@ -1,5 +1,5 @@
-var path = require('path');
-
+const path = require('path');
+// const MinifyPlugin = require('babel-minify-webpack-plugin');
 module.exports = {
     entry: {
         'fgp-graph-demo': './src/demo.ts',
@@ -10,27 +10,31 @@ module.exports = {
         contentBase: [path.join(__dirname, 'demo')],
         compress: true,
         clientLogLevel: 'debug',
-        open: false,
-        filename: '[name].bundle.js'
+        open: true,
+        filename: '[name].bundle.js',
+        noInfo: true
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].bundle.js',
+        filename: '[name].bundle.js'
     },
+    // plugins: [new MinifyPlugin({})],
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']
     },
-    externals:{
-        'dygraphs': 'Dygraph',
-        'moment': 'moment',
-        'timezone': 'moment-timezone'
+    externals: {
+        dygraphs: 'Dygraph',
+        moment: 'moment',
+        timezone: 'moment-timezone'
     },
     module: {
-        rules: [{
-            // Include ts, tsx, js, and jsx files.
-            test: /\.(ts|js)x?$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-        }],
+        rules: [
+            {
+                // Include ts, tsx, js, and jsx files.
+                test: /\.(ts|js)x?$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader'
+            }
+        ]
     }
 };

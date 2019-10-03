@@ -880,10 +880,20 @@ export class GraphOperator {
                     showRangeSelector: true,
                     rangeSelectorHeight: 30,
                     legend: 'never',
-                    drawCallback: (dygraph, is_initial) => {
+                    drawCallback: (dygraph, isInitial) => {
                         const xAxisRange: Array<number> = dygraph.xAxisRange();
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        // only run first draw
+                        if (isInitial) {
+                            // find zoomhandle
+                            const handles = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                            // left handle  just in case the right handle overlap the left one
+                            if(handles[0] instanceof HTMLElement){
+                                handles[0].style.zIndex = "11";
+                            }
+                        }
+
                         this.datewindowCallback(xAxisRange, this.currentView);
                     }
                 });

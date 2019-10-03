@@ -102,8 +102,7 @@ export class Formatters {
             opts("axisLabelFormatter"));
         let ticks = [];
         let t;
-
-        console.info("granularity: " + granularity);
+        
         if (granularity < GraphConstant.MONTHLY) {
             // Generate one tick mark for every fixed interval of time.
             let spacing = this.SHORT_SPACINGS[granularity];
@@ -139,7 +138,7 @@ export class Formatters {
             start = d.valueOf();
 
             let start_offset_min = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess()).utcOffset();
-            let check_dst = (spacing >= this.SHORT_SPACINGS[14]);
+            let check_dst = (spacing >= this.SHORT_SPACINGS[GraphConstant.TWO_DAILY]);
             for (t = start; t <= end; t += spacing) {
                 let d = moment(t).tz(this.timezone ? this.timezone : moment.tz.guess());
 
@@ -197,7 +196,7 @@ export class Formatters {
             for (let i = start_year; i <= end_year; i++) {
                 if (i % year_mod !== 0) continue;
                 for (let j = 0; j < months.length; j++) {
-                    let dt = moment.tz(new Date(i, months[j], 1), this.timezone ? this.timezone : moment.tz.guess()); // moment.tz(Date, tz_String) is NOT the same as moment(Date).tz(String) !!
+                    let dt = moment.tz(new Date(i, months[j], 1), this.timezone ? this.timezone : moment.tz.guess());
                     dt.year(i);
                     t = dt.valueOf();
                     if (t < start || t > end) continue;
@@ -220,7 +219,7 @@ export class Formatters {
 
         let granularity = this.pickDateTickGranularity(a, b, pixels, opts);
         if (granularity >= 0) {
-            return this.getDateAxis(a, b, granularity, opts, dygraph); // use own own function here
+            return this.getDateAxis(a, b, granularity, opts, dygraph); // use own function here
         } else {
             // this can happen if self.width_ is zero.
             return [];
