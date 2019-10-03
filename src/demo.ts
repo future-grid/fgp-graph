@@ -120,7 +120,7 @@ class DataService implements DataHandler {
             setTimeout(() => {
                 resolve(sampleData); 
                 console.debug("data has been sent to graph!");
-            }, 2000);
+            }, 200);
             
         });
     }
@@ -201,7 +201,7 @@ let vdConfig: ViewConfig = {
     ],
     initRange: {
         start: moment().subtract(10, 'days').startOf('day').valueOf(),
-        end: moment().add(1, 'days').valueOf()
+        end: moment().add(2, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {
@@ -346,7 +346,6 @@ let vsConfig2: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
             clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -416,7 +415,6 @@ let vsConfig3: ViewConfig = {
         callback: {
             highlighCallback: (datetime, series, points) => {
                 // console.debug("selected series: ", series);
-                return [];
             },
             clickCallback: (series) => {
                 // console.debug("choosed series: ", series);
@@ -447,13 +445,13 @@ graph2.setChildren([graph1]);   // problem with right and left axis
 // highlight on first graph
 
 
-setTimeout(() => {
+// setTimeout(() => {
 
-    graph1.highlightSeries(["Avg"], 0);
+//     graph1.highlightSeries(["Avg"], 0);
 
-    setTimeout(() => {
-        graph1.highlightSeries(["Max","Min"], 2);
-    }, 2000);
+//     setTimeout(() => {
+//         graph1.highlightSeries(["Max","Min"], 2);
+//     }, 2000);
 
-}, 5000);
+// }, 5000);
 

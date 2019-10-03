@@ -48,6 +48,14 @@ export default class FgpGraph {
 
     private callbackDelayTimer: any = 0;
 
+    /**
+     *Creates an instance of FgpGraph.
+     * @param {HTMLElement} dom 
+     * graph container
+     * @param {Array<ViewConfig>} viewConfigs
+     * graph configuration
+     * @memberof FgpGraph
+     */
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
         this.defaultGraphRanges = [
@@ -94,6 +102,13 @@ export default class FgpGraph {
         this.viewConfigs = viewConfigs;
     }
 
+    /**
+     *update datewindow for children graphs
+     * @param datewindow 
+     * @param currentView
+     * @private
+     * @memberof FgpGraph
+     */
     private dateWindowHandler = (dateWindow: Array<number>, currentView?: ViewConfig) => {
 
 
@@ -123,7 +138,7 @@ export default class FgpGraph {
 
     /**
      * init graph with configuration
-     *
+     * 
      * @private
      * @memberof FgpGraph
      */
@@ -193,6 +208,11 @@ export default class FgpGraph {
 
 
 
+    /**
+     *update currrent graph datewindow
+     * @param datewindow
+     * @memberof FgpGraph
+     */
     public updateDatewinow = (datewindow: Array<number>) => {
         // update graph 
         if (this.graph) {
@@ -206,16 +226,22 @@ export default class FgpGraph {
         }
     }
 
+    /**
+     *bind children graphs
+     * @param graphs 
+     * children graphs
+     * @memberof FgpGraph
+     */
     public setChildren = (graphs: Array<FgpGraph>) => {
         this.childrenGraphs = this.childrenGraphs.concat(graphs);
     }
 
     /**
      * highlight line on graph
-     * 
-     * Multiple lines each time
-     * @param series  name of lines
-     * @param duration unhighlight after <duration> seconds  0 means highlight forever
+     * @param series  
+     * name of lines
+     * @param duration 
+     * unhighlight after <duration> seconds  0 means highlight forever
      * 
      * @memberof FgpGraph
      */
