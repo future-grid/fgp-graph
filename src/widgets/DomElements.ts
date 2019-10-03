@@ -589,11 +589,17 @@ export class GraphOperator {
                 if (this.currentView.initRange.end > last.timestamp) {
                     initialData[1] = [this.currentView.initRange.end];
                 }
+                // upate choosed collection
+                const gap = initialData[1][0] - initialData[0][0];
+
+                choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
+                    return collection.threshold && (gap) <= (collection.threshold.max - collection.threshold.min);
+                });
+
             }
 
             let isY2: boolean = false;
             let mainGraphLabels: Array<string> = [];
-
 
             if (choosedCollection && entities.length == 1) {
                 mainGraphLabels = [];
@@ -633,6 +639,14 @@ export class GraphOperator {
                 }
 
             }
+
+            if (choosedCollection) {
+                // set currentCollection to choosedCollection
+                this.currentCollection = choosedCollection;
+            }
+
+
+
             let currentDatewindowOnMouseDown: any[] = [];
 
             const datewindowChangeFunc = (e: MouseEvent, yAxisRange?: Array<Array<number>>) => {

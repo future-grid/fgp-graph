@@ -11,7 +11,7 @@
     "build:bundle": "webpack --mode development",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
-    "start": "webpack-dev-server --color --mode development",
+    "start": "webpack-dev-server --color --open --mode development",
     "test": "jest"
   },
   "keywords": [

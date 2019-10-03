@@ -94,8 +94,6 @@ class DataService implements DataHandler {
                 tempDate += 3600000;
             }
 
-
-
         }
 
         return new Promise((resolve, reject) => {
