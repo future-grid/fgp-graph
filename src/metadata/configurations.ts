@@ -130,3 +130,35 @@ export interface ViewConfig {
     interaction?: { callback?: Callbacks }
 
 }
+
+/**
+ * datetime ranges index
+ *
+ * @export
+ * @enum {number}
+ */
+export enum GraphConstant {
+    SECONDLY = 0,
+    TWO_SECONDLY = 1,
+    FIVE_SECONDLY = 2,
+    TEN_SECONDLY = 3,
+    THIRTY_SECONDLY = 4,
+    MINUTELY = 5,
+    TWO_MINUTELY = 6,
+    FIVE_MINUTELY = 7,
+    TEN_MINUTELY = 8,
+    THIRTY_MINUTELY = 9,
+    HOURLY = 10,
+    TWO_HOURLY = 11,
+    SIX_HOURLY = 12,
+    DAILY = 13,
+    TWO_DAILY = 14,
+    WEEKLY = 15,
+    MONTHLY = 16,
+    QUARTERLY = 17,
+    BIANNUAL = 18,
+    ANNUAL = 19,
+    DECADAL = 20,
+    CENTENNIAL = 21,
+    NUM_GRANULARITIES = 22
+}

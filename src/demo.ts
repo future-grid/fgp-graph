@@ -120,7 +120,7 @@ class DataService implements DataHandler {
             setTimeout(() => {
                 resolve(sampleData); 
                 console.debug("data has been sent to graph!");
-            }, 2000);
+            }, 200);
             
         });
     }
@@ -181,7 +181,7 @@ let vdConfig: ViewConfig = {
                 interval: 86400000,
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'right' },
+                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
@@ -445,13 +445,13 @@ graph2.setChildren([graph1]);   // problem with right and left axis
 // highlight on first graph
 
 
-setTimeout(() => {
+// setTimeout(() => {
 
-    graph1.highlightSeries(["Avg"], 0);
+//     graph1.highlightSeries(["Avg"], 0);
 
-    setTimeout(() => {
-        graph1.highlightSeries(["Max","Min"], 2);
-    }, 2000);
+//     setTimeout(() => {
+//         graph1.highlightSeries(["Max","Min"], 2);
+//     }, 2000);
 
-}, 5000);
+// }, 5000);
 

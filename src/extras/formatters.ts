@@ -1,5 +1,6 @@
 import Dygraph from 'dygraphs';
 import moment from 'moment-timezone';
+import { GraphConstant } from '../metadata/configurations';
 
 export class Formatters {
 
@@ -11,6 +12,8 @@ export class Formatters {
     public timezone: string;
 
     private TICK_PLACEMENT: any[];
+
+    private SHORT_SPACINGS: any[];
     /**
      *Creates an instance of Formatters.
      * @param {string} timezone  show graph timestamp with this timezone
@@ -27,57 +30,47 @@ export class Formatters {
         const DATEFIELD_MS = 6;
         const NUM_DATEFIELDS = 7;
 
-        const SECONDLY = 0;
-        const TWO_SECONDLY = 1;
-        const FIVE_SECONDLY = 2;
-        const TEN_SECONDLY = 3;
-        const THIRTY_SECONDLY = 4;
-        const MINUTELY = 5;
-        const TWO_MINUTELY = 6;
-        const FIVE_MINUTELY = 7;
-        const TEN_MINUTELY = 8;
-        const THIRTY_MINUTELY = 9;
-        const HOURLY = 10;
-        const TWO_HOURLY = 11;
-        const SIX_HOURLY = 12;
-        const DAILY = 13;
-        const TWO_DAILY = 14;
-        const WEEKLY = 15;
-        const MONTHLY = 16;
-        const QUARTERLY = 17;
-        const BIANNUAL = 18;
-        const ANNUAL = 19;
-        const DECADAL = 20;
-        const CENTENNIAL = 21;
-        const NUM_GRANULARITIES = 22;
-
-
         this.TICK_PLACEMENT = [];
-        this.TICK_PLACEMENT[SECONDLY] = { datefield: DATEFIELD_SS, step: 1, spacing: 1000 * 1 };
-        this.TICK_PLACEMENT[TWO_SECONDLY] = { datefield: DATEFIELD_SS, step: 2, spacing: 1000 * 2 };
-        this.TICK_PLACEMENT[FIVE_SECONDLY] = { datefield: DATEFIELD_SS, step: 5, spacing: 1000 * 5 };
-        this.TICK_PLACEMENT[TEN_SECONDLY] = { datefield: DATEFIELD_SS, step: 10, spacing: 1000 * 10 };
-        this.TICK_PLACEMENT[THIRTY_SECONDLY] = { datefield: DATEFIELD_SS, step: 30, spacing: 1000 * 30 };
-        this.TICK_PLACEMENT[MINUTELY] = { datefield: DATEFIELD_MM, step: 1, spacing: 1000 * 60 };
-        this.TICK_PLACEMENT[TWO_MINUTELY] = { datefield: DATEFIELD_MM, step: 2, spacing: 1000 * 60 * 2 };
-        this.TICK_PLACEMENT[FIVE_MINUTELY] = { datefield: DATEFIELD_MM, step: 5, spacing: 1000 * 60 * 5 };
-        this.TICK_PLACEMENT[TEN_MINUTELY] = { datefield: DATEFIELD_MM, step: 10, spacing: 1000 * 60 * 10 };
-        this.TICK_PLACEMENT[THIRTY_MINUTELY] = { datefield: DATEFIELD_MM, step: 30, spacing: 1000 * 60 * 30 };
-        this.TICK_PLACEMENT[HOURLY] = { datefield: DATEFIELD_HH, step: 1, spacing: 1000 * 3600 };
-        this.TICK_PLACEMENT[TWO_HOURLY] = { datefield: DATEFIELD_HH, step: 2, spacing: 1000 * 3600 * 2 };
-        this.TICK_PLACEMENT[SIX_HOURLY] = { datefield: DATEFIELD_HH, step: 6, spacing: 1000 * 3600 * 6 };
-        this.TICK_PLACEMENT[DAILY] = { datefield: DATEFIELD_D, step: 1, spacing: 1000 * 86400 };
-        this.TICK_PLACEMENT[TWO_DAILY] = { datefield: DATEFIELD_D, step: 2, spacing: 1000 * 86400 * 2 };
-        this.TICK_PLACEMENT[WEEKLY] = { datefield: DATEFIELD_D, step: 7, spacing: 1000 * 604800 };
-        this.TICK_PLACEMENT[MONTHLY] = { datefield: DATEFIELD_M, step: 1, spacing: 1000 * 7200 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 12
-        this.TICK_PLACEMENT[QUARTERLY] = { datefield: DATEFIELD_M, step: 3, spacing: 1000 * 21600 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 4
-        this.TICK_PLACEMENT[BIANNUAL] = { datefield: DATEFIELD_M, step: 6, spacing: 1000 * 43200 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 2
-        this.TICK_PLACEMENT[ANNUAL] = { datefield: DATEFIELD_Y, step: 1, spacing: 1000 * 86400 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 1
-        this.TICK_PLACEMENT[DECADAL] = { datefield: DATEFIELD_Y, step: 10, spacing: 1000 * 864000 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 10
-        this.TICK_PLACEMENT[CENTENNIAL] = { datefield: DATEFIELD_Y, step: 100, spacing: 1000 * 8640000 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 100
+        this.TICK_PLACEMENT[GraphConstant.SECONDLY] = { datefield: DATEFIELD_SS, step: 1, spacing: 1000 * 1 };
+        this.TICK_PLACEMENT[GraphConstant.TWO_SECONDLY] = { datefield: DATEFIELD_SS, step: 2, spacing: 1000 * 2 };
+        this.TICK_PLACEMENT[GraphConstant.FIVE_SECONDLY] = { datefield: DATEFIELD_SS, step: 5, spacing: 1000 * 5 };
+        this.TICK_PLACEMENT[GraphConstant.TEN_SECONDLY] = { datefield: DATEFIELD_SS, step: 10, spacing: 1000 * 10 };
+        this.TICK_PLACEMENT[GraphConstant.THIRTY_SECONDLY] = { datefield: DATEFIELD_SS, step: 30, spacing: 1000 * 30 };
+        this.TICK_PLACEMENT[GraphConstant.MINUTELY] = { datefield: DATEFIELD_MM, step: 1, spacing: 1000 * 60 };
+        this.TICK_PLACEMENT[GraphConstant.TWO_MINUTELY] = { datefield: DATEFIELD_MM, step: 2, spacing: 1000 * 60 * 2 };
+        this.TICK_PLACEMENT[GraphConstant.FIVE_MINUTELY] = { datefield: DATEFIELD_MM, step: 5, spacing: 1000 * 60 * 5 };
+        this.TICK_PLACEMENT[GraphConstant.TEN_MINUTELY] = { datefield: DATEFIELD_MM, step: 10, spacing: 1000 * 60 * 10 };
+        this.TICK_PLACEMENT[GraphConstant.THIRTY_MINUTELY] = { datefield: DATEFIELD_MM, step: 30, spacing: 1000 * 60 * 30 };
+        this.TICK_PLACEMENT[GraphConstant.HOURLY] = { datefield: DATEFIELD_HH, step: 1, spacing: 1000 * 3600 };
+        this.TICK_PLACEMENT[GraphConstant.TWO_HOURLY] = { datefield: DATEFIELD_HH, step: 2, spacing: 1000 * 3600 * 2 };
+        this.TICK_PLACEMENT[GraphConstant.SIX_HOURLY] = { datefield: DATEFIELD_HH, step: 6, spacing: 1000 * 3600 * 6 };
+        this.TICK_PLACEMENT[GraphConstant.DAILY] = { datefield: DATEFIELD_D, step: 1, spacing: 1000 * 86400 };
+        this.TICK_PLACEMENT[GraphConstant.TWO_DAILY] = { datefield: DATEFIELD_D, step: 2, spacing: 1000 * 86400 * 2 };
+        this.TICK_PLACEMENT[GraphConstant.WEEKLY] = { datefield: DATEFIELD_D, step: 7, spacing: 1000 * 604800 };
+        this.TICK_PLACEMENT[GraphConstant.MONTHLY] = { datefield: DATEFIELD_M, step: 1, spacing: 1000 * 7200 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 12
+        this.TICK_PLACEMENT[GraphConstant.QUARTERLY] = { datefield: DATEFIELD_M, step: 3, spacing: 1000 * 21600 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 4
+        this.TICK_PLACEMENT[GraphConstant.BIANNUAL] = { datefield: DATEFIELD_M, step: 6, spacing: 1000 * 43200 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 / 2
+        this.TICK_PLACEMENT[GraphConstant.ANNUAL] = { datefield: DATEFIELD_Y, step: 1, spacing: 1000 * 86400 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 1
+        this.TICK_PLACEMENT[GraphConstant.DECADAL] = { datefield: DATEFIELD_Y, step: 10, spacing: 1000 * 864000 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 10
+        this.TICK_PLACEMENT[GraphConstant.CENTENNIAL] = { datefield: DATEFIELD_Y, step: 100, spacing: 1000 * 8640000 * 365.2524 }; // 1e3 * 60 * 60 * 24 * 365.2524 * 100
+        this.SHORT_SPACINGS = [];
+        this.SHORT_SPACINGS[GraphConstant.SECONDLY] = 1000 * 1;
+        this.SHORT_SPACINGS[GraphConstant.TWO_SECONDLY] = 1000 * 2;
+        this.SHORT_SPACINGS[GraphConstant.FIVE_SECONDLY] = 1000 * 5;
+        this.SHORT_SPACINGS[GraphConstant.TEN_SECONDLY] = 1000 * 10;
+        this.SHORT_SPACINGS[GraphConstant.THIRTY_SECONDLY] = 1000 * 30;
+        this.SHORT_SPACINGS[GraphConstant.MINUTELY] = 1000 * 60;
+        this.SHORT_SPACINGS[GraphConstant.TWO_MINUTELY] = 1000 * 60 * 2;
+        this.SHORT_SPACINGS[GraphConstant.FIVE_MINUTELY] = 1000 * 60 * 5;
+        this.SHORT_SPACINGS[GraphConstant.TEN_MINUTELY] = 1000 * 60 * 10;
+        this.SHORT_SPACINGS[GraphConstant.THIRTY_MINUTELY] = 1000 * 60 * 30;
+        this.SHORT_SPACINGS[GraphConstant.HOURLY] = 1000 * 3600;
+        this.SHORT_SPACINGS[GraphConstant.TWO_HOURLY] = 1000 * 3600 * 2;
+        this.SHORT_SPACINGS[GraphConstant.SIX_HOURLY] = 1000 * 3600 * 6;
+        this.SHORT_SPACINGS[GraphConstant.DAILY] = 1000 * 86400;
+        this.SHORT_SPACINGS[GraphConstant.WEEKLY] = 1000 * 604800;
+        this.SHORT_SPACINGS[GraphConstant.TWO_DAILY] = 1000 * 86400 * 2;
     }
-
-
 
 
     private numDateTicks = (start_time: number, end_time: number, granularity: number) => {
@@ -104,62 +97,20 @@ export class Formatters {
 
 
     private getDateAxis = (start: any, end: any, granularity: any, opts: any, dygraph: Dygraph) => {
-
-        const SECONDLY = 0;
-        const TWO_SECONDLY = 1;
-        const FIVE_SECONDLY = 2;
-        const TEN_SECONDLY = 3;
-        const THIRTY_SECONDLY = 4;
-        const MINUTELY = 5;
-        const TWO_MINUTELY = 6;
-        const FIVE_MINUTELY = 7;
-        const TEN_MINUTELY = 8;
-        const THIRTY_MINUTELY = 9;
-        const HOURLY = 10;
-        const TWO_HOURLY = 11;
-        const SIX_HOURLY = 12;
-        const DAILY = 13;
-        const TWO_DAILY = 14;
-        const WEEKLY = 15;
-        const MONTHLY = 16;
-        const QUARTERLY = 17;
-        const BIANNUAL = 18;
-        const ANNUAL = 19;
-        const DECADAL = 20;
-        const CENTENNIAL = 21;
-        const NUM_GRANULARITIES = 22;
-        let SHORT_SPACINGS = [];
-        SHORT_SPACINGS[SECONDLY] = 1000 * 1;
-        SHORT_SPACINGS[TWO_SECONDLY] = 1000 * 2;
-        SHORT_SPACINGS[FIVE_SECONDLY] = 1000 * 5;
-        SHORT_SPACINGS[TEN_SECONDLY] = 1000 * 10;
-        SHORT_SPACINGS[THIRTY_SECONDLY] = 1000 * 30;
-        SHORT_SPACINGS[MINUTELY] = 1000 * 60;
-        SHORT_SPACINGS[TWO_MINUTELY] = 1000 * 60 * 2;
-        SHORT_SPACINGS[FIVE_MINUTELY] = 1000 * 60 * 5;
-        SHORT_SPACINGS[TEN_MINUTELY] = 1000 * 60 * 10;
-        SHORT_SPACINGS[THIRTY_MINUTELY] = 1000 * 60 * 30;
-        SHORT_SPACINGS[HOURLY] = 1000 * 3600;
-        SHORT_SPACINGS[TWO_HOURLY] = 1000 * 3600 * 2;
-        SHORT_SPACINGS[SIX_HOURLY] = 1000 * 3600 * 6;
-        SHORT_SPACINGS[DAILY] = 1000 * 86400;
-        SHORT_SPACINGS[WEEKLY] = 1000 * 604800;
-        SHORT_SPACINGS[TWO_DAILY] = 1000 * 86400 * 2;
-
         //
         let formatter = /** @type{AxisLabelFormatter} */(
             opts("axisLabelFormatter"));
         let ticks = [];
         let t;
 
-        console.info("granularity: "+granularity);
-        if (granularity < MONTHLY) {
+        console.info("granularity: " + granularity);
+        if (granularity < GraphConstant.MONTHLY) {
             // Generate one tick mark for every fixed interval of time.
-            var spacing = SHORT_SPACINGS[granularity];
+            let spacing = this.SHORT_SPACINGS[granularity];
             // Find a time less than start_time which occurs on a "nice" time boundary
             // for this granularity.
-            var g = spacing / 1000;
-            var d = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess());
+            let g = spacing / 1000;
+            let d = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess());
             d.millisecond(0);
             var x;
             if (g <= 60) {  // seconds
@@ -187,8 +138,8 @@ export class Formatters {
             }
             start = d.valueOf();
 
-            var start_offset_min = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess()).utcOffset();
-            var check_dst = (spacing >= SHORT_SPACINGS[14]);
+            let start_offset_min = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess()).utcOffset();
+            let check_dst = (spacing >= this.SHORT_SPACINGS[14]);
             for (t = start; t <= end; t += spacing) {
                 let d = moment(t).tz(this.timezone ? this.timezone : moment.tz.guess());
 
@@ -223,30 +174,30 @@ export class Formatters {
             // displaying a tick mark once every 10 years, say, on long time scales.
             let months: number[] = [];
             let year_mod = 1;  // e.g. to only print one point every 10 years.
-            if (granularity == MONTHLY) {
+            if (granularity == GraphConstant.MONTHLY) {
                 months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-            } else if (granularity == QUARTERLY) {
+            } else if (granularity == GraphConstant.QUARTERLY) {
                 months = [0, 3, 6, 9];
-            } else if (granularity == BIANNUAL) {
+            } else if (granularity == GraphConstant.BIANNUAL) {
                 months = [0, 6];
-            } else if (granularity == ANNUAL) {
+            } else if (granularity == GraphConstant.ANNUAL) {
                 months = [0];
-            } else if (granularity == DECADAL) {
+            } else if (granularity == GraphConstant.DECADAL) {
                 months = [0];
                 year_mod = 10;
-            } else if (granularity == CENTENNIAL) {
+            } else if (granularity == GraphConstant.CENTENNIAL) {
                 months = [0];
                 year_mod = 100;
             } else {
                 console.warn("Span of dates is too long");
             }
 
-            var start_year = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess()).year();
-            var end_year = moment(end).tz(this.timezone ? this.timezone : moment.tz.guess()).year();
+            let start_year = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess()).year();
+            let end_year = moment(end).tz(this.timezone ? this.timezone : moment.tz.guess()).year();
             for (let i = start_year; i <= end_year; i++) {
                 if (i % year_mod !== 0) continue;
                 for (let j = 0; j < months.length; j++) {
-                    var dt = moment.tz(new Date(i, months[j], 1), this.timezone ? this.timezone : moment.tz.guess()); // moment.tz(Date, tz_String) is NOT the same as moment(Date).tz(String) !!
+                    let dt = moment.tz(new Date(i, months[j], 1), this.timezone ? this.timezone : moment.tz.guess()); // moment.tz(Date, tz_String) is NOT the same as moment(Date).tz(String) !!
                     dt.year(i);
                     t = dt.valueOf();
                     if (t < start || t > end) continue;
@@ -316,11 +267,11 @@ export class Formatters {
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
 
-        var html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
 
         data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
-            var labeledData = series.labelHTML + ': ' + series.yHTML;
+            let labeledData = series.labelHTML + ': ' + series.yHTML;
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
                 html += '<br>' + series.dashHTML + ' ' + labeledData;
@@ -354,7 +305,7 @@ export class Formatters {
         };
 
         let hmsString_ = (hh: number, mm: number, ss: number) => {
-            var ret = zeropad(hh) + ":" + zeropad(mm);
+            let ret = zeropad(hh) + ":" + zeropad(mm);
             if (ss) {
                 ret += ":" + zeropad(ss);
             }
@@ -366,7 +317,7 @@ export class Formatters {
         } else if (granularity >= Dygraph.MONTHLY) {
             return SHORT_MONTH_NAMES[momentDatetime.month()] + '&#160;' + momentDatetime.year();
         } else {
-            var frac = momentDatetime.hours() * 3600 + momentDatetime.minutes() * 60 + momentDatetime.seconds() + 1e-3 * momentDatetime.milliseconds();
+            let frac = momentDatetime.hours() * 3600 + momentDatetime.minutes() * 60 + momentDatetime.seconds() + 1e-3 * momentDatetime.milliseconds();
             if (frac === 0 || granularity >= Dygraph.DAILY) {
                 // e.g. '21 Jan' (%d%b)
                 return zeropad(momentDatetime.date()) + '&#160;' + SHORT_MONTH_NAMES[momentDatetime.month()];
