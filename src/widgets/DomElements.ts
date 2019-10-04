@@ -759,6 +759,7 @@ export class GraphOperator {
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
                 // drawAxesAtZero: true,
+                connectSeparatedPoints: this.currentView.connectSeparatedPoints ? this.currentView.connectSeparatedPoints : false,
                 axes: {
                     x: {
                         axisLabelFormatter: formatters.axisLabel,
@@ -889,7 +890,7 @@ export class GraphOperator {
                             // find zoomhandle
                             const handles = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
                             // left handle  just in case the right handle overlap the left one
-                            if(handles[0] instanceof HTMLElement){
+                            if (handles[0] instanceof HTMLElement) {
                                 handles[0].style.zIndex = "11";
                             }
                         }
@@ -911,14 +912,13 @@ export class GraphOperator {
 
                     window.addEventListener("mouseup", (e) => {
                         datewindowChangeFunc(e, []);
-
+                        // check if need to call "callback function"
                         if (interactionCallback) {
                             // ready to update children
                             interactionCallback();
                         }
                     }, { once: true });
                 }
-
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element: any = rangeBarHandles[i];

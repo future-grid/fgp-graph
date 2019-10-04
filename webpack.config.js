@@ -12,7 +12,7 @@ module.exports = {
         clientLogLevel: 'debug',
         open: true,
         filename: '[name].bundle.js',
-        noInfo: true
+        // noInfo: true
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
