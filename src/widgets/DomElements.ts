@@ -516,31 +516,31 @@ export class GraphOperator {
 
 
         // 
-        this.currentView.dataService.fetchFirstNLast(entities, this.currentView.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
+        this.currentView.dataService.fetchFirstNLast([this.currentView.graphConfig.rangeEntity.name], this.currentView.graphConfig.rangeEntity.type, this.currentView.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
             // get first and last records, just need start and end timestamp
             let first: any = { timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf() };
             let last: any = { timestamp: 0 };
             // get all first and last then find out which first is the smalllest and last is the largest
-            entities.forEach(entity => {
-                //
-                resp.forEach(entityData => {
-                    if (entityData.id == entity) {
-                        if (entityData.data && entityData.data.first && entityData.data.first.timestamp) {
-                            //
-                            if (first.timestamp > entityData.data.first.timestamp) {
-                                first = entityData.data.first;
-                            }
-                        }
-
-                        if (entityData.data && entityData.data.last && entityData.data.last.timestamp) {
-                            //
-                            if (last.timestamp < entityData.data.last.timestamp) {
-                                last = entityData.data.last;
-                            }
+            // entities.forEach(entity => {
+            //
+            resp.forEach(entityData => {
+                if (entityData.id == this.currentView.graphConfig.rangeEntity.name) {
+                    if (entityData.data && entityData.data.first && entityData.data.first.timestamp) {
+                        //
+                        if (first.timestamp > entityData.data.first.timestamp) {
+                            first = entityData.data.first;
                         }
                     }
-                });
+
+                    if (entityData.data && entityData.data.last && entityData.data.last.timestamp) {
+                        //
+                        if (last.timestamp < entityData.data.last.timestamp) {
+                            last = entityData.data.last;
+                        }
+                    }
+                }
             });
+            // });
 
             // init empty graph with start and end  no other data
             let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
@@ -1016,8 +1016,10 @@ export class GraphOperator {
         // get data for main graph
         // main graph entities
         const mainEntities: Array<string> = [];
+        let mainDeviceType: string = "";
         view.graphConfig.entities.forEach(entity => {
             mainEntities.push(entity.id);
+            mainDeviceType = entity.type;
         });
 
         // get fields for main graph
@@ -1166,48 +1168,51 @@ export class GraphOperator {
                     }
 
                     entities.forEach((entity, _index) => {
-                        let record = graphData[_index].find((data: any) => data.timestamp == date);
-                        point[_index + 1] = record ? f(record) : null;
+                        if (graphData.length > _index) {
+                            let record = graphData[_index].find((data: any) => data.timestamp == date);
+                            point[_index + 1] = record ? f(record) : null;
 
-                        yIndexs.forEach(_yIndex => {
-                            if (_yIndex == (_index + 1)) {
-                                //
-                                if (yAxis.min) {
-                                    // compare and put the value
-                                    yAxis.min = yAxis.min > point[_index + 1] ? point[_index + 1] : yAxis.min;
-                                } else {
-                                    yAxis.min = point[_index + 1];
+                            yIndexs.forEach(_yIndex => {
+                                if (_yIndex == (_index + 1)) {
+                                    //
+                                    if (yAxis.min) {
+                                        // compare and put the value
+                                        yAxis.min = yAxis.min > point[_index + 1] ? point[_index + 1] : yAxis.min;
+                                    } else {
+                                        yAxis.min = point[_index + 1];
+                                    }
+
+                                    if (yAxis.max) {
+                                        // compare and put the value
+                                        yAxis.max = yAxis.max < point[_index + 1] ? point[_index + 1] : yAxis.max;
+                                    } else {
+                                        yAxis.max = point[_index + 1];
+                                    }
                                 }
+                            });
 
-                                if (yAxis.max) {
-                                    // compare and put the value
-                                    yAxis.max = yAxis.max < point[_index + 1] ? point[_index + 1] : yAxis.max;
-                                } else {
-                                    yAxis.max = point[_index + 1];
+                            // right 
+                            y2Indexs.forEach(_yIndex => {
+                                if (_yIndex == (_index + 1)) {
+                                    //
+                                    if (yAxis2.min) {
+                                        // compare and put the value
+                                        yAxis2.min = yAxis2.min > point[_index + 1] ? point[_index + 1] : yAxis2.min;
+                                    } else {
+                                        yAxis2.min = point[_index + 1];
+                                    }
+
+                                    if (yAxis2.max) {
+                                        // compare and put the value
+                                        yAxis2.max = yAxis2.max < point[_index + 1] ? point[_index + 1] : yAxis2.max;
+                                    } else {
+                                        yAxis2.max = point[_index + 1];
+                                    }
                                 }
-                            }
-                        });
-
-                        // right 
-                        y2Indexs.forEach(_yIndex => {
-                            if (_yIndex == (_index + 1)) {
-                                //
-                                if (yAxis2.min) {
-                                    // compare and put the value
-                                    yAxis2.min = yAxis2.min > point[_index + 1] ? point[_index + 1] : yAxis2.min;
-                                } else {
-                                    yAxis2.min = point[_index + 1];
-                                }
-
-                                if (yAxis2.max) {
-                                    // compare and put the value
-                                    yAxis2.max = yAxis2.max < point[_index + 1] ? point[_index + 1] : yAxis2.max;
-                                } else {
-                                    yAxis2.max = point[_index + 1];
-                                }
-                            }
-                        });
-
+                            });
+                        } else {
+                            point[_index + 1] = null;
+                        }
                     });
                 });
             }
@@ -1218,7 +1223,7 @@ export class GraphOperator {
         if (graphCollection) {
             this.spinner.show();
             // get data for 
-            view.dataService.fetchdata(mainEntities, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
+            view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = { valueRange: [] };
                 let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
@@ -1286,6 +1291,7 @@ export class GraphOperator {
         if (view.graphConfig.features.rangeBar) {
             // get fields for range-bar 
             const rangeEntities: Array<string> = [view.graphConfig.rangeEntity.id];
+            const rangeDeviceType: string = view.graphConfig.rangeEntity.type;
             // get fields for main graph
             let fieldsForRangebarGraph: string[] = [];
 
@@ -1299,7 +1305,7 @@ export class GraphOperator {
                 }
             });
             // for range
-            view.dataService.fetchdata(rangeEntities, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
+            view.dataService.fetchdata(rangeEntities, rangeDeviceType, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
                 // merge data
                 const currentDatewindowData = prepareGraphData(resp, rangeEntities, rangeCollection);
                 let preData: Array<any> = rangebarGraph.file_;

@@ -21,14 +21,14 @@ class DataService implements DataHandler {
 
 
 
-    fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
+    fetchFirstNLast(ids: string[], type: string, interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
         return new Promise((resolve, reject) => {
             // sample data for first and last
             resolve(this.rangeData);
         });
     }
 
-    fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
         // console.debug("fetching data from server...");
         let tempDate = moment(range.start).startOf('day').valueOf();
         let existData: any[] = [];
@@ -109,6 +109,7 @@ class DataService implements DataHandler {
                                 _records.push(_d);
                             }
                         });
+                        console.info(_id);
                         sampleData.push({ id: _id, data: _records });
                     }
                 });
@@ -116,10 +117,10 @@ class DataService implements DataHandler {
 
             // show loading 
             setTimeout(() => {
-                resolve(sampleData); 
+                resolve(sampleData);
                 // console.debug("data has been sent to graph!");
             }, 200);
-            
+
         });
     }
 
@@ -425,19 +426,19 @@ let vsConfig3: ViewConfig = {
 
 
 
-let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-graph3.initGraph();
+// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+// graph3.initGraph();
 
-let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-graph2.initGraph();
+// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+// graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 
-// link graphs
-graph1.setChildren([graph2, graph3]);
+// // link graphs
+// graph1.setChildren([graph2, graph3]);
 
-graph2.setChildren([graph1]);   // problem with right and left axis 
+// graph2.setChildren([graph1]);   // problem with right and left axis 
 
 
 // highlight on first graph
