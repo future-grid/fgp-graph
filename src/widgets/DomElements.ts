@@ -1030,6 +1030,7 @@ export class GraphOperator {
         let y2Indexs: Array<number> = [];
         let colors: Array<string> = [];
         let mainGraphSeries: any = {};
+        let mainLabels: Array<string> = [];
         let isY2: boolean = false;
         if (graphCollection) {
             graphCollection.series.forEach((series, _index) => {
@@ -1057,6 +1058,7 @@ export class GraphOperator {
                     color: series.color,
                     highlightCircleSize: 4
                 };
+                
 
                 if (series.type == 'dots') {
                     mainGraphSeries[series.label]["strokeWidth"] = 0;
@@ -1095,9 +1097,12 @@ export class GraphOperator {
             });
             // 
             _dates.sort();
+            // rest labels
+            mainLabels = [];
             if (entities.length == 1) {
                 // get collection config
                 collection.series.forEach((series: any, _index: number) => {
+                    mainLabels.push(series.label);
                     var f = new Function("data", "with(data) { if(" + series.exp + "!=null)return " + series.exp + ";return null;}");
                     // generate data for this column
                     _dates.forEach(date => {
@@ -1156,6 +1161,11 @@ export class GraphOperator {
                     });
                 });
             } else if (entities.length > 1 && collection.series && collection.series[0]) {
+
+                entities.forEach(entity => {
+                    mainLabels.push(entity);
+                });
+
                 const exp = collection.series[0].exp;
                 var f = new Function("data", "with(data) { if(" + exp + "!=null)return " + exp + ";return null;}");
                 _dates.forEach(date => {
@@ -1168,7 +1178,9 @@ export class GraphOperator {
                     }
 
                     entities.forEach((entity, _index) => {
+                        
                         if (graphData.length > _index) {
+                            
                             let record = graphData[_index].find((data: any) => data.timestamp == date);
                             point[_index + 1] = record ? f(record) : null;
 
@@ -1258,10 +1270,12 @@ export class GraphOperator {
                         this.currentGraphData.push(_data);
                     });
                 }
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    labels: ['x'].concat(mainLabels),   
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
                         strokeWidth: 1.5

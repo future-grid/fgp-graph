@@ -28,6 +28,7 @@ class DataService implements DataHandler {
         });
     }
 
+
     fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
         // console.debug("fetching data from server...");
         let tempDate = moment(range.start).startOf('day').valueOf();
@@ -360,8 +361,9 @@ let vsConfig3: ViewConfig = {
         features: {
             zoom: true,
             scroll: false,
-            rangeBar: false,
+            rangeBar: true,
             legend: formatters.legendForSingleSeries
+            
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -424,6 +426,55 @@ let vsConfig3: ViewConfig = {
     // timezone: 'Pacific/Auckland'
 };
 
+let vdConfigUE: ViewConfig = {
+    name: 'device view',
+    connectSeparatedPoints: true,
+    graphConfig: {
+        features: { 
+            zoom: true,
+            scroll: true,
+            rangeBar: true,
+            legend: formatters.legendForAllSeries
+        },
+        entities: [ { id: "001350030035b8f9_a", type: "channel", name: "001350030035b8f9_a" }],
+        rangeEntity: { id: "001350030035b8f9_a", type: "channel", name: "001350030035b8f9_a" },
+        rangeCollection: {
+            label: 'channel_read_hour',
+            name: 'channel_read_hour',
+            interval: 3600000,
+            series: [ {label: 'Avg Voltage',type: 'line',exp: 'data.voltageAvgLvt'}]
+        },
+        collections: [
+            {
+                label: 'channel_read_hour',
+                name: 'channel_read_hour',
+                interval: 3600000,
+                series: [
+                    { label: 'Avg Voltage', type: 'line', exp: 'data.voltageAvgLvt', yIndex: 'left', color: '#d80808' },
+                    { label: 'Max Voltage', type: 'line', exp: 'data.voltageMaxLvt', yIndex: 'left', color: '#2d2d2d' },
+                    { label: 'Min Voltage', type: 'line', exp: 'data.voltageMinLvt', yIndex: 'left', color: '#058902' }
+                ],
+                threshold: { min: 0, max: 1000 * 60 * 60 * 24 * 400 }, //  0 ~ 2 days
+                yLabel: 'Voltage',
+                initScales: { left: { min: 150, max: 300 }},
+                fill: false
+            }
+        ]
+    },
+    dataService: dataService,
+    show: true,
+    ranges: [
+        { name: '2 days', value: (2 * 1000 * 60 * 60 * 24 ), show: true },
+        { name: '1 week', value: (7 * 1000 * 60 * 60 * 24 ) }
+    ],
+    initRange: {
+        start: moment().tz('Australia/Melbourne').subtract(2, 'days').startOf('day').valueOf(),
+        end: moment().tz('Australia/Melbourne').add(1, 'days').startOf('day').valueOf()
+    },
+    timezone: 'Australia/Melbourne'
+    // timezone: 'Pacific/Auckland'
+};
+
 
 
 // let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
@@ -439,6 +490,9 @@ graph1.initGraph();
 // graph1.setChildren([graph2, graph3]);
 
 // graph2.setChildren([graph1]);   // problem with right and left axis 
+
+// let ueGraph = new FgpGraph(graphDiv, [vdConfigUE]);
+// ueGraph.initGraph();
 
 
 // highlight on first graph
