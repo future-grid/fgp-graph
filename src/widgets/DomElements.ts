@@ -768,7 +768,7 @@ export class GraphOperator {
                     y: yScale,
                     y2: y2Scale
                 },
-                highlightSeriesBackgroundAlpha: this.currentView.highlightSeriesBackgroundAlpha,
+                highlightSeriesBackgroundAlpha: this.currentView.highlightSeriesBackgroundAlpha ? this.currentView.highlightSeriesBackgroundAlpha : 0.5,
                 highlightSeriesOpts: { strokeWidth: 1 },
                 highlightCallback: (e, x, ps, row, seriesName) => {
                     if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlighCallback) {
