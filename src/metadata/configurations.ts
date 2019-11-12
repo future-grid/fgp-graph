@@ -130,6 +130,7 @@ export interface ViewConfig {
     initRange?: { start: number, end: number };
     interaction?: { callback?: Callbacks };
     connectSeparatedPoints?: boolean;
+    highlightSeriesBackgroundAlpha?: number;
 }
 
 /**

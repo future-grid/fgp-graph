@@ -48,6 +48,11 @@ class DataService implements DataHandler {
             // create data for different devices with correct interval
             existData.forEach(_ed => {
                 if (_ed.id.indexOf('meter') != -1) {
+
+                    if(_ed.id.indexOf('meter2') == -1){
+                        
+                    
+
                     // get existing data
                     if (_ed.interval == interval) {
                         // find data
@@ -63,6 +68,7 @@ class DataService implements DataHandler {
                             _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                         }
                     }
+                }
 
                 } else if (_ed.id.indexOf('substation') != -1) {
                     if (_ed.interval == interval) {
@@ -182,7 +188,7 @@ let vdConfig: ViewConfig = {
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
+                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'right' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -213,7 +219,8 @@ let vdConfig: ViewConfig = {
             }
         }
     },
-    timezone: 'Australia/Melbourne'
+    timezone: 'Australia/Melbourne',
+    highlightSeriesBackgroundAlpha: 1
     // timezone: 'Pacific/Auckland'
 };
 let vsConfig: ViewConfig = {
@@ -426,68 +433,19 @@ let vsConfig3: ViewConfig = {
     // timezone: 'Pacific/Auckland'
 };
 
-let vdConfigUE: ViewConfig = {
-    name: 'device view',
-    connectSeparatedPoints: true,
-    graphConfig: {
-        features: { 
-            zoom: true,
-            scroll: true,
-            rangeBar: true,
-            legend: formatters.legendForAllSeries
-        },
-        entities: [ { id: "001350030035b8f9_a", type: "channel", name: "001350030035b8f9_a" }],
-        rangeEntity: { id: "001350030035b8f9_a", type: "channel", name: "001350030035b8f9_a" },
-        rangeCollection: {
-            label: 'channel_read_hour',
-            name: 'channel_read_hour',
-            interval: 3600000,
-            series: [ {label: 'Avg Voltage',type: 'line',exp: 'data.voltageAvgLvt'}]
-        },
-        collections: [
-            {
-                label: 'channel_read_hour',
-                name: 'channel_read_hour',
-                interval: 3600000,
-                series: [
-                    { label: 'Avg Voltage', type: 'line', exp: 'data.voltageAvgLvt', yIndex: 'left', color: '#d80808' },
-                    { label: 'Max Voltage', type: 'line', exp: 'data.voltageMaxLvt', yIndex: 'left', color: '#2d2d2d' },
-                    { label: 'Min Voltage', type: 'line', exp: 'data.voltageMinLvt', yIndex: 'left', color: '#058902' }
-                ],
-                threshold: { min: 0, max: 1000 * 60 * 60 * 24 * 400 }, //  0 ~ 2 days
-                yLabel: 'Voltage',
-                initScales: { left: { min: 150, max: 300 }},
-                fill: false
-            }
-        ]
-    },
-    dataService: dataService,
-    show: true,
-    ranges: [
-        { name: '2 days', value: (2 * 1000 * 60 * 60 * 24 ), show: true },
-        { name: '1 week', value: (7 * 1000 * 60 * 60 * 24 ) }
-    ],
-    initRange: {
-        start: moment().tz('Australia/Melbourne').subtract(2, 'days').startOf('day').valueOf(),
-        end: moment().tz('Australia/Melbourne').add(1, 'days').startOf('day').valueOf()
-    },
-    timezone: 'Australia/Melbourne'
-    // timezone: 'Pacific/Auckland'
-};
 
 
+let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+graph3.initGraph();
 
-// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-// graph3.initGraph();
-
-// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-// graph2.initGraph();
+let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 
 // // link graphs
-// graph1.setChildren([graph2, graph3]);
+graph1.setChildren([graph2, graph3]);
 
 // graph2.setChildren([graph1]);   // problem with right and left axis 
 
