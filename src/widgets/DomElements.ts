@@ -1275,7 +1275,7 @@ export class GraphOperator {
                 }
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
-
+                console.debug("Graph is clean now!~");
                 if (graphData.data) {
                     this.currentGraphData = [];
                     graphData.data.forEach(_data => {
