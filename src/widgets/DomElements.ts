@@ -520,6 +520,11 @@ export class GraphOperator {
             // get first and last records, just need start and end timestamp
             let first: any = { timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf() };
             let last: any = { timestamp: 0 };
+            // if init range exist put the second on here
+            if(this.currentView.initRange && this.currentView.initRange.end){
+                last.timestamp = this.currentView.initRange.end;
+            }
+            
             // get all first and last then find out which first is the smalllest and last is the largest
             // entities.forEach(entity => {
             //

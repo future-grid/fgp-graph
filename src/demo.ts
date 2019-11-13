@@ -155,9 +155,9 @@ let vdConfig: ViewConfig = {
             exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
-            { id: "substation1", type: "substation", name: "**F**substation" },
+            { id: "substation1", type: "substation", name: "substation1" },
         ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
             label: 'substation_day',
             name: 'substation_interval_day',
