@@ -1069,7 +1069,6 @@ export class GraphOperator {
                 if (series.yIndex != 'left') {
                     isY2 = true;
                 }
-
             });
         }
 
@@ -1084,9 +1083,9 @@ export class GraphOperator {
                 _dates = [first, last];
             }
             data.forEach(entityData => {
-                entities.forEach(id => {
+                entities.forEach((id, _index) => {
                     if (id == entityData.id) {
-                        graphData.push(entityData.data);
+                        graphData.splice(_index, 0, entityData.data);
                         // merge date 
                         entityData.data.forEach((item: any) => {  // item is object
                             if (_dates.indexOf(item.timestamp) == -1) {
@@ -1271,7 +1270,10 @@ export class GraphOperator {
                         this.currentGraphData.push(_data);
                     });
                 }
-
+                if(view.graphConfig.entities.length > 1){
+                    // reset mainGraphSeries to empty
+                    mainGraphSeries = null;
+                }
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
