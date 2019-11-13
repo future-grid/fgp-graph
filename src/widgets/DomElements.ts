@@ -467,8 +467,6 @@ export class GraphOperator {
         const intervalsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.intervalsDropdown, [...dropdownOpts]);
         intervalsDropdonwOptions.render();
 
-        let newStart = this.start;
-        let newEnd = this.end;
         this.intervalsDropdown.onchange = (e) => {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
@@ -602,12 +600,11 @@ export class GraphOperator {
                     initialData[1] = [this.currentView.initRange.end];
                 }
                 // upate choosed collection
-                const gap = initialData[1][0] - initialData[0][0];
+                const gap = this.currentView.initRange.end - this.currentView.initRange.start;
 
                 choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                     return collection.threshold && (gap) <= (collection.threshold.max - collection.threshold.min);
                 });
-
             }
 
             let isY2: boolean = false;
