@@ -410,6 +410,7 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
+        let currentDatewindow:[number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
         let bottomAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-bottom' }];
@@ -466,16 +467,22 @@ export class GraphOperator {
         const intervalsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.intervalsDropdown, [...dropdownOpts]);
         intervalsDropdonwOptions.render();
 
+        let newStart = this.start;
+        let newEnd = this.end;
         this.intervalsDropdown.onchange = (e) => {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
+                    // get the middle timestamp of current timewindow.
+                    let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
                     // if ragnebar graph not exist, ignore it.
                     if (this.ragnebarGraph) {
+                        // shrink and grow base on middle datetime
                         this.ragnebarGraph.updateOptions({
-                            dateWindow: [(timewindowEnd - config.value), timewindowEnd]
+                            dateWindow: [(middleDatetime - config.value / 2), (middleDatetime + config.value / 2)]
                         });
                     }
+                    
 
                     // find the correct collection and update graph
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
@@ -488,8 +495,8 @@ export class GraphOperator {
                     this.currentCollection = choosedCollection;
                     this.currentView = this.currentView;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
-                    this.start = (timewindowEnd - config.value);
-                    this.end = timewindowEnd;
+                    this.start = (middleDatetime - config.value / 2);
+                    this.end = (middleDatetime + config.value / 2) > timewindowEnd ? (middleDatetime + config.value / 2) : timewindowEnd;
 
                     this.update();
                     this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
@@ -797,6 +804,7 @@ export class GraphOperator {
                 },
                 drawCallback: (dygraph, is_initial) => {
                     const xAxisRange: Array<number> = dygraph.xAxisRange();
+                    currentDatewindow = [xAxisRange[0], xAxisRange[1]];
                     if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
                         endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
