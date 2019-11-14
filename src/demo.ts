@@ -50,9 +50,6 @@ class DataService implements DataHandler {
                 if (_ed.id.indexOf('meter') != -1) {
 
                     if(_ed.id.indexOf('meter2') == -1){
-                        
-                    
-
                     // get existing data
                     if (_ed.interval == interval) {
                         // find data
@@ -234,8 +231,9 @@ let vsConfig: ViewConfig = {
             exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
-            { id: "meter1", type: "meter", name: "meter1" },
-            { id: "meter2", type: "meter", name: "meter2" }
+            { id: "meter2", type: "meter", name: "meter2" },
+            { id: "meter1", type: "meter", name: "meter1" }
+            
         ],
         rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
         rangeCollection: {

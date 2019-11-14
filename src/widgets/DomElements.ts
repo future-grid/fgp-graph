@@ -1088,6 +1088,12 @@ export class GraphOperator {
             // update main graph
             let graphData: any[] = [];
             let finalData: any[] = [];
+            //init data arrays with default empty 
+            entities.forEach((id, _index) => {
+                graphData.push([]);
+            });
+
+
             let _dates: Array<number> = [];
             if (first && last) {
                 _dates = [first, last];
@@ -1095,7 +1101,7 @@ export class GraphOperator {
             data.forEach(entityData => {
                 entities.forEach((id, _index) => {
                     if (id == entityData.id) {
-                        graphData.splice(_index, 0, entityData.data);
+                        graphData.splice(_index, 1, entityData.data);
                         // merge date 
                         entityData.data.forEach((item: any) => {  // item is object
                             if (_dates.indexOf(item.timestamp) == -1) {
