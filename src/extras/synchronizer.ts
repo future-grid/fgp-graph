@@ -213,8 +213,4 @@ export class Synchronizer {
             graphs: [this.graphs]
         };
     };
-
-
-
-
 }

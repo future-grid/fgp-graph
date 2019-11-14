@@ -11,9 +11,9 @@ export interface DataHandler {
      * @returns {Array<{ id: string, data: Array<any> }>}
      * @memberof DataHandler
      */
-    fetchdata(ids: Array<string>, interval: string, range: { start: number; end: number }, fields?: Array<string>): Promise<Array<{ id: string, data: Array<any> }>>;
+    fetchdata(ids: Array<string>, deviceType:string, interval: string, range: { start: number; end: number }, fields?: Array<string>): Promise<Array<{ id: string, data: Array<any> }>>;
 
-    fetchFirstNLast(ids: Array<string>, interval: string, fields?: Array<string>): Promise<Array<{ id: string, data: { first: any, last: any } }>>;
+    fetchFirstNLast(ids: Array<string>, devieType:string, interval: string, fields?: Array<string>): Promise<Array<{ id: string, data: { first: any, last: any } }>>;
 }
 
 
@@ -47,8 +47,6 @@ export class LoadingSpinner {
     }
 
 }
-
-
 
 export class ExportUtils {
     public static exportCsv(content: string, fileName: string) {
@@ -85,7 +83,6 @@ export class ExportUtils {
                     }
                 });
             });
-
         }
     }
 

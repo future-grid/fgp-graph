@@ -65,6 +65,7 @@ export interface GraphSeries {
     exp: string;
     type: string;
     yIndex?: string;
+    visibility?: boolean;  // only worked in single device view
 }
 
 /**
@@ -113,6 +114,7 @@ export interface Callbacks {
     clickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }
+
 /**
  * View config
  *
@@ -127,8 +129,9 @@ export interface ViewConfig {
     ranges?: Array<{ name: string, value: number, show?: boolean }>;
     timezone?: string;
     initRange?: { start: number, end: number };
-    interaction?: { callback?: Callbacks }
-
+    interaction?: { callback?: Callbacks };
+    connectSeparatedPoints?: boolean;
+    highlightSeriesBackgroundAlpha?: number;
 }
 
 /**

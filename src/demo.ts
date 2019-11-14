@@ -21,14 +21,15 @@ class DataService implements DataHandler {
 
 
 
-    fetchFirstNLast(ids: string[], interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
+    fetchFirstNLast(ids: string[], type: string, interval: string, fields?: string[]): Promise<{ id: string; data: { first: any; last: any; }; }[]> {
         return new Promise((resolve, reject) => {
             // sample data for first and last
             resolve(this.rangeData);
         });
     }
 
-    fetchdata(ids: string[], interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
+
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
         // console.debug("fetching data from server...");
         let tempDate = moment(range.start).startOf('day').valueOf();
         let existData: any[] = [];
@@ -47,6 +48,8 @@ class DataService implements DataHandler {
             // create data for different devices with correct interval
             existData.forEach(_ed => {
                 if (_ed.id.indexOf('meter') != -1) {
+
+                    if(_ed.id.indexOf('meter2') == -1){
                     // get existing data
                     if (_ed.interval == interval) {
                         // find data
@@ -62,6 +65,7 @@ class DataService implements DataHandler {
                             _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                         }
                     }
+                }
 
                 } else if (_ed.id.indexOf('substation') != -1) {
                     if (_ed.interval == interval) {
@@ -94,8 +98,6 @@ class DataService implements DataHandler {
                 tempDate += 3600000;
             }
 
-
-
         }
 
         return new Promise((resolve, reject) => {
@@ -111,6 +113,7 @@ class DataService implements DataHandler {
                                 _records.push(_d);
                             }
                         });
+                        console.info(_id);
                         sampleData.push({ id: _id, data: _records });
                     }
                 });
@@ -118,10 +121,10 @@ class DataService implements DataHandler {
 
             // show loading 
             setTimeout(() => {
-                resolve(sampleData); 
-                console.debug("data has been sent to graph!");
+                resolve(sampleData);
+                // console.debug("data has been sent to graph!");
             }, 200);
-            
+
         });
     }
 
@@ -149,9 +152,9 @@ let vdConfig: ViewConfig = {
             exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
-            { id: "substation1", type: "substation", name: "**F**substation" },
+            { id: "substation1", type: "substation", name: "substation1" },
         ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
             label: 'substation_day',
             name: 'substation_interval_day',
@@ -166,7 +169,7 @@ let vdConfig: ViewConfig = {
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' },
+                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' , visibility: false },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
                 ],
@@ -174,7 +177,7 @@ let vdConfig: ViewConfig = {
                 yLabel: 'voltage',
                 y2Label: 'voltage',
                 initScales: { left: { min: 245, max: 260 } },
-                fill: false
+                fill: true
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
@@ -200,7 +203,7 @@ let vdConfig: ViewConfig = {
         { name: "1 month", value: 2592000000 }
     ],
     initRange: {
-        start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        start: moment().subtract(5, 'days').startOf('day').valueOf(),
         end: moment().add(2, 'days').endOf('day').valueOf()
     },
     interaction: {
@@ -209,11 +212,12 @@ let vdConfig: ViewConfig = {
                 // console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
-    timezone: 'Australia/Melbourne'
+    timezone: 'Australia/Melbourne',
+    highlightSeriesBackgroundAlpha: 1
     // timezone: 'Pacific/Auckland'
 };
 let vsConfig: ViewConfig = {
@@ -229,8 +233,9 @@ let vsConfig: ViewConfig = {
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
             { id: "meter2", type: "meter", name: "meter2" }
+            
         ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
             label: 'substation_day',
             name: 'substation_interval_day',
@@ -270,7 +275,7 @@ let vsConfig: ViewConfig = {
         { name: "1 month", value: 2592000000 }
     ],
     initRange: {
-        start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        start: moment().subtract(5, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
     },
     interaction: {
@@ -279,7 +284,7 @@ let vsConfig: ViewConfig = {
                 // console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -363,6 +368,7 @@ let vsConfig3: ViewConfig = {
             scroll: false,
             rangeBar: false,
             legend: formatters.legendForSingleSeries
+            
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -427,19 +433,21 @@ let vsConfig3: ViewConfig = {
 
 
 
-let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-graph3.initGraph();
+// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+// graph3.initGraph();
 
-let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-graph2.initGraph();
+// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+// graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
+// // link graphs
+// graph1.setChildren([graph2, graph3]);
 
-// link graphs
-graph1.setChildren([graph2, graph3]);
+// graph2.setChildren([graph1]);   // problem with right and left axis 
 
-graph2.setChildren([graph1]);   // problem with right and left axis 
+// let ueGraph = new FgpGraph(graphDiv, [vdConfigUE]);
+// ueGraph.initGraph();
 
 
 // highlight on first graph
