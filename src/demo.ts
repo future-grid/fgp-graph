@@ -169,7 +169,7 @@ let vdConfig: ViewConfig = {
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' },
+                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' , visibility: false },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
                 ],
@@ -231,11 +231,11 @@ let vsConfig: ViewConfig = {
             exports: [GraphExports.Data, GraphExports.Image]
         },
         entities: [
-            { id: "meter2", type: "meter", name: "meter2" },
-            { id: "meter1", type: "meter", name: "meter1" }
+            { id: "meter1", type: "meter", name: "meter1" },
+            { id: "meter2", type: "meter", name: "meter2" }
             
         ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
             label: 'substation_day',
             name: 'substation_interval_day',
@@ -275,7 +275,7 @@ let vsConfig: ViewConfig = {
         { name: "1 month", value: 2592000000 }
     ],
     initRange: {
-        start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        start: moment().subtract(5, 'days').startOf('day').valueOf(),
         end: moment().add(1, 'days').valueOf()
     },
     interaction: {
@@ -441,7 +441,6 @@ let vsConfig3: ViewConfig = {
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
-
 // // link graphs
 // graph1.setChildren([graph2, graph3]);
 

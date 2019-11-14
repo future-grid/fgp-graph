@@ -65,6 +65,7 @@ export interface GraphSeries {
     exp: string;
     type: string;
     yIndex?: string;
+    visibility?: boolean;  // only worked in single device view
 }
 
 /**

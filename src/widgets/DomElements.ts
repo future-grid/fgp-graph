@@ -70,6 +70,8 @@ export class DropdownMenu {
             if (opt.checked) {
                 checkbox.setAttribute("checked", "checked");
                 checkbox.setAttribute("data-value", opt.label);
+            } else {
+                checkbox.setAttribute("data-value", opt.label);
             }
             checkbox.addEventListener("click", (e) => {
                 //
@@ -297,7 +299,7 @@ export class GraphOperator {
     }
 
 
-    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph) => {
+    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?:Array<boolean>) => {
         let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
 
         if (dropdown && dropdown[0]) {
@@ -307,11 +309,17 @@ export class GraphOperator {
         dropdown[0].appendChild(select);
 
         let opts: Array<{ checked: boolean, name: string, label: string }> = [];
-        series.forEach(_series => {
-
-            opts.push(
-                { checked: true, name: _series, label: _series }
-            );
+        series.forEach((_series, _index) => {
+            if(visibility && visibility[_index] != undefined){
+                opts.push(
+                    { checked: visibility[_index], name: _series, label: _series }
+                );
+            } else {
+                opts.push(
+                    { checked: true, name: _series, label: _series }
+                );
+            }
+            
         });
 
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
@@ -609,11 +617,18 @@ export class GraphOperator {
 
             let isY2: boolean = false;
             let mainGraphLabels: Array<string> = [];
-
+            // check visibility config
+            let initVisibility:Array<boolean> = [];
+            
             if (choosedCollection && entities.length == 1) {
                 mainGraphLabels = [];
                 choosedCollection.series.forEach((series, _index) => {
                     mainGraphLabels.push(series.label);
+                    if(series.visibility == undefined || series.visibility == true){
+                        initVisibility.push(true);
+                    } else if(series.visibility == false){
+                        initVisibility.push(false);
+                    } 
                     initialData.forEach((_data: any) => {
                         _data[_index + 1] = null;
                     });
@@ -653,8 +668,6 @@ export class GraphOperator {
                 // set currentCollection to choosedCollection
                 this.currentCollection = choosedCollection;
             }
-
-
 
             let currentDatewindowOnMouseDown: any[] = [];
 
@@ -758,12 +771,16 @@ export class GraphOperator {
             // create a interaction model instance
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
+            
 
+
+            // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
                 ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
                 y2label: choosedCollection && choosedCollection.y2Label ? choosedCollection.y2Label : "",
                 rangeSelectorHeight: 30,
+                visibility: initVisibility.length > 0 ? initVisibility : undefined,
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
@@ -970,7 +987,7 @@ export class GraphOperator {
 
             }
 
-            this.updateSeriesDropdown(this.header, seriesName, this.mainGraph);
+            this.updateSeriesDropdown(this.header, seriesName, this.mainGraph, initVisibility);
 
         });
     }
