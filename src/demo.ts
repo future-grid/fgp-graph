@@ -176,7 +176,7 @@ let vdConfig: ViewConfig = {
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                initScales: { left: { min: 245, max: 260 } },
+                // initScales: { left: { min: 245, max: 260 } },
                 fill: true
             }, {
                 label: 'substation_day',
@@ -190,7 +190,7 @@ let vdConfig: ViewConfig = {
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                initScales: { left: { min: 230, max: 260 } },
+                // initScales: { left: { min: 230, max: 260 } },
                 fill: false
             }
         ]
