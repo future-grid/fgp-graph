@@ -299,7 +299,7 @@ export class GraphOperator {
     }
 
 
-    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?:Array<boolean>) => {
+    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?: Array<boolean>) => {
         let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
 
         if (dropdown && dropdown[0]) {
@@ -310,7 +310,7 @@ export class GraphOperator {
 
         let opts: Array<{ checked: boolean, name: string, label: string }> = [];
         series.forEach((_series, _index) => {
-            if(visibility && visibility[_index] != undefined){
+            if (visibility && visibility[_index] != undefined) {
                 opts.push(
                     { checked: visibility[_index], name: _series, label: _series }
                 );
@@ -319,7 +319,7 @@ export class GraphOperator {
                     { checked: true, name: _series, label: _series }
                 );
             }
-            
+
         });
 
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
@@ -418,7 +418,7 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
-        let currentDatewindow:[number, number];
+        let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
         let bottomAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-bottom' }];
@@ -488,7 +488,7 @@ export class GraphOperator {
                             dateWindow: [(middleDatetime - config.value / 2), (middleDatetime + config.value / 2)]
                         });
                     }
-                    
+
 
                     // find the correct collection and update graph
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
@@ -534,10 +534,10 @@ export class GraphOperator {
             let first: any = { timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf() };
             let last: any = { timestamp: 0 };
             // if init range exist put the second on here
-            if(this.currentView.initRange && this.currentView.initRange.end){
+            if (this.currentView.initRange && this.currentView.initRange.end) {
                 last.timestamp = this.currentView.initRange.end;
             }
-            
+
             // get all first and last then find out which first is the smalllest and last is the largest
             // entities.forEach(entity => {
             //
@@ -618,17 +618,17 @@ export class GraphOperator {
             let isY2: boolean = false;
             let mainGraphLabels: Array<string> = [];
             // check visibility config
-            let initVisibility:Array<boolean> = [];
-            
+            let initVisibility: Array<boolean> = [];
+
             if (choosedCollection && entities.length == 1) {
                 mainGraphLabels = [];
                 choosedCollection.series.forEach((series, _index) => {
                     mainGraphLabels.push(series.label);
-                    if(series.visibility == undefined || series.visibility == true){
+                    if (series.visibility == undefined || series.visibility == true) {
                         initVisibility.push(true);
-                    } else if(series.visibility == false){
+                    } else if (series.visibility == false) {
                         initVisibility.push(false);
-                    } 
+                    }
                     initialData.forEach((_data: any) => {
                         _data[_index + 1] = null;
                     });
@@ -647,8 +647,8 @@ export class GraphOperator {
                 });
             }
 
-            let yScale: any = {};
-            let y2Scale: any = {};
+            let yScale: any = null;
+            let y2Scale: any = null;
             // check if there is a init scale
             if (choosedCollection && choosedCollection.initScales) {
                 if (choosedCollection.initScales.left) {
@@ -661,7 +661,6 @@ export class GraphOperator {
                         valueRange: [choosedCollection.initScales.right.min, choosedCollection.initScales.right.max]
                     };
                 }
-
             }
 
             if (choosedCollection) {
@@ -694,7 +693,7 @@ export class GraphOperator {
                     });
 
 
-                    let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
+                    let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
                     Object.assign(collection, choosedCollection);
 
                     if (yAxisRange) {
@@ -771,7 +770,6 @@ export class GraphOperator {
             // create a interaction model instance
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
-            
 
 
             // create graph instance
@@ -1017,7 +1015,7 @@ export class GraphOperator {
             this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
                 return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
             });
-            let collection: GraphCollection = { label: "", name: "", series: [], interval: 0, initScales: { left: { min: 0, max: 0 }, right: { min: 0, max: 0 } } };
+            let collection: GraphCollection = { label: "", name: "", series: [], interval: 0};
             Object.assign(collection, this.currentCollection);
             // check initScale
             this.update();
@@ -1086,7 +1084,7 @@ export class GraphOperator {
                     color: series.color,
                     highlightCircleSize: 4
                 };
-                
+
 
                 if (series.type == 'dots') {
                     mainGraphSeries[series.label]["strokeWidth"] = 0;
@@ -1158,14 +1156,14 @@ export class GraphOperator {
                                 //
                                 if (yAxis.min) {
                                     // compare and put the value
-                                    yAxis.min = yAxis.min > point[_index + 1] ? point[_index + 1] : yAxis.min;
+                                    yAxis.min = (yAxis.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.min;
                                 } else {
                                     yAxis.min = point[_index + 1];
                                 }
 
                                 if (yAxis.max) {
                                     // compare and put the value
-                                    yAxis.max = yAxis.max < point[_index + 1] ? point[_index + 1] : yAxis.max;
+                                    yAxis.max = (yAxis.max < point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.max;
                                 } else {
                                     yAxis.max = point[_index + 1];
                                 }
@@ -1191,6 +1189,7 @@ export class GraphOperator {
                                 }
                             }
                         });
+
                     });
                 });
             } else if (entities.length > 1 && collection.series && collection.series[0]) {
@@ -1211,9 +1210,9 @@ export class GraphOperator {
                     }
 
                     entities.forEach((entity, _index) => {
-                        
+
                         if (graphData.length > _index) {
-                            
+
                             let record = graphData[_index].find((data: any) => data.timestamp == date);
                             point[_index + 1] = record ? f(record) : null;
 
@@ -1222,14 +1221,14 @@ export class GraphOperator {
                                     //
                                     if (yAxis.min) {
                                         // compare and put the value
-                                        yAxis.min = yAxis.min > point[_index + 1] ? point[_index + 1] : yAxis.min;
+                                        yAxis.min = (yAxis.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.min;
                                     } else {
                                         yAxis.min = point[_index + 1];
                                     }
 
                                     if (yAxis.max) {
                                         // compare and put the value
-                                        yAxis.max = yAxis.max < point[_index + 1] ? point[_index + 1] : yAxis.max;
+                                        yAxis.max = (yAxis.max < point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.max;
                                     } else {
                                         yAxis.max = point[_index + 1];
                                     }
@@ -1242,14 +1241,14 @@ export class GraphOperator {
                                     //
                                     if (yAxis2.min) {
                                         // compare and put the value
-                                        yAxis2.min = yAxis2.min > point[_index + 1] ? point[_index + 1] : yAxis2.min;
+                                        yAxis2.min = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.min;
                                     } else {
                                         yAxis2.min = point[_index + 1];
                                     }
 
                                     if (yAxis2.max) {
                                         // compare and put the value
-                                        yAxis2.max = yAxis2.max < point[_index + 1] ? point[_index + 1] : yAxis2.max;
+                                        yAxis2.max = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.max;
                                     } else {
                                         yAxis2.max = point[_index + 1];
                                     }
@@ -1261,7 +1260,7 @@ export class GraphOperator {
                     });
                 });
             }
-
+            console.info(yAxis, yAxis2);
             return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
         }
 
@@ -1278,7 +1277,6 @@ export class GraphOperator {
                         if (graphData.axis.y) {
                             yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
                         }
-
                         if (graphData.axis.y2) {
                             y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
                         }
@@ -1303,7 +1301,7 @@ export class GraphOperator {
                         this.currentGraphData.push(_data);
                     });
                 }
-                if(view.graphConfig.entities.length > 1){
+                if (view.graphConfig.entities.length > 1) {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
                 }
@@ -1311,7 +1309,7 @@ export class GraphOperator {
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
-                    labels: ['x'].concat(mainLabels),   
+                    labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
                         strokeWidth: 1.5
