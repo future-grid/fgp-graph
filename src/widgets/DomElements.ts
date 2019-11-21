@@ -651,12 +651,12 @@ export class GraphOperator {
             let y2Scale: any = null;
             // check if there is a init scale
             if (choosedCollection && choosedCollection.initScales) {
-                if (choosedCollection.initScales.left) {
+                if (choosedCollection.initScales.left && (choosedCollection.initScales.left.min != 0 && choosedCollection.initScales.left.max !=0)) {
                     yScale = {
                         valueRange: [choosedCollection.initScales.left.min, choosedCollection.initScales.left.max]
                     };
                 }
-                if (choosedCollection.initScales.right) {
+                if (choosedCollection.initScales.right && (choosedCollection.initScales.right.min != 0 && choosedCollection.initScales.right.max !=0)) {
                     y2Scale = {
                         valueRange: [choosedCollection.initScales.right.min, choosedCollection.initScales.right.max]
                     };
@@ -771,14 +771,17 @@ export class GraphOperator {
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
 
-
+            let fullVisibility:Array<boolean> = [];
+            mainGraphLabels.forEach(label=>{
+                fullVisibility.push(true);
+            });
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
                 ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
                 y2label: choosedCollection && choosedCollection.y2Label ? choosedCollection.y2Label : "",
                 rangeSelectorHeight: 30,
-                visibility: initVisibility.length > 0 ? initVisibility : undefined,
+                visibility: initVisibility.length > 0 ? initVisibility : fullVisibility,
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
@@ -795,8 +798,8 @@ export class GraphOperator {
                 highlightSeriesBackgroundAlpha: this.currentView.highlightSeriesBackgroundAlpha ? this.currentView.highlightSeriesBackgroundAlpha : 0.5,
                 highlightSeriesOpts: { strokeWidth: 1 },
                 highlightCallback: (e, x, ps, row, seriesName) => {
-                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlighCallback) {
-                        this.currentView.interaction.callback.highlighCallback(x, seriesName, ps);
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                        this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
                     currentSelection = seriesName;
                 },
@@ -1281,16 +1284,28 @@ export class GraphOperator {
                             y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
                         }
                     }
-                } else {
+                } else if(graphCollection && graphCollection.initScales) {
                     // check if there is a init scale
                     if (graphCollection && graphCollection.initScales && graphCollection.initScales.left) {
                         yScale.valueRange = [graphCollection.initScales.left.min, graphCollection.initScales.left.max];
-
+                        if(graphCollection.initScales.left.min == 0 && graphCollection.initScales.left.max == 0){
+                            if (graphData.axis && graphData.axis.y) {
+                                yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                            }
+                        }
                     }
                     if (graphCollection && graphCollection.initScales && graphCollection.initScales.right) {
-                        y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max]
+                        y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max];
+                        if(graphCollection.initScales.right.min == 0 && graphCollection.initScales.right.max == 0){
+                            if (graphData.axis && graphData.axis.y2) {
+                                y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                            }
+                        }
                     }
                 }
+
+                console.info("y valueRange:", yScale.valueRange);
+                console.info("y2 valueRange:", yScale.valueRange);
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
                 console.debug("Graph is clean now!~");

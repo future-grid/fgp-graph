@@ -110,7 +110,7 @@ export interface GraphConfig {
  */
 export interface Callbacks {
     dataCallback?(data: any): void;
-    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    highlightCallback?(datetime: any, series: any, points: any[]): void;
     clickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }

@@ -176,7 +176,7 @@ let vdConfig: ViewConfig = {
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                // initScales: { left: { min: 245, max: 260 } },
+                initScales: { left: { min: 245, max: 260 } },
                 fill: true
             }, {
                 label: 'substation_day',
@@ -190,7 +190,7 @@ let vdConfig: ViewConfig = {
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                // initScales: { left: { min: 230, max: 260 } },
+                initScales: { left: { min: 230, max: 260 } },
                 fill: false
             }
         ]
@@ -208,11 +208,11 @@ let vdConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
@@ -280,11 +280,11 @@ let vsConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);    // too many messages in console
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -349,11 +349,11 @@ let vsConfig2: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -419,11 +419,11 @@ let vsConfig3: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -433,16 +433,16 @@ let vsConfig3: ViewConfig = {
 
 
 
-// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-// graph3.initGraph();
+let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+graph3.initGraph();
 
-// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-// graph2.initGraph();
+let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 // // link graphs
-// graph1.setChildren([graph2, graph3]);
+graph1.setChildren([graph2, graph3]);
 
 // graph2.setChildren([graph1]);   // problem with right and left axis 
 
