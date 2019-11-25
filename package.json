@@ -1,6 +1,6 @@
 {
   "name": "@future-grid/fgp-graph",
-  "version": "19.6.17",
+  "version": "19.6.18",
   "description": "fgp-graph is a chart lib based on Dygraphs",
   "main": "dist/fgp-graph.bundle.js",
   "module": "lib/index.js",

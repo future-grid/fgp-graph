@@ -1292,6 +1292,18 @@ export class GraphOperator {
                             if (graphData.axis && graphData.axis.y) {
                                 yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
                             }
+                        } else {
+                            // check min and max then fix initScale
+                            if (graphData.axis && graphData.axis.y) {
+                                if(graphCollection.initScales.left.min > graphData.axis.y.min){
+                                    //
+                                    yScale.valueRange[0] = graphData.axis.y.min * 0.97;
+                                }
+
+                                if(graphCollection.initScales.left.max < graphData.axis.y.max){
+                                    yScale.valueRange[1] = graphData.axis.y.max * 0.97;
+                                }
+                            }
                         }
                     }
                     if (graphCollection && graphCollection.initScales && graphCollection.initScales.right) {
@@ -1299,6 +1311,16 @@ export class GraphOperator {
                         if(graphCollection.initScales.right.min == 0 && graphCollection.initScales.right.max == 0){
                             if (graphData.axis && graphData.axis.y2) {
                                 y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                            }
+                        } else {
+                            if (graphData.axis && graphData.axis.y2) {
+                                if(graphCollection.initScales.right.min > graphData.axis.y2.min){
+                                    y2Scale.valueRange[0] = graphData.axis.y2.min * 0.97;
+                                }
+
+                                if(graphCollection.initScales.right.max < graphData.axis.y2.max){
+                                    y2Scale.valueRange[1] = graphData.axis.y2.max * 0.97;
+                                }
                             }
                         }
                     }
