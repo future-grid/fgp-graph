@@ -1220,7 +1220,7 @@ export class GraphOperator {
                             point[_index + 1] = record ? f(record) : null;
 
                             yIndexs.forEach(_yIndex => {
-                                if (_yIndex == (_index + 1)) {
+                                // if (_yIndex == (_index + 1)) {
                                     //
                                     if (yAxis.min) {
                                         // compare and put the value
@@ -1235,12 +1235,12 @@ export class GraphOperator {
                                     } else {
                                         yAxis.max = point[_index + 1];
                                     }
-                                }
+                                // }
                             });
 
                             // right 
                             y2Indexs.forEach(_yIndex => {
-                                if (_yIndex == (_index + 1)) {
+                                // if (_yIndex == (_index + 1)) {
                                     //
                                     if (yAxis2.min) {
                                         // compare and put the value
@@ -1255,7 +1255,7 @@ export class GraphOperator {
                                     } else {
                                         yAxis2.max = point[_index + 1];
                                     }
-                                }
+                                // }
                             });
                         } else {
                             point[_index + 1] = null;
@@ -1278,10 +1278,10 @@ export class GraphOperator {
                 if (graphCollection && !graphCollection.initScales) {
                     if (graphData.axis) {
                         if (graphData.axis.y) {
-                            yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                            yScale.valueRange = [graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08), graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08)];
                         }
                         if (graphData.axis.y2) {
-                            y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                            y2Scale.valueRange = [graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08), graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08)];
                         }
                     }
                 } else if(graphCollection && graphCollection.initScales) {
@@ -1290,18 +1290,18 @@ export class GraphOperator {
                         yScale.valueRange = [graphCollection.initScales.left.min, graphCollection.initScales.left.max];
                         if(graphCollection.initScales.left.min == 0 && graphCollection.initScales.left.max == 0){
                             if (graphData.axis && graphData.axis.y) {
-                                yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                                yScale.valueRange = [graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08), graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08)];
                             }
                         } else {
                             // check min and max then fix initScale
                             if (graphData.axis && graphData.axis.y) {
                                 if(graphCollection.initScales.left.min > graphData.axis.y.min){
                                     //
-                                    yScale.valueRange[0] = graphData.axis.y.min * 0.97;
+                                    yScale.valueRange[0] = graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08);
                                 }
 
                                 if(graphCollection.initScales.left.max < graphData.axis.y.max){
-                                    yScale.valueRange[1] = graphData.axis.y.max * 0.97;
+                                    yScale.valueRange[1] = graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08);
                                 }
                             }
                         }
@@ -1310,16 +1310,16 @@ export class GraphOperator {
                         y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max];
                         if(graphCollection.initScales.right.min == 0 && graphCollection.initScales.right.max == 0){
                             if (graphData.axis && graphData.axis.y2) {
-                                y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                                y2Scale.valueRange = [graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08), graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08)];
                             }
                         } else {
                             if (graphData.axis && graphData.axis.y2) {
                                 if(graphCollection.initScales.right.min > graphData.axis.y2.min){
-                                    y2Scale.valueRange[0] = graphData.axis.y2.min * 0.97;
+                                    y2Scale.valueRange[0] = graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08);
                                 }
 
                                 if(graphCollection.initScales.right.max < graphData.axis.y2.max){
-                                    y2Scale.valueRange[1] = graphData.axis.y2.max * 0.97;
+                                    y2Scale.valueRange[1] = graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08);
                                 }
                             }
                         }
@@ -1327,7 +1327,7 @@ export class GraphOperator {
                 }
 
                 console.info("y valueRange:", yScale.valueRange);
-                console.info("y2 valueRange:", yScale.valueRange);
+                console.info("y2 valueRange:", y2Scale.valueRange);
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
                 console.debug("Graph is clean now!~");

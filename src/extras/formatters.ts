@@ -244,7 +244,7 @@ export class Formatters {
         var html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
         data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
-            var labeledData = series.labelHTML + ': ' + series.yHTML;
+            var labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
             }
@@ -270,7 +270,7 @@ export class Formatters {
 
         data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
-            let labeledData = series.labelHTML + ': ' + series.yHTML;
+            let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
                 html += '<br>' + series.dashHTML + ' ' + labeledData;
