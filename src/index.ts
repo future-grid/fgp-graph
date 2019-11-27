@@ -83,9 +83,15 @@ export default class FgpGraph {
         let buttonsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-buttons" }];
         const buttonsArea = DomElementOperator.createElement('div', buttonsAttrs);
 
+        let filterAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-filter-buttons" }];
+        const filterArea = DomElementOperator.createElement('div', filterAttrs);
+
+
+
         let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
         this.header = DomElementOperator.createElement('div', headerAttrs);
         this.header.appendChild(buttonsArea);
+        this.header.appendChild(filterArea);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
         this.header.appendChild(this.seriesDropdown);

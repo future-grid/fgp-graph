@@ -86,6 +86,13 @@ export interface GraphCollection {
     fill?: boolean;
 }
 
+export type filterFunc = () => Array<string>;
+
+export interface FilterConfig {
+    label: string;
+    func: filterFunc;
+}
+
 /**
  * graph configuration
  *
@@ -98,6 +105,7 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
+    filters?: Array<FilterConfig>;
 }
 
 

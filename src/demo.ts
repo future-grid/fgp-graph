@@ -49,23 +49,23 @@ class DataService implements DataHandler {
             existData.forEach(_ed => {
                 if (_ed.id.indexOf('meter') != -1) {
 
-                    if(_ed.id.indexOf('meter2') == -1){
-                    // get existing data
-                    if (_ed.interval == interval) {
-                        // find data
-                        let recordExist = false;
-                        _ed.data.forEach((_data: any) => {
-                            if (_data.timestamp == tempDate) {
-                                // found it
-                                recordExist = true;
+                    if (_ed.id.indexOf('meter2') == -1) {
+                        // get existing data
+                        if (_ed.interval == interval) {
+                            // find data
+                            let recordExist = false;
+                            _ed.data.forEach((_data: any) => {
+                                if (_data.timestamp == tempDate) {
+                                    // found it
+                                    recordExist = true;
+                                }
+                            });
+                            if (!recordExist) {
+                                // add new one
+                                _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                             }
-                        });
-                        if (!recordExist) {
-                            // add new one
-                            _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                         }
                     }
-                }
 
                 } else if (_ed.id.indexOf('substation') != -1) {
                     if (_ed.interval == interval) {
@@ -169,7 +169,7 @@ let vdConfig: ViewConfig = {
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' , visibility: false },
+                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902', visibility: false },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
                 ],
@@ -192,6 +192,32 @@ let vdConfig: ViewConfig = {
                 y2Label: 'voltage',
                 initScales: { left: { min: 230, max: 260 } },
                 fill: false
+            }
+        ],
+        filters: [
+            {
+                label: "All"
+                , func: () => {
+                    return ["Min", "Max", "Avg"];
+                }
+            },
+            {
+                label: "Min"
+                , func: () => {
+                    return ["Min"];
+                }
+            },
+            {
+                label: "Max"
+                , func: () => {
+                    return ["Max"];
+                }
+            },
+            {
+                label: "Avg"
+                , func: () => {
+                    return ["Avg"];
+                }
             }
         ]
 
@@ -233,7 +259,7 @@ let vsConfig: ViewConfig = {
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
             { id: "meter2", type: "meter", name: "meter2" }
-            
+
         ],
         rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
@@ -265,6 +291,26 @@ let vsConfig: ViewConfig = {
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 initScales: { left: { min: 245, max: 260 } },
                 yLabel: 'voltage'
+            }
+        ],
+        filters: [
+            {
+                label: "All"
+                , func: () => {
+                    return ["meter1", "meter2"];
+                }
+            },
+            {
+                label: "PhaseA"
+                , func: () => {
+                    return ["meter1"];
+                }
+            },
+            {
+                label: "PhaseB"
+                , func: () => {
+                    return ["meter2"];
+                }
             }
         ]
     },
@@ -368,7 +414,7 @@ let vsConfig3: ViewConfig = {
             scroll: false,
             rangeBar: false,
             legend: formatters.legendForSingleSeries
-            
+
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -433,16 +479,16 @@ let vsConfig3: ViewConfig = {
 
 
 
-let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-graph3.initGraph();
+// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+// graph3.initGraph();
 
-let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-graph2.initGraph();
+// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+// graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 // // link graphs
-graph1.setChildren([graph2, graph3]);
+// graph1.setChildren([graph2, graph3]);
 
 // graph2.setChildren([graph1]);   // problem with right and left axis 
 
