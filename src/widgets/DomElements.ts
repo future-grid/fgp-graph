@@ -418,6 +418,50 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
+        let buttons = this.header.getElementsByClassName("fgp-filter-buttons");
+        if (buttons && buttons[0]) {
+            buttons[0].innerHTML = "";
+        }
+        // check filter buttons
+        if (view.graphConfig.filters) {
+            // create buttons and add event listener
+            view.graphConfig.filters.forEach(filter => {
+                let button: HTMLSpanElement = document.createElement("button");
+                button.className = "fgp-filter-button";
+                button.textContent = filter.label;
+                button.addEventListener('click', (event) => {
+                    // call function and get series list back
+                    const series: Array<string> = filter.func();
+                    // set visibility
+                    let graphLabels: Array<string> = this.mainGraph.getOption('labels');
+                    let visibility: Array<boolean> = [];
+                    let labels = graphLabels.filter((element, index, array) => {
+                        if (index != 0) {
+                            visibility.push(true);
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    labels.map((value, index, array) => {
+                        if (series.includes(value)) {
+                            visibility[index] = true;
+                        } else {
+                            visibility[index] = false;
+                        }
+                    });
+
+                    // set visibility
+                    this.mainGraph.updateOptions({
+                        visibility: visibility
+                    });
+                });
+                // add button 
+                buttons[0].appendChild(button);
+            });
+        }
+
+
         let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
@@ -651,12 +695,12 @@ export class GraphOperator {
             let y2Scale: any = null;
             // check if there is a init scale
             if (choosedCollection && choosedCollection.initScales) {
-                if (choosedCollection.initScales.left) {
+                if (choosedCollection.initScales.left && (choosedCollection.initScales.left.min != 0 && choosedCollection.initScales.left.max != 0)) {
                     yScale = {
                         valueRange: [choosedCollection.initScales.left.min, choosedCollection.initScales.left.max]
                     };
                 }
-                if (choosedCollection.initScales.right) {
+                if (choosedCollection.initScales.right && (choosedCollection.initScales.right.min != 0 && choosedCollection.initScales.right.max != 0)) {
                     y2Scale = {
                         valueRange: [choosedCollection.initScales.right.min, choosedCollection.initScales.right.max]
                     };
@@ -771,14 +815,17 @@ export class GraphOperator {
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
 
-
+            let fullVisibility: Array<boolean> = [];
+            mainGraphLabels.forEach(label => {
+                fullVisibility.push(true);
+            });
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
                 ylabel: choosedCollection && choosedCollection.yLabel ? choosedCollection.yLabel : "",
                 y2label: choosedCollection && choosedCollection.y2Label ? choosedCollection.y2Label : "",
                 rangeSelectorHeight: 30,
-                visibility: initVisibility.length > 0 ? initVisibility : undefined,
+                visibility: initVisibility.length > 0 ? initVisibility : fullVisibility,
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
@@ -795,8 +842,8 @@ export class GraphOperator {
                 highlightSeriesBackgroundAlpha: this.currentView.highlightSeriesBackgroundAlpha ? this.currentView.highlightSeriesBackgroundAlpha : 0.5,
                 highlightSeriesOpts: { strokeWidth: 1 },
                 highlightCallback: (e, x, ps, row, seriesName) => {
-                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlighCallback) {
-                        this.currentView.interaction.callback.highlighCallback(x, seriesName, ps);
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                        this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
                     currentSelection = seriesName;
                 },
@@ -1015,7 +1062,7 @@ export class GraphOperator {
             this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
                 return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
             });
-            let collection: GraphCollection = { label: "", name: "", series: [], interval: 0};
+            let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
             Object.assign(collection, this.currentCollection);
             // check initScale
             this.update();
@@ -1217,42 +1264,42 @@ export class GraphOperator {
                             point[_index + 1] = record ? f(record) : null;
 
                             yIndexs.forEach(_yIndex => {
-                                if (_yIndex == (_index + 1)) {
-                                    //
-                                    if (yAxis.min) {
-                                        // compare and put the value
-                                        yAxis.min = (yAxis.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.min;
-                                    } else {
-                                        yAxis.min = point[_index + 1];
-                                    }
-
-                                    if (yAxis.max) {
-                                        // compare and put the value
-                                        yAxis.max = (yAxis.max < point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.max;
-                                    } else {
-                                        yAxis.max = point[_index + 1];
-                                    }
+                                // if (_yIndex == (_index + 1)) {
+                                //
+                                if (yAxis.min) {
+                                    // compare and put the value
+                                    yAxis.min = (yAxis.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.min;
+                                } else {
+                                    yAxis.min = point[_index + 1];
                                 }
+
+                                if (yAxis.max) {
+                                    // compare and put the value
+                                    yAxis.max = (yAxis.max < point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis.max;
+                                } else {
+                                    yAxis.max = point[_index + 1];
+                                }
+                                // }
                             });
 
                             // right 
                             y2Indexs.forEach(_yIndex => {
-                                if (_yIndex == (_index + 1)) {
-                                    //
-                                    if (yAxis2.min) {
-                                        // compare and put the value
-                                        yAxis2.min = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.min;
-                                    } else {
-                                        yAxis2.min = point[_index + 1];
-                                    }
-
-                                    if (yAxis2.max) {
-                                        // compare and put the value
-                                        yAxis2.max = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.max;
-                                    } else {
-                                        yAxis2.max = point[_index + 1];
-                                    }
+                                // if (_yIndex == (_index + 1)) {
+                                //
+                                if (yAxis2.min) {
+                                    // compare and put the value
+                                    yAxis2.min = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.min;
+                                } else {
+                                    yAxis2.min = point[_index + 1];
                                 }
+
+                                if (yAxis2.max) {
+                                    // compare and put the value
+                                    yAxis2.max = (yAxis2.min > point[_index + 1] && point[_index + 1]) ? point[_index + 1] : yAxis2.max;
+                                } else {
+                                    yAxis2.max = point[_index + 1];
+                                }
+                                // }
                             });
                         } else {
                             point[_index + 1] = null;
@@ -1275,22 +1322,56 @@ export class GraphOperator {
                 if (graphCollection && !graphCollection.initScales) {
                     if (graphData.axis) {
                         if (graphData.axis.y) {
-                            yScale.valueRange = [graphData.axis.y.min * 0.97, graphData.axis.y.max * 1.03];
+                            yScale.valueRange = [graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08), graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08)];
                         }
                         if (graphData.axis.y2) {
-                            y2Scale.valueRange = [graphData.axis.y2.min * 0.97, graphData.axis.y2.max * 1.03];
+                            y2Scale.valueRange = [graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08), graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08)];
                         }
                     }
-                } else {
+                } else if (graphCollection && graphCollection.initScales) {
                     // check if there is a init scale
                     if (graphCollection && graphCollection.initScales && graphCollection.initScales.left) {
                         yScale.valueRange = [graphCollection.initScales.left.min, graphCollection.initScales.left.max];
+                        if (graphCollection.initScales.left.min == 0 && graphCollection.initScales.left.max == 0) {
+                            if (graphData.axis && graphData.axis.y) {
+                                yScale.valueRange = [graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08), graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08)];
+                            }
+                        } else {
+                            // check min and max then fix initScale
+                            if (graphData.axis && graphData.axis.y) {
+                                if (graphCollection.initScales.left.min > graphData.axis.y.min) {
+                                    //
+                                    yScale.valueRange[0] = graphData.axis.y.min - (Math.abs(graphData.axis.y.min) * 0.08);
+                                }
 
+                                if (graphCollection.initScales.left.max < graphData.axis.y.max) {
+                                    yScale.valueRange[1] = graphData.axis.y.max + (Math.abs(graphData.axis.y.max) * 0.08);
+                                }
+                            }
+                        }
                     }
                     if (graphCollection && graphCollection.initScales && graphCollection.initScales.right) {
-                        y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max]
+                        y2Scale.valueRange = [graphCollection.initScales.right.min, graphCollection.initScales.right.max];
+                        if (graphCollection.initScales.right.min == 0 && graphCollection.initScales.right.max == 0) {
+                            if (graphData.axis && graphData.axis.y2) {
+                                y2Scale.valueRange = [graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08), graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08)];
+                            }
+                        } else {
+                            if (graphData.axis && graphData.axis.y2) {
+                                if (graphCollection.initScales.right.min > graphData.axis.y2.min) {
+                                    y2Scale.valueRange[0] = graphData.axis.y2.min - (Math.abs(graphData.axis.y2.min) * 0.08);
+                                }
+
+                                if (graphCollection.initScales.right.max < graphData.axis.y2.max) {
+                                    y2Scale.valueRange[1] = graphData.axis.y2.max + (Math.abs(graphData.axis.y2.max) * 0.08);
+                                }
+                            }
+                        }
                     }
                 }
+
+                console.info("y valueRange:", yScale.valueRange);
+                console.info("y2 valueRange:", y2Scale.valueRange);
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
                 console.debug("Graph is clean now!~");

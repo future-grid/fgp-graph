@@ -86,6 +86,13 @@ export interface GraphCollection {
     fill?: boolean;
 }
 
+export type filterFunc = () => Array<string>;
+
+export interface FilterConfig {
+    label: string;
+    func: filterFunc;
+}
+
 /**
  * graph configuration
  *
@@ -98,6 +105,7 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
+    filters?: Array<FilterConfig>;
 }
 
 
@@ -110,7 +118,7 @@ export interface GraphConfig {
  */
 export interface Callbacks {
     dataCallback?(data: any): void;
-    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    highlightCallback?(datetime: any, series: any, points: any[]): void;
     clickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }

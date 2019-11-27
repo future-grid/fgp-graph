@@ -49,23 +49,23 @@ class DataService implements DataHandler {
             existData.forEach(_ed => {
                 if (_ed.id.indexOf('meter') != -1) {
 
-                    if(_ed.id.indexOf('meter2') == -1){
-                    // get existing data
-                    if (_ed.interval == interval) {
-                        // find data
-                        let recordExist = false;
-                        _ed.data.forEach((_data: any) => {
-                            if (_data.timestamp == tempDate) {
-                                // found it
-                                recordExist = true;
+                    if (_ed.id.indexOf('meter2') == -1) {
+                        // get existing data
+                        if (_ed.interval == interval) {
+                            // find data
+                            let recordExist = false;
+                            _ed.data.forEach((_data: any) => {
+                                if (_data.timestamp == tempDate) {
+                                    // found it
+                                    recordExist = true;
+                                }
+                            });
+                            if (!recordExist) {
+                                // add new one
+                                _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                             }
-                        });
-                        if (!recordExist) {
-                            // add new one
-                            _ed.data.push({ 'timestamp': tempDate, 'voltage': this.randomNumber(252, 255), 'amp': this.randomNumber(1, 2), 'avgVoltage': this.randomNumber(250, 255) });
                         }
                     }
-                }
 
                 } else if (_ed.id.indexOf('substation') != -1) {
                     if (_ed.interval == interval) {
@@ -169,14 +169,14 @@ let vdConfig: ViewConfig = {
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' , visibility: false },
+                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902', visibility: false },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
                     { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
                 ],
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                // initScales: { left: { min: 245, max: 260 } },
+                initScales: { left: { min: 245, max: 260 } },
                 fill: true
             }, {
                 label: 'substation_day',
@@ -190,8 +190,34 @@ let vdConfig: ViewConfig = {
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                // initScales: { left: { min: 230, max: 260 } },
+                initScales: { left: { min: 230, max: 260 } },
                 fill: false
+            }
+        ],
+        filters: [
+            {
+                label: "All"
+                , func: () => {
+                    return ["Min", "Max", "Avg"];
+                }
+            },
+            {
+                label: "Min"
+                , func: () => {
+                    return ["Min"];
+                }
+            },
+            {
+                label: "Max"
+                , func: () => {
+                    return ["Max"];
+                }
+            },
+            {
+                label: "Avg"
+                , func: () => {
+                    return ["Avg"];
+                }
             }
         ]
 
@@ -203,16 +229,16 @@ let vdConfig: ViewConfig = {
         { name: "1 month", value: 2592000000 }
     ],
     initRange: {
-        start: moment().subtract(5, 'days').startOf('day').valueOf(),
-        end: moment().add(2, 'days').endOf('day').valueOf()
+        start: moment("2019/06/01").add(10, 'days').startOf('day').valueOf(),
+        end: moment().subtract(15, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
@@ -233,7 +259,7 @@ let vsConfig: ViewConfig = {
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
             { id: "meter2", type: "meter", name: "meter2" }
-            
+
         ],
         rangeEntity: { id: "substation1", type: "substation", name: "substation1" },
         rangeCollection: {
@@ -266,6 +292,26 @@ let vsConfig: ViewConfig = {
                 initScales: { left: { min: 245, max: 260 } },
                 yLabel: 'voltage'
             }
+        ],
+        filters: [
+            {
+                label: "All"
+                , func: () => {
+                    return ["meter1", "meter2"];
+                }
+            },
+            {
+                label: "PhaseA"
+                , func: () => {
+                    return ["meter1"];
+                }
+            },
+            {
+                label: "PhaseB"
+                , func: () => {
+                    return ["meter2"];
+                }
+            }
         ]
     },
     dataService: dataService,
@@ -280,11 +326,11 @@ let vsConfig: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);    // too many messages in console
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -349,11 +395,11 @@ let vsConfig2: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
@@ -368,7 +414,7 @@ let vsConfig3: ViewConfig = {
             scroll: false,
             rangeBar: false,
             legend: formatters.legendForSingleSeries
-            
+
         },
         entities: [
             { id: "meter1", type: "meter", name: "meter1" },
@@ -419,11 +465,11 @@ let vsConfig3: ViewConfig = {
     },
     interaction: {
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                // console.debug("choosed series: ", series);
+                console.debug("choosed series: ", series);
             }
         }
     },
