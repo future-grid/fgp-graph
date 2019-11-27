@@ -194,7 +194,7 @@ let vdConfig: ViewConfig = {
                 fill: false
             }
         ],
-        filters: [
+        filters: {"buttons": [
             {
                 label: "All"
                 , func: () => {
@@ -219,7 +219,7 @@ let vdConfig: ViewConfig = {
                     return ["Avg"];
                 }
             }
-        ]
+        ]}
 
     },
     dataService: dataService,
@@ -293,26 +293,24 @@ let vsConfig: ViewConfig = {
                 yLabel: 'voltage'
             }
         ],
-        filters: [
-            {
+        filters: {
+            "dropdown": [{
                 label: "All"
                 , func: () => {
                     return ["meter1", "meter2"];
                 }
-            },
-            {
-                label: "PhaseA"
+            },{
+                label: "Meter1"
                 , func: () => {
                     return ["meter1"];
                 }
-            },
-            {
-                label: "PhaseB"
+            },{
+                label: "Meter2"
                 , func: () => {
                     return ["meter2"];
                 }
-            }
-        ]
+            }]
+        }
     },
     dataService: dataService,
     show: false,

@@ -105,7 +105,7 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-    filters?: Array<FilterConfig>;
+    filters?: {"buttons"?: Array<FilterConfig>, "dropdown"?: Array<FilterConfig>};
 }
 
 

@@ -1,5 +1,5 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports, filterFunc } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
 import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
@@ -415,6 +415,32 @@ export class GraphOperator {
     }
 
 
+    private setVisibility = (series: Array<string>) => {
+        // set visibility
+        let graphLabels: Array<string> = this.mainGraph.getOption('labels');
+        let visibility: Array<boolean> = [];
+        let labels = graphLabels.filter((element, index, array) => {
+            if (index != 0) {
+                visibility.push(true);
+                return true;
+            }
+            return false;
+        });
+
+        labels.map((value, index, array) => {
+            if (series.includes(value)) {
+                visibility[index] = true;
+            } else {
+                visibility[index] = false;
+            }
+        });
+
+        // set visibility
+        this.mainGraph.updateOptions({
+            visibility: visibility
+        });
+    }
+
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
@@ -423,42 +449,61 @@ export class GraphOperator {
             buttons[0].innerHTML = "";
         }
         // check filter buttons
-        if (view.graphConfig.filters) {
+        if (view.graphConfig.filters && view.graphConfig.filters.buttons) {
             // create buttons and add event listener
-            view.graphConfig.filters.forEach(filter => {
+            view.graphConfig.filters.buttons.forEach(filter => {
                 let button: HTMLSpanElement = document.createElement("button");
                 button.className = "fgp-filter-button";
                 button.textContent = filter.label;
                 button.addEventListener('click', (event) => {
                     // call function and get series list back
                     const series: Array<string> = filter.func();
-                    // set visibility
-                    let graphLabels: Array<string> = this.mainGraph.getOption('labels');
-                    let visibility: Array<boolean> = [];
-                    let labels = graphLabels.filter((element, index, array) => {
-                        if (index != 0) {
-                            visibility.push(true);
-                            return true;
-                        }
-                        return false;
-                    });
-
-                    labels.map((value, index, array) => {
-                        if (series.includes(value)) {
-                            visibility[index] = true;
-                        } else {
-                            visibility[index] = false;
-                        }
-                    });
-
-                    // set visibility
-                    this.mainGraph.updateOptions({
-                        visibility: visibility
-                    });
+                    this.setVisibility(series);
                 });
                 // add button 
                 buttons[0].appendChild(button);
             });
+        }
+
+        // dropdown list filter buttons
+        if (view.graphConfig.filters && view.graphConfig.filters.dropdown) {
+
+
+            // put it into dropdown\
+
+            let filtersDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-filter-dropdown" }];
+            let filtersDropdown = DomElementOperator.createElement('select', filtersDropdownAttrs);
+
+            buttons[0].appendChild(filtersDropdown);
+
+            // create options
+            let dropdownOpts: Array<{ id: string, label: string }> = [];
+
+            let reference: Array<{ name: string, func: filterFunc }> = [];
+
+            view.graphConfig.filters.dropdown.forEach(filter => {
+                //
+                dropdownOpts.push({ id: filter.label, label: filter.label });
+                reference.push({ name: filter.label, func: filter.func });
+            });
+
+            const filterDropdonwOptions = new DropdownButton(<HTMLSelectElement>filtersDropdown, [...dropdownOpts]);
+            filterDropdonwOptions.render();
+            // add event listener
+            filtersDropdown.onchange = (e) => {
+                //
+                const filterDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
+                const currentValue: string = filterDropdown.value;
+                // call function and get series array back
+                reference.forEach(_conf => {
+                    if (_conf.name === currentValue) {
+                        // call 
+                        const series: Array<string> = _conf.func();
+                        // compare then update graph
+                        this.setVisibility(series);
+                    }
+                });
+            };
         }
 
 
