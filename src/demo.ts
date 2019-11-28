@@ -1,5 +1,5 @@
 import FgpGraph from "./index";
-import { ViewConfig, GraphExports } from "./metadata/configurations";
+import { ViewConfig, GraphExports, FilterType } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
@@ -194,32 +194,49 @@ let vdConfig: ViewConfig = {
                 fill: false
             }
         ],
-        filters: {"buttons": [
-            {
-                label: "All"
-                , func: () => {
-                    return ["Min", "Max", "Avg"];
+        filters: {
+            "buttons": [
+                {
+                    label: "All"
+                    , func: () => {
+                        return ["Min", "Max", "Avg"];
+                    }
+                },
+                {
+                    label: "Min"
+                    , func: (): Array<string> => {
+                        return ["Min"];
+                    }
+                },
+                {
+                    label: "Max"
+                    , func: () => {
+                        return ["Max"];
+                    }
+                },
+                {
+                    label: "Avg"
+                    , func: () => {
+                        return ["Avg"];
+                    }
+                },
+                {
+                    label: "Colors",
+                    type: FilterType.COLORS,
+                    func: (labels?: Array<string>) => {
+                        let colors: Array<string> = [];
+                        // generate colors 
+                        if (labels) {
+                            labels.forEach(element => {
+                                colors.push("#FF0000");
+                            });
+                            
+                        } 
+                        return colors;
+                    }
                 }
-            },
-            {
-                label: "Min"
-                , func: () => {
-                    return ["Min"];
-                }
-            },
-            {
-                label: "Max"
-                , func: () => {
-                    return ["Max"];
-                }
-            },
-            {
-                label: "Avg"
-                , func: () => {
-                    return ["Avg"];
-                }
-            }
-        ]}
+            ]
+        }
 
     },
     dataService: dataService,
@@ -299,12 +316,12 @@ let vsConfig: ViewConfig = {
                 , func: () => {
                     return ["meter1", "meter2"];
                 }
-            },{
+            }, {
                 label: "Meter1"
                 , func: () => {
                     return ["meter1"];
                 }
-            },{
+            }, {
                 label: "Meter2"
                 , func: () => {
                     return ["meter2"];

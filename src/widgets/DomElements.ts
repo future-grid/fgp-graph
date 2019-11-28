@@ -1,5 +1,5 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports, filterFunc } from '../metadata/configurations';
+import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports, filterFunc, FilterType } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
 import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
@@ -414,6 +414,15 @@ export class GraphOperator {
 
     }
 
+    private setColors = (colors: Array<string>) => {
+        // check if length match or not
+        let graphLabels: Array<string> = this.mainGraph.getLabels();
+        if(graphLabels.length - 1 === colors.length){
+            this.mainGraph.updateOptions({
+                colors: colors
+            });
+        }
+    }
 
     private setVisibility = (series: Array<string>) => {
         // set visibility
@@ -457,8 +466,18 @@ export class GraphOperator {
                 button.textContent = filter.label;
                 button.addEventListener('click', (event) => {
                     // call function and get series list back
-                    const series: Array<string> = filter.func();
-                    this.setVisibility(series);
+                    if (!filter.type || filter.type == FilterType.HIGHLIGHT) {
+                        const series: Array<string> = <Array<string>>filter.func();
+                        this.setVisibility(series);
+                    } else if (filter.type == FilterType.COLORS) {
+                        // 
+                        let labels = [...this.mainGraph.getLabels()];
+                        labels = labels.slice(1);
+                        const colors: Array<string> = <Array<string>>filter.func(labels);
+                        // update colors
+                        this.setColors(colors);
+                    }
+
                 });
                 // add button 
                 buttons[0].appendChild(button);
@@ -467,10 +486,7 @@ export class GraphOperator {
 
         // dropdown list filter buttons
         if (view.graphConfig.filters && view.graphConfig.filters.dropdown) {
-
-
             // put it into dropdown\
-
             let filtersDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-filter-dropdown" }];
             let filtersDropdown = DomElementOperator.createElement('select', filtersDropdownAttrs);
 
@@ -479,12 +495,12 @@ export class GraphOperator {
             // create options
             let dropdownOpts: Array<{ id: string, label: string }> = [];
 
-            let reference: Array<{ name: string, func: filterFunc }> = [];
+            let reference: Array<{ name: string, func: filterFunc, type: FilterType | undefined }> = [];
 
             view.graphConfig.filters.dropdown.forEach(filter => {
                 //
                 dropdownOpts.push({ id: filter.label, label: filter.label });
-                reference.push({ name: filter.label, func: filter.func });
+                reference.push({ name: filter.label, func: filter.func, type: filter.type });
             });
 
             const filterDropdonwOptions = new DropdownButton(<HTMLSelectElement>filtersDropdown, [...dropdownOpts]);
@@ -498,9 +514,17 @@ export class GraphOperator {
                 reference.forEach(_conf => {
                     if (_conf.name === currentValue) {
                         // call 
-                        const series: Array<string> = _conf.func();
-                        // compare then update graph
-                        this.setVisibility(series);
+                        if (!_conf.type || _conf.type == FilterType.HIGHLIGHT) {
+                            const series: Array<string> = <Array<string>>_conf.func();
+                            // compare then update graph
+                            this.setVisibility(series);
+                        } else if(_conf.type == FilterType.COLORS) {
+                            let labels = [...this.mainGraph.getLabels()];
+                            labels = labels.slice(1);
+                            const colors: Array<string> = <Array<string>>_conf.func(labels);
+                            this.setColors(colors);
+                        }
+
                     }
                 });
             };
