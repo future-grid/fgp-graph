@@ -234,6 +234,13 @@ let vdConfig: ViewConfig = {
                         } 
                         return colors;
                     }
+                },
+                {
+                    label: "reset Colors",
+                    type: FilterType.COLORS,
+                    func: (labels?: Array<string>) => {
+                        return [];
+                    }
                 }
             ]
         }

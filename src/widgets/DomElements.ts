@@ -421,6 +421,22 @@ export class GraphOperator {
             this.mainGraph.updateOptions({
                 colors: colors
             });
+        } else {
+            if(this.currentView.graphConfig.entities.length > 1){
+                this.mainGraph.updateOptions({
+                    colors: undefined
+                }); 
+            } else {
+                if(this.currentCollection){
+                    let defaultColors:Array<string> = [];
+                    this.currentCollection.series.forEach(series => {
+                        defaultColors.push(series.color ? series.color : "undifined");
+                    });
+                    this.mainGraph.updateOptions({
+                        colors: defaultColors
+                    });
+                }
+            }
         }
     }
 
@@ -1197,9 +1213,10 @@ export class GraphOperator {
 
                 mainGraphSeries[series.label] = {
                     axis: series.yIndex == 'left' ? 'y' : 'y2',
-                    color: series.color,
+                    // defaultColor: series.color,
                     highlightCircleSize: 4
                 };
+
 
 
                 if (series.type == 'dots') {
@@ -1459,6 +1476,7 @@ export class GraphOperator {
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    colors: colors.length == 0 ? undefined : colors,
                     labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
