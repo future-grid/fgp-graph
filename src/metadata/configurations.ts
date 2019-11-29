@@ -61,7 +61,7 @@ export interface DomAttrs {
  */
 export interface GraphSeries {
     label: string;
-    color?: string;
+    color?: string | undefined;
     exp: string;
     type: string;
     yIndex?: string;

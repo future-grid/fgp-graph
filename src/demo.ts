@@ -253,7 +253,7 @@ let vdConfig: ViewConfig = {
         { name: "1 month", value: 2592000000 }
     ],
     initRange: {
-        start: moment("2019/06/01").add(10, 'days').startOf('day').valueOf(),
+        start: moment("2019-06-01").add(10, 'days').startOf('day').valueOf(),
         end: moment().subtract(15, 'days').endOf('day').valueOf()
     },
     interaction: {

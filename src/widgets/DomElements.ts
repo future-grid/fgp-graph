@@ -4,7 +4,8 @@ import moment from 'moment-timezone';
 import { Synchronizer } from '../extras/synchronizer';
 import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
 import { GraphInteractions } from '../extras/interactions';
-import { Formatters } from '../extras/formatters';
+import { Formatters, hsvToRGB } from '../extras/formatters';
+
 
 export class DropdownButton {
 
@@ -417,23 +418,80 @@ export class GraphOperator {
     private setColors = (colors: Array<string>) => {
         // check if length match or not
         let graphLabels: Array<string> = this.mainGraph.getLabels();
+        let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
+        let sat = 1.0;
+        let val = 0.5;
+        // get current y and y2 axis scaling max and min
+        let ranges:Array<Array<number>> = this.mainGraph.yAxisRanges();
+
         if(graphLabels.length - 1 === colors.length){
             this.mainGraph.updateOptions({
-                colors: colors
+                colors: colors,
+                axes: {
+                    x: {
+                        axisLabelFormatter: formatters.axisLabel
+                    },
+                    y: {
+                        valueRange: ranges[0],
+                        axisLabelWidth: 60,
+                        labelsKMB: true
+                    },
+                    y2: ranges.length > 1 ? {
+                        valueRange: ranges[1],
+                        axisLabelWidth: 60,
+                        labelsKMB: true
+                    }: undefined
+                }
             });
         } else {
             if(this.currentView.graphConfig.entities.length > 1){
                 this.mainGraph.updateOptions({
-                    colors: undefined
+                    colors: undefined,
+                    axes: {
+                        x: {
+                            axisLabelFormatter: formatters.axisLabel
+                        },
+                        y: {
+                            valueRange: ranges[0],
+                            axisLabelWidth: 60,
+                            labelsKMB: true
+                        },
+                        y2: ranges.length > 1 ? {
+                            valueRange: ranges[1],
+                            axisLabelWidth: 60,
+                            labelsKMB: true
+                        }: undefined
+                    }
                 }); 
             } else {
                 if(this.currentCollection){
                     let defaultColors:Array<string> = [];
-                    this.currentCollection.series.forEach(series => {
-                        defaultColors.push(series.color ? series.color : "undifined");
+                    const num = this.currentCollection.series.length;
+                    this.currentCollection.series.forEach((series, i) => {
+                        let half = Math.ceil(num / 2);
+                        let idx = i % 2 ? (half + (i + 1)/ 2) : Math.ceil((i + 1) / 2);
+                        let hue = (1.0 * idx / (1 + num));
+                        let colorStr = hsvToRGB(hue, sat, val);
+                        defaultColors.push(series.color ? series.color : colorStr);
                     });
+                    
                     this.mainGraph.updateOptions({
-                        colors: defaultColors
+                        colors: defaultColors,
+                        axes: {
+                            x: {
+                                axisLabelFormatter: formatters.axisLabel
+                            },
+                            y: {
+                                valueRange: ranges[0],
+                                axisLabelWidth: 60,
+                                labelsKMB: true
+                            },
+                            y2: ranges.length > 1 ? {
+                                valueRange: ranges[1],
+                                axisLabelWidth: 60,
+                                labelsKMB: true
+                            }: undefined
+                        }
                     });
                 }
             }

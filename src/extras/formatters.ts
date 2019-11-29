@@ -2,6 +2,37 @@ import Dygraph from 'dygraphs';
 import moment from 'moment-timezone';
 import { GraphConstant } from '../metadata/configurations';
 
+export function hsvToRGB(hue: number, saturation: number, value: number) {
+    var red: number = 0;
+    var green: number = 0;
+    var blue: number = 0;
+    if (saturation === 0) {
+        red = value;
+        green = value;
+        blue = value;
+    } else {
+        var i = Math.floor(hue * 6);
+        var f = (hue * 6) - i;
+        var p = value * (1 - saturation);
+        var q = value * (1 - (saturation * f));
+        var t = value * (1 - (saturation * (1 - f)));
+        switch (i) {
+            case 1: red = q; green = value; blue = p; break;
+            case 2: red = p; green = value; blue = t; break;
+            case 3: red = p; green = q; blue = value; break;
+            case 4: red = t; green = p; blue = value; break;
+            case 5: red = value; green = p; blue = q; break;
+            case 6: // fall through
+            case 0: red = value; green = t; blue = p; break;
+        }
+    }
+    red = Math.floor(255 * red + 0.5);
+    green = Math.floor(255 * green + 0.5);
+    blue = Math.floor(255 * blue + 0.5);
+    return 'rgb(' + red + ',' + green + ',' + blue + ')';
+};
+
+
 export class Formatters {
 
     /**
@@ -102,7 +133,7 @@ export class Formatters {
             opts("axisLabelFormatter"));
         let ticks = [];
         let t;
-        
+
         if (granularity < GraphConstant.MONTHLY) {
             // Generate one tick mark for every fixed interval of time.
             let spacing = this.SHORT_SPACINGS[granularity];
