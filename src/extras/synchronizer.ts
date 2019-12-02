@@ -22,7 +22,7 @@ export class Synchronizer {
         var opts: any = {
             selection: true,
             zoom: true,
-            range: true
+            range: false
         };
         var dygraphs: any[] = [];
         var prevCallbacks: any[] = [];

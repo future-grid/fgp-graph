@@ -1,3 +1,6 @@
+import Dygraph from "dygraphs";
+import moment from 'moment-timezone';
+
 export class GraphInteractions {
 
 
@@ -14,6 +17,12 @@ export class GraphInteractions {
     private needRefresh!: boolean;
 
     private yAxisRangeChanged!: boolean;
+
+    private mainGraph!: Dygraph;
+
+    private xBoundary!: [number, number];
+
+
 
     constructor(public callback: any, public dateRange?: Array<number>) {
         this.panEnable = false;
@@ -477,6 +486,5 @@ export class GraphInteractions {
             // console.debug("enable scroll zooming~");
         }, 1000);
     }
-
-
 }
+

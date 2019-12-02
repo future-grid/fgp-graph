@@ -190,7 +190,12 @@ export class GraphOperator {
 
     private spinner: LoadingSpinner;
 
-    private yAxisRanges = [];
+    private xBoundary: [number, number];
+
+    private yAxisBtnArea: HTMLElement;
+
+    private y2AxisBtnArea: HTMLElement;
+
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
         this.mainGraph = mainGraph;
@@ -202,6 +207,12 @@ export class GraphOperator {
         this.header = header;
         this.currentGraphData = [];
         this.spinner = new LoadingSpinner(this.graphContainer);
+        this.xBoundary = [0, 0];
+        let yAxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn-container' }];
+        this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
+
+        let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn-container' }];
+        this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
     }
 
     public showSpinner = () => {
@@ -422,9 +433,9 @@ export class GraphOperator {
         let sat = 1.0;
         let val = 0.5;
         // get current y and y2 axis scaling max and min
-        let ranges:Array<Array<number>> = this.mainGraph.yAxisRanges();
+        let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
 
-        if(graphLabels.length - 1 === colors.length){
+        if (graphLabels.length - 1 === colors.length) {
             this.mainGraph.updateOptions({
                 colors: colors,
                 axes: {
@@ -433,18 +444,18 @@ export class GraphOperator {
                     },
                     y: {
                         valueRange: ranges[0],
-                        axisLabelWidth: 60,
+                        axisLabelWidth: 80,
                         labelsKMB: true
                     },
                     y2: ranges.length > 1 ? {
                         valueRange: ranges[1],
-                        axisLabelWidth: 60,
+                        axisLabelWidth: 80,
                         labelsKMB: true
-                    }: undefined
+                    } : undefined
                 }
             });
         } else {
-            if(this.currentView.graphConfig.entities.length > 1){
+            if (this.currentView.graphConfig.entities.length > 1) {
                 this.mainGraph.updateOptions({
                     colors: undefined,
                     axes: {
@@ -453,28 +464,28 @@ export class GraphOperator {
                         },
                         y: {
                             valueRange: ranges[0],
-                            axisLabelWidth: 60,
+                            axisLabelWidth: 80,
                             labelsKMB: true
                         },
                         y2: ranges.length > 1 ? {
                             valueRange: ranges[1],
-                            axisLabelWidth: 60,
+                            axisLabelWidth: 80,
                             labelsKMB: true
-                        }: undefined
+                        } : undefined
                     }
-                }); 
+                });
             } else {
-                if(this.currentCollection){
-                    let defaultColors:Array<string> = [];
+                if (this.currentCollection) {
+                    let defaultColors: Array<string> = [];
                     const num = this.currentCollection.series.length;
                     this.currentCollection.series.forEach((series, i) => {
                         let half = Math.ceil(num / 2);
-                        let idx = i % 2 ? (half + (i + 1)/ 2) : Math.ceil((i + 1) / 2);
+                        let idx = i % 2 ? (half + (i + 1) / 2) : Math.ceil((i + 1) / 2);
                         let hue = (1.0 * idx / (1 + num));
                         let colorStr = hsvToRGB(hue, sat, val);
                         defaultColors.push(series.color ? series.color : colorStr);
                     });
-                    
+
                     this.mainGraph.updateOptions({
                         colors: defaultColors,
                         axes: {
@@ -483,14 +494,14 @@ export class GraphOperator {
                             },
                             y: {
                                 valueRange: ranges[0],
-                                axisLabelWidth: 60,
+                                axisLabelWidth: 80,
                                 labelsKMB: true
                             },
                             y2: ranges.length > 1 ? {
                                 valueRange: ranges[1],
-                                axisLabelWidth: 60,
+                                axisLabelWidth: 80,
                                 labelsKMB: true
-                            }: undefined
+                            } : undefined
                         }
                     });
                 }
@@ -592,7 +603,7 @@ export class GraphOperator {
                             const series: Array<string> = <Array<string>>_conf.func();
                             // compare then update graph
                             this.setVisibility(series);
-                        } else if(_conf.type == FilterType.COLORS) {
+                        } else if (_conf.type == FilterType.COLORS) {
                             let labels = [...this.mainGraph.getLabels()];
                             labels = labels.slice(1);
                             const colors: Array<string> = <Array<string>>_conf.func(labels);
@@ -784,8 +795,7 @@ export class GraphOperator {
             }
 
             let initialData = [[first.timestamp], [last.timestamp]];
-
-
+            this.xBoundary = [first.timestamp, last.timestamp];
             if (this.currentView.initRange) {
                 if (this.currentView.initRange.start < first.timestamp) {
                     initialData[0] = [this.currentView.initRange.start];
@@ -883,6 +893,7 @@ export class GraphOperator {
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
                     Object.assign(collection, choosedCollection);
 
+
                     if (yAxisRange) {
                         yAxisRange.forEach((element, _index) => {
                             if (_index == 0) {
@@ -948,14 +959,14 @@ export class GraphOperator {
                 }
             };
 
+            // create a interaction model instance
+            let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
 
             let dateLabelLeftAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-left' }];
             let startLabelLeft: HTMLElement = DomElementOperator.createElement('label', dateLabelLeftAttrs);
             let dateLabelRightAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-right' }];
             let endLabelRight: HTMLElement = DomElementOperator.createElement('label', dateLabelRightAttrs);
 
-            // create a interaction model instance
-            let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
             let currentSelection = "";
 
             let fullVisibility: Array<boolean> = [];
@@ -1020,6 +1031,311 @@ export class GraphOperator {
                 }
             });
 
+            let ctrlBtnTimer: any = null;
+
+            const ctrlBtnsEventListener: EventListener = (e) => {
+                if (e.target instanceof Element) {
+                    const btn: Element = e.target;
+                    const g: Dygraph = this.mainGraph;
+                    if (g && btn.getAttribute("fgp-ctrl") === "x-pan-left") {
+                        let newDatewindow = [0, 0];
+                        // move left 
+                        // current datewindow
+                        const datewindow: [number, number] = g.xAxisRange();
+                        const dateGap = datewindow[1] - datewindow[0];
+                        //
+                        if (this.xBoundary[0] < (datewindow[0] - dateGap)) {
+                            // move allowed
+                            newDatewindow[0] = datewindow[0] - dateGap;
+                            newDatewindow[1] = datewindow[1] - dateGap;
+                        } else {
+                            newDatewindow[0] = this.xBoundary[0];
+                            newDatewindow[1] = datewindow[1] - (datewindow[0] - this.xBoundary[0]);
+                        }
+                        // update datewindow
+                        this.mainGraph.updateOptions({
+                            dateWindow: newDatewindow
+                        });
+                        // update graph
+                        if (ctrlBtnTimer) {
+                            window.clearTimeout(ctrlBtnTimer);
+                        }
+                        ctrlBtnTimer = window.setTimeout(() => {
+                            // how to updat
+                            this.refresh();
+                        }, 1000);
+                    } else if (g && btn.getAttribute("fgp-ctrl") === "x-pan-right") {
+                        let newDatewindow = [0, 0];
+                        // move left 
+                        // current datewindow
+                        const datewindow: [number, number] = g.xAxisRange();
+                        const dateGap = datewindow[1] - datewindow[0];
+                        //
+                        if (this.xBoundary[1] > (datewindow[1] + dateGap)) {
+                            // move allowed
+                            newDatewindow[0] = datewindow[0] + dateGap;
+                            newDatewindow[1] = datewindow[1] + dateGap;
+                        } else {
+                            newDatewindow[1] = this.xBoundary[1];
+                            newDatewindow[0] = datewindow[0] + (this.xBoundary[1] - datewindow[1]);
+                        }
+                        // update datewindow
+                        this.mainGraph.updateOptions({
+                            dateWindow: newDatewindow
+                        });
+                        // update graph
+                        if (ctrlBtnTimer) {
+                            window.clearTimeout(ctrlBtnTimer);
+                        }
+                        ctrlBtnTimer = window.setTimeout(() => {
+                            // update graph
+                            this.refresh();
+                        }, 1000);
+                    } else if (g && btn.getAttribute("fgp-ctrl") === "x-zoom-in") {
+                        let newDatewindow = [0, 0];
+                        //  minimum  ?   left - right > 5 minutes
+                        const datewindow: [number, number] = g.xAxisRange();
+
+                        const delta: number = (datewindow[1] - datewindow[0]) / 20;
+
+                        if ((datewindow[1] - delta) > ((datewindow[0] + delta) + (1000 * 60 * 300))) {
+                            newDatewindow = [datewindow[0] + delta, datewindow[1] - delta];
+                            this.mainGraph.updateOptions({
+                                dateWindow: newDatewindow
+                            });
+                            // update graph
+                            if (ctrlBtnTimer) {
+                                window.clearTimeout(ctrlBtnTimer);
+                            }
+                            ctrlBtnTimer = window.setTimeout(() => {
+                                // update graph
+                                this.refresh();
+                            }, 1000);
+                        }
+                    } else if (g && btn.getAttribute("fgp-ctrl") === "x-zoom-out") {
+                        let newDatewindow = [0, 0];
+                        //  minimum  ?   left - right > 5 minutes
+                        const datewindow: [number, number] = g.xAxisRange();
+
+                        const delta: number = (datewindow[1] - datewindow[0]) / 20;
+
+                        if ((datewindow[1] + delta) < this.xBoundary[1]) {
+                            newDatewindow[1] = datewindow[1] + delta;
+                        } else {
+                            newDatewindow[1] = this.xBoundary[1];
+                        }
+
+                        if ((datewindow[0] - delta) > this.xBoundary[0]) {
+                            newDatewindow[0] = datewindow[0] - delta;
+                        } else {
+                            newDatewindow[0] = this.xBoundary[0];
+                        }
+
+                        this.mainGraph.updateOptions({
+                            dateWindow: newDatewindow
+                        });
+                        // update graph
+                        if (ctrlBtnTimer) {
+                            window.clearTimeout(ctrlBtnTimer);
+                        }
+                        ctrlBtnTimer = window.setTimeout(() => {
+                            // update graph
+                            this.refresh();
+                        }, 1000);
+
+                    }
+                }
+            };
+
+            // show always
+            // zoom and pan buttons for x-axis
+
+            let xAxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn-container' }];
+            let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
+
+            // add buttons 
+            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in' }];
+            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
+            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
+            let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-right' }];
+
+            //
+            let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
+            xAxisZoomInBtn.setAttribute("fgp-ctrl", "x-zoom-in");
+            let xAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomOutBtnAttrs);
+            xAxisZoomOutBtn.setAttribute("fgp-ctrl", "x-zoom-out");
+            let xAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanLeftBtnAttrs);
+            xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
+            let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
+            xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
+            xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+            xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+            xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+            xAxisPanRightBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+            // add buttons into container
+            xAxisBtnArea.appendChild(xAxisPanLeftBtn);
+            xAxisBtnArea.appendChild(xAxisZoomInBtn);
+            xAxisBtnArea.appendChild(xAxisZoomOutBtn);
+            xAxisBtnArea.appendChild(xAxisPanRightBtn);
+
+            // add buttons for y and y2 ctrl
+            const ctrlVBtnsEventListener: EventListener = (e) => {
+
+                const g: any = this.mainGraph;
+
+                let yZoomIn = (side: string) => {
+                    let yAxes = g.axes_;
+                    let ranges = this.mainGraph.yAxisRanges();
+                    if (side === "left") {
+                        //
+                        const range = ranges[0];
+                        yAxes[0]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                        yAxes[0]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                    } else if (side === "right") {
+                        // 
+                        const range = ranges[1];
+                        yAxes[1]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                        yAxes[1]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                    }
+                    g.drawGraph_(true);
+                };
+
+                let yZoomOut = (side: string) => {
+                    let yAxes = g.axes_;
+                    let ranges = this.mainGraph.yAxisRanges();
+                    if (side === "left") {
+                        //
+                        const range = ranges[0];
+                        yAxes[0]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                        yAxes[0]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                    } else if (side === "right") {
+                        // 
+                        const range = ranges[1];
+                        yAxes[1]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                        yAxes[1]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                    }
+                    g.drawGraph_(true);
+                };
+
+                let yPanUp = (side: string) => {
+                    let yAxes = g.axes_;
+                    let ranges = this.mainGraph.yAxisRanges();
+                    if (side === "left") {
+                        const range = ranges[0];
+                        yAxes[0]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                        yAxes[0]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                    } else if (side === "right") {
+                        const range = ranges[1];
+                        yAxes[1]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                        yAxes[1]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
+                    }
+                    g.drawGraph_(true);
+                };
+
+                let yPanDown = (side: string) => {
+                    let yAxes = g.axes_;
+                    let ranges = this.mainGraph.yAxisRanges();
+                    if (side === "left") {
+                        const range = ranges[0];
+                        yAxes[0]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                        yAxes[0]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                    } else if (side === "right") {
+                        const range = ranges[1];
+                        yAxes[1]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                        yAxes[1]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
+                    }
+                    g.drawGraph_(true);
+                };
+
+                if (e.target instanceof Element) {
+                    const btn: Element = e.target;
+                    const g: Dygraph = this.mainGraph;
+                    const ctrlAttrs = btn.getAttribute("fgp-ctrl");
+                    if (ctrlAttrs != null && ctrlAttrs.indexOf("y2") != -1) {
+                        if (btn.getAttribute("fgp-ctrl") === "y2-pan-up") {
+                            yPanUp("right");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y2-pan-down") {
+                            yPanDown("right");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y2-zoom-in") {
+                            yZoomIn("right");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y2-zoom-out") {
+                            yZoomOut("right");
+                        }
+                    } else if (g && ctrlAttrs != null && ctrlAttrs.indexOf("y") != -1) {
+                        if (btn.getAttribute("fgp-ctrl") === "y-pan-up") {
+                            yPanUp("left");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y-pan-down") {
+                            yPanDown("left");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y-zoom-in") {
+                            yZoomIn("left");
+                        } else if (btn.getAttribute("fgp-ctrl") === "y-zoom-out") {
+                            yZoomOut("left");
+                        }
+                    }
+
+
+                }
+            };
+
+
+            // add buttons 
+            let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in' }];
+            let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
+            let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
+            let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-pan-right' }];
+
+            //
+            let yAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomInBtnAttrs);
+            yAxisZoomInBtn.setAttribute("fgp-ctrl", "y-zoom-in");
+            let yAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomOutBtnAttrs);
+            yAxisZoomOutBtn.setAttribute("fgp-ctrl", "y-zoom-out");
+            let yAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanLeftBtnAttrs);
+            yAxisPanLeftBtn.setAttribute("fgp-ctrl", "y-pan-up");
+            let yAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanRightBtnAttrs);
+            yAxisPanRightBtn.setAttribute("fgp-ctrl", "y-pan-down");
+
+            yAxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            yAxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            yAxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            yAxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+
+
+            this.yAxisBtnArea.appendChild(yAxisPanLeftBtn);
+            this.yAxisBtnArea.appendChild(yAxisZoomInBtn);
+            this.yAxisBtnArea.appendChild(yAxisZoomOutBtn);
+            this.yAxisBtnArea.appendChild(yAxisPanRightBtn);
+            this.graphContainer.appendChild(this.yAxisBtnArea);
+
+            // add buttons for y and y2 ctrl
+
+
+            // add buttons 
+            let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in' }];
+            let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
+            let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
+            let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-pan-right' }];
+
+            //
+            let y2AxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomInBtnAttrs);
+            y2AxisZoomInBtn.setAttribute("fgp-ctrl", "y2-zoom-in");
+            let y2AxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomOutBtnAttrs);
+            y2AxisZoomOutBtn.setAttribute("fgp-ctrl", "y2-zoom-out");
+            let y2AxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanLeftBtnAttrs);
+            y2AxisPanLeftBtn.setAttribute("fgp-ctrl", "y2-pan-up");
+            let y2AxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanRightBtnAttrs);
+            y2AxisPanRightBtn.setAttribute("fgp-ctrl", "y2-pan-down");
+
+
+            y2AxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            y2AxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            y2AxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+            y2AxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+
+            this.y2AxisBtnArea.appendChild(y2AxisPanLeftBtn);
+            this.y2AxisBtnArea.appendChild(y2AxisZoomInBtn);
+            this.y2AxisBtnArea.appendChild(y2AxisZoomOutBtn);
+            this.y2AxisBtnArea.appendChild(y2AxisPanRightBtn);
+            this.graphContainer.appendChild(this.y2AxisBtnArea);
             // remove first
             if (this.graphContainer.getElementsByClassName("fgp-graph-bottom").length > 0) {
                 let bottoms = this.graphContainer.getElementsByClassName("fgp-graph-bottom");
@@ -1071,6 +1387,7 @@ export class GraphOperator {
                 let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{ key: 'style', value: 'height:22px;' }]);
                 dateLabels.appendChild(startLabelLeft);
                 dateLabels.appendChild(endLabelRight);
+                dateLabels.appendChild(xAxisBtnArea);
                 bottom = DomElementOperator.createElement('div', bottomAttrs);
                 bottom.appendChild(dateLabels);
                 let rangeBarAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-rangebar' }];
@@ -1086,10 +1403,10 @@ export class GraphOperator {
                     axes: {
                         x: { drawAxis: false },
                         y: {
-                            axisLabelWidth: 60
+                            axisLabelWidth: 80
                         },
                         y2: {
-                            axisLabelWidth: 60
+                            axisLabelWidth: 80
                         }
                     },
                     labels: ['x'].concat(labels),
@@ -1145,8 +1462,6 @@ export class GraphOperator {
                 }
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
-            } else {
-
             }
             // update datewindow
             this.mainGraph.updateOptions({
@@ -1208,7 +1523,7 @@ export class GraphOperator {
             let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
             Object.assign(collection, this.currentCollection);
             // check initScale
-            this.update();
+            this.update(undefined, undefined, true);
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
 
@@ -1216,7 +1531,7 @@ export class GraphOperator {
     }
 
 
-    update = (first?: number, last?: number) => {
+    update = (first?: number, last?: number, refersh?: boolean) => {
 
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
@@ -1228,7 +1543,6 @@ export class GraphOperator {
         let view = this.currentView;
 
         let formatters: Formatters = new Formatters(view.timezone ? view.timezone : moment.tz.guess());
-        let mainGraphColors: Array<string> = [];
         // get data for main graph
         // main graph entities
         const mainEntities: Array<string> = [];
@@ -1290,10 +1604,12 @@ export class GraphOperator {
 
 
 
-        let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } } } => {
+        let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } }, isY2?: boolean, isY?: boolean } => {
             // update main graph
             let graphData: any[] = [];
             let finalData: any[] = [];
+            let checkY = false;
+            let checkY2 = false;
             //init data arrays with default empty 
             entities.forEach((id, _index) => {
                 graphData.push([]);
@@ -1323,7 +1639,7 @@ export class GraphOperator {
             mainLabels = [];
             if (entities.length == 1) {
                 // get collection config
-                collection.series.forEach((series: any, _index: number) => {
+                collection.series.forEach((series: GraphSeries, _index: number) => {
                     mainLabels.push(series.label);
                     var f = new Function("data", "with(data) { if(" + series.exp + "!=null)return " + series.exp + ";return null;}");
                     // generate data for this column
@@ -1451,7 +1767,6 @@ export class GraphOperator {
                     });
                 });
             }
-            console.info(yAxis, yAxis2);
             return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
         }
 
@@ -1462,6 +1777,19 @@ export class GraphOperator {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = { valueRange: [] };
                 let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
+
+
+                if (yIndexs.length == 0) {
+                    this.yAxisBtnArea.style.display = "none";
+                } else {
+                    this.yAxisBtnArea.style.display = "";
+                }
+
+                if (y2Indexs.length == 0) {
+                    this.y2AxisBtnArea.style.display = "none";
+                } else {
+                    this.y2AxisBtnArea.style.display = "";
+                }
                 // get init scale
                 if (graphCollection && !graphCollection.initScales) {
                     if (graphData.axis) {
@@ -1513,9 +1841,6 @@ export class GraphOperator {
                         }
                     }
                 }
-
-                console.info("y valueRange:", yScale.valueRange);
-                console.info("y2 valueRange:", y2Scale.valueRange);
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
                 console.debug("Graph is clean now!~");
@@ -1546,16 +1871,17 @@ export class GraphOperator {
                         },
                         y: {
                             valueRange: yScale.valueRange,
-                            axisLabelWidth: 60,
+                            axisLabelWidth: 80,
                             labelsKMB: true
                         },
                         y2: {
                             valueRange: y2Scale.valueRange,
-                            axisLabelWidth: 60,
+                            axisLabelWidth: 80,
                             labelsKMB: true
                         }
                     }
                 });
+
             });
         }
 

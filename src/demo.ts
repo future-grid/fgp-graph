@@ -185,7 +185,7 @@ let vdConfig: ViewConfig = {
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
+                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'right' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -230,8 +230,8 @@ let vdConfig: ViewConfig = {
                             labels.forEach(element => {
                                 colors.push("#FF0000");
                             });
-                            
-                        } 
+
+                        }
                         return colors;
                     }
                 },
@@ -259,10 +259,10 @@ let vdConfig: ViewConfig = {
     interaction: {
         callback: {
             highlightCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
             }
         }
     },
