@@ -289,10 +289,14 @@ export class GraphInteractions {
                 }
                 if (g.attributes_.getForAxis("logscale", index)) {
                     axis.valueRange = [Math.pow(10, minValue), Math.pow(10, maxValue)];
+                    axis.valueWindow = [Math.pow(10, minValue), Math.pow(10, maxValue)];
+                    axis.extremeRange = [Math.pow(10, minValue), Math.pow(10, maxValue)];
                 } else {
                     axis.valueRange = [minValue, maxValue];
+                    axis.valueWindow = [minValue, maxValue];
+                    axis.extremeRange = [minValue, maxValue];
                 }
-                // console.debug(axis.valueRange);
+                g.drawGraph_(true);
             } else {
                 //
                 var zoomRange = this.dateRange;
@@ -305,9 +309,10 @@ export class GraphInteractions {
                 } else {
                     g.dateWindow_ = [new Date(minDate), new Date(maxDate)];
                 }
+                g.drawGraph_(false);
             }
         }
-        g.drawGraph_(false);
+        
     }
 
     private adjustAxis = (axis: any, zoomInPercentage: number, bias: any) => {
@@ -327,22 +332,21 @@ export class GraphInteractions {
             newYAxes[i] = this.adjustAxis(yAxes[i].valueRange, zoomInPercentage, yBias);
         }
 
-
         if ('v' == direction) {
             if ('l' == side) {
                 yAxes[0]['valueRange'] = newYAxes[0];
                 yAxes[0]['valueWindow'] = newYAxes[0];
+                yAxes[0]['extremeRange'] = newYAxes[0];
             } else if ('r' == side && g.numAxes() == 2) {
                 yAxes[1]['valueRange'] = newYAxes[1];
                 yAxes[1]['valueWindow'] = newYAxes[1];
+                yAxes[1]['extremeRange'] = newYAxes[0];
             }
             g.drawGraph_(false);
         } else {
             if (this.scrollTimer) {
                 window.clearTimeout(this.scrollTimer);
             }
-
-
             var ranges = g.dateWindow_;
             if (ranges[0] instanceof Date) {
                 ranges[0] = ranges[0].getTime();

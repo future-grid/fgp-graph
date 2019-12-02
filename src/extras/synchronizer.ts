@@ -59,7 +59,9 @@ export class Synchronizer {
                         var opts: { dateWindow: any, valueRange?: any } = {
                             dateWindow: me.xAxisRange()
                         };
-                        if (syncOpts.range) opts.valueRange = me.yAxisRange();
+                        if (syncOpts.range) { 
+                            opts.valueRange = me.yAxisRange();
+                        };
 
                         for (var j = 0; j < gs.length; j++) {
                             if (gs[j] == me) {
@@ -69,9 +71,9 @@ export class Synchronizer {
                                 continue;
                             }
 
-                            // Only redraw if there are new options
-                            if (arraysAreEqual(opts.dateWindow, gs[j].getOption('dateWindow')) &&
-                                arraysAreEqual(opts.valueRange, gs[j].getOption('valueRange'))) {
+                            // Only redraw if there are new options  (in this case only dateWindow changed!)
+                            //&& arraysAreEqual(opts.valueRange, gs[j].getOption('valueRange'))
+                            if (arraysAreEqual(opts.dateWindow, gs[j].getOption('dateWindow'))) {
                                 continue;
                             }
 

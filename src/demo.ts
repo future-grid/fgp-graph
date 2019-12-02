@@ -185,7 +185,7 @@ let vdConfig: ViewConfig = {
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'right' }
+                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -501,16 +501,16 @@ let vsConfig3: ViewConfig = {
 
 
 
-// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-// graph3.initGraph();
+let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+graph3.initGraph();
 
-// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-// graph2.initGraph();
+let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+graph2.initGraph();
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
 // // link graphs
-// graph1.setChildren([graph2, graph3]);
+graph1.setChildren([graph2, graph3]);
 
 // graph2.setChildren([graph1]);   // problem with right and left axis 
 

@@ -1790,6 +1790,7 @@ export class GraphOperator {
                 } else {
                     this.y2AxisBtnArea.style.display = "";
                 }
+
                 // get init scale
                 if (graphCollection && !graphCollection.initScales) {
                     if (graphData.axis) {
