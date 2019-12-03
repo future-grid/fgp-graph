@@ -1150,6 +1150,7 @@ export class GraphOperator {
             // show always
             // zoom and pan buttons for x-axis
 
+
             let xAxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn-container' }];
             let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
 
@@ -1168,6 +1169,8 @@ export class GraphOperator {
             xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
             let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
             xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
+
+
             xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
             xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
             xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
@@ -1276,66 +1279,65 @@ export class GraphOperator {
 
                 }
             };
+            // check if exist or not
+            if (this.graphContainer.getElementsByClassName("fgp-graph-yaxis-btn").length == 0) {
+                // add buttons 
+                let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in' }];
+                let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
+                let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
+                let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-pan-right' }];
+                //
+                let yAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomInBtnAttrs);
+                yAxisZoomInBtn.setAttribute("fgp-ctrl", "y-zoom-in");
+                let yAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomOutBtnAttrs);
+                yAxisZoomOutBtn.setAttribute("fgp-ctrl", "y-zoom-out");
+                let yAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanLeftBtnAttrs);
+                yAxisPanLeftBtn.setAttribute("fgp-ctrl", "y-pan-up");
+                let yAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanRightBtnAttrs);
+                yAxisPanRightBtn.setAttribute("fgp-ctrl", "y-pan-down");
 
+                yAxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                yAxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                yAxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                yAxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
 
-            // add buttons 
-            let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in' }];
-            let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
-            let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
-            let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-pan-right' }];
-
-            //
-            let yAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomInBtnAttrs);
-            yAxisZoomInBtn.setAttribute("fgp-ctrl", "y-zoom-in");
-            let yAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomOutBtnAttrs);
-            yAxisZoomOutBtn.setAttribute("fgp-ctrl", "y-zoom-out");
-            let yAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanLeftBtnAttrs);
-            yAxisPanLeftBtn.setAttribute("fgp-ctrl", "y-pan-up");
-            let yAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', yAxisPanRightBtnAttrs);
-            yAxisPanRightBtn.setAttribute("fgp-ctrl", "y-pan-down");
-
-            yAxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            yAxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            yAxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            yAxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-
-
-            this.yAxisBtnArea.appendChild(yAxisPanLeftBtn);
-            this.yAxisBtnArea.appendChild(yAxisZoomInBtn);
-            this.yAxisBtnArea.appendChild(yAxisZoomOutBtn);
-            this.yAxisBtnArea.appendChild(yAxisPanRightBtn);
-            this.graphContainer.appendChild(this.yAxisBtnArea);
-
+                this.yAxisBtnArea.appendChild(yAxisPanLeftBtn);
+                this.yAxisBtnArea.appendChild(yAxisZoomInBtn);
+                this.yAxisBtnArea.appendChild(yAxisZoomOutBtn);
+                this.yAxisBtnArea.appendChild(yAxisPanRightBtn);
+                this.graphContainer.appendChild(this.yAxisBtnArea);
+            }
+            
             // add buttons for y and y2 ctrl
+            if (this.graphContainer.getElementsByClassName("fgp-graph-y2axis-btn").length == 0) {
+                // add buttons 
+                let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in' }];
+                let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
+                let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
+                let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-pan-right' }];
 
+                //
+                let y2AxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomInBtnAttrs);
+                y2AxisZoomInBtn.setAttribute("fgp-ctrl", "y2-zoom-in");
+                let y2AxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomOutBtnAttrs);
+                y2AxisZoomOutBtn.setAttribute("fgp-ctrl", "y2-zoom-out");
+                let y2AxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanLeftBtnAttrs);
+                y2AxisPanLeftBtn.setAttribute("fgp-ctrl", "y2-pan-up");
+                let y2AxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanRightBtnAttrs);
+                y2AxisPanRightBtn.setAttribute("fgp-ctrl", "y2-pan-down");
 
-            // add buttons 
-            let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in' }];
-            let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
-            let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
-            let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-pan-right' }];
+                y2AxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                y2AxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                y2AxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
+                y2AxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
 
-            //
-            let y2AxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomInBtnAttrs);
-            y2AxisZoomInBtn.setAttribute("fgp-ctrl", "y2-zoom-in");
-            let y2AxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomOutBtnAttrs);
-            y2AxisZoomOutBtn.setAttribute("fgp-ctrl", "y2-zoom-out");
-            let y2AxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanLeftBtnAttrs);
-            y2AxisPanLeftBtn.setAttribute("fgp-ctrl", "y2-pan-up");
-            let y2AxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisPanRightBtnAttrs);
-            y2AxisPanRightBtn.setAttribute("fgp-ctrl", "y2-pan-down");
+                this.y2AxisBtnArea.appendChild(y2AxisPanLeftBtn);
+                this.y2AxisBtnArea.appendChild(y2AxisZoomInBtn);
+                this.y2AxisBtnArea.appendChild(y2AxisZoomOutBtn);
+                this.y2AxisBtnArea.appendChild(y2AxisPanRightBtn);
 
-
-            y2AxisPanLeftBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            y2AxisZoomInBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            y2AxisZoomOutBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-            y2AxisPanRightBtn.addEventListener('mousedown', ctrlVBtnsEventListener, false);
-
-            this.y2AxisBtnArea.appendChild(y2AxisPanLeftBtn);
-            this.y2AxisBtnArea.appendChild(y2AxisZoomInBtn);
-            this.y2AxisBtnArea.appendChild(y2AxisZoomOutBtn);
-            this.y2AxisBtnArea.appendChild(y2AxisPanRightBtn);
-            this.graphContainer.appendChild(this.y2AxisBtnArea);
+                this.graphContainer.appendChild(this.y2AxisBtnArea);
+            }
             // remove first
             if (this.graphContainer.getElementsByClassName("fgp-graph-bottom").length > 0) {
                 let bottoms = this.graphContainer.getElementsByClassName("fgp-graph-bottom");
@@ -1388,6 +1390,8 @@ export class GraphOperator {
                 dateLabels.appendChild(startLabelLeft);
                 dateLabels.appendChild(endLabelRight);
                 dateLabels.appendChild(xAxisBtnArea);
+
+
                 bottom = DomElementOperator.createElement('div', bottomAttrs);
                 bottom.appendChild(dateLabels);
                 let rangeBarAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-rangebar' }];
