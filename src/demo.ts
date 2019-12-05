@@ -248,10 +248,10 @@ let vdConfig: ViewConfig = {
     },
     dataService: dataService,
     show: true,
-    ranges: [
-        { name: "7 days", value: 604800000, show: true },
-        { name: "1 month", value: 2592000000 }
-    ],
+    // ranges: [
+    //     { name: "7 days", value: 604800000, show: true },
+    //     { name: "1 month", value: 2592000000 }
+    // ],
     initRange: {
         start: moment("2019-06-01").add(10, 'days').startOf('day').valueOf(),
         end: moment().subtract(15, 'days').endOf('day').valueOf()

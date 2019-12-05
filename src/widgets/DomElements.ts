@@ -232,7 +232,7 @@ export class GraphOperator {
         if (series && series.length > 0) {
             // hide all the others 
             let _updateVisibility: boolean[] = [];
-            
+
 
             if (this.currentCollection) {
                 const _graphSeries = this.mainGraph.getLabels();
@@ -266,7 +266,7 @@ export class GraphOperator {
                         _updateVisibility.push(true);
                     }
                 });
-                
+
                 this.mainGraph.updateOptions({
                     visibility: _updateVisibility,
                     axes: {
@@ -315,7 +315,7 @@ export class GraphOperator {
             }
         } else {
             // bring all back
-            let _updateVisibility:Array<boolean> = [];
+            let _updateVisibility: Array<boolean> = [];
             visibility.forEach(_v => {
                 _updateVisibility.push(true);
             });
@@ -756,7 +756,7 @@ export class GraphOperator {
         // which one should be shown first? base on current window size? or base on the collection config?
 
         // get default time range from graph config
-        let graphRangesConfig = this.defaultGraphRanges;
+        let graphRangesConfig: Array<{ name: string, value: number, show?: boolean }> = [];
         if (this.currentView.ranges) {
             graphRangesConfig = this.currentView.ranges;
         }
@@ -772,6 +772,14 @@ export class GraphOperator {
 
         const intervalsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.intervalsDropdown, [...dropdownOpts]);
         intervalsDropdonwOptions.render();
+
+        // if configured then show it, otherwise hide it.
+        if (dropdownOpts.length === 0) {
+            this.intervalsDropdown.style.display = "none";
+        } else {
+            this.intervalsDropdown.style.display = "";
+        }
+
 
         this.intervalsDropdown.onchange = (e) => {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
@@ -862,7 +870,8 @@ export class GraphOperator {
             let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
             if (!firstRanges) {
                 // throw errors;
-                throw new Error("non default range for range-bar!");
+                console.warn("non default range for range-bar, use default 7 days");
+                firstRanges = { name: "7 days", value: 604800000, show: true };
             }
 
             // get fields and labels
@@ -1131,12 +1140,12 @@ export class GraphOperator {
                 }
             });
             // add dbl event
-            if(this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback){
+            if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback) {
 
                 const callbackFunc = this.currentView.interaction.callback.dbClickCallback;
 
                 this.graphBody.addEventListener('dblclick', (e) => {
-                    if(currentSelection){
+                    if (currentSelection) {
                         callbackFunc(currentSelection);
                     }
                 });
@@ -1163,7 +1172,7 @@ export class GraphOperator {
                             newDatewindow[0] = this.xBoundary[0];
                             newDatewindow[1] = datewindow[1] - (datewindow[0] - this.xBoundary[0]);
                         }
-                        
+
                         // update datewindow
                         this.mainGraph.updateOptions({
                             dateWindow: newDatewindow,
