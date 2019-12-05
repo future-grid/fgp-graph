@@ -196,6 +196,8 @@ export class GraphOperator {
 
     private y2AxisBtnArea: HTMLElement;
 
+    private lockedInterval: { name: string, interval: number } | undefined;
+
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
         this.mainGraph = mainGraph;
@@ -348,25 +350,67 @@ export class GraphOperator {
      */
     private updateCollectionLabels = (header: HTMLElement, entities: Array<Entity>, choosedCollection: GraphCollection | undefined, collections: Array<GraphCollection>) => {
         // 
-        let labels = header.getElementsByClassName('fgp-interval-labels');// should only have one.
+        let labelsContainer = header.getElementsByClassName('fgp-interval-labels');// should only have one.
         let firstLabelArea: any = null;
-        for (let i = 0; i < labels.length; i++) {
-            const element = labels[i];
-            element.innerHTML = ''; // remove all child
-            if (i == 0) {
-                firstLabelArea = element;
-            }
+
+        if (labelsContainer.length > 0) {
+            // get first one
+            firstLabelArea = labelsContainer[0];
+            firstLabelArea.innerHTML = "";
         }
 
         // add children
         collections.forEach(_collection => {
             //
-            let labelAttrs: Array<DomAttrs> = [{ key: 'class', value: 'badge badge-pill badge-secondary' }];
+            let labelAttrs: Array<DomAttrs> = [{ key: 'class', value: 'badge badge-pill badge-secondary badge-interval' }];
             if (choosedCollection && _collection.name == choosedCollection.name) {
-                labelAttrs = [{ key: 'class', value: 'badge badge-pill badge-success' }];
+                labelAttrs = [{ key: 'class', value: 'badge badge-pill badge-success badge-interval' }];
             }
             let label: HTMLElement = this.createElement('span', labelAttrs);
+            label.setAttribute("data-interval-locked", "false");
+            label.setAttribute("data-interval-name", _collection.label);
+            label.setAttribute("data-interval-value", _collection.interval + '');
             label.innerText = _collection.label;
+
+
+            // make interval label lockable
+            label.addEventListener('click', (e: MouseEvent) => {
+                if (e.target) {
+                    let label = (<HTMLSpanElement>e.target);
+                    let _interval = label.getAttribute("data-interval-value");
+                    let locked = label.getAttribute("data-interval-locked");
+                    let intervalName = label.getAttribute("data-interval-name");
+                    if ("false" === locked) {
+                        // change all others 
+                        let badges: HTMLCollection = firstLabelArea.getElementsByClassName("badge-interval");
+                        for (let badge of badges) {
+                            badge.className = "badge badge-pill badge-secondary badge-interval";
+                            badge.setAttribute("data-interval-locked", "false");
+                        }
+                        // change color
+                        label.setAttribute("data-interval-locked", "true");
+                        label.className = "badge badge-pill badge-warning badge-interval";
+
+                        // setup lockec
+                        if (intervalName && _interval) {
+                            // update choosedCollection
+                            collections.map(collection => {
+                                if (collection.label === intervalName) {
+                                    this.currentCollection = choosedCollection = collection;
+                                }
+                            });
+                            this.lockedInterval = { "name": intervalName, "interval": Number(_interval) };
+                        }
+                    } else {
+                        // change color
+                        label.setAttribute("data-interval-locked", "false");
+                        label.className = "badge badge-pill badge-success badge-interval";
+                        // reset
+                        this.lockedInterval = undefined;
+                    }
+                }
+            });
+
             firstLabelArea.appendChild(label);
         });
 
@@ -994,10 +1038,14 @@ export class GraphOperator {
                         return a.interval > b.interval ? 1 : -1;
                     });
 
-                    choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
-                        return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
-                    });
 
+                    if (!this.lockedInterval) {
+                        choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
+                            return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
+                        });
+                    } else {
+                        choosedCollection = this.currentCollection;
+                    }
 
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
                     Object.assign(collection, choosedCollection);
@@ -1030,7 +1078,10 @@ export class GraphOperator {
                     this.end = datewindow[1];
 
                     this.update();
-                    this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
+                    if (!this.lockedInterval) {
+                        this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
+                    }
+                    
                 }
             }
 
