@@ -400,6 +400,9 @@ export class GraphOperator {
                                 }
                             });
                             this.lockedInterval = { "name": intervalName, "interval": Number(_interval) };
+                            // call refresh
+                            // this.update(undefined, undefined, true);
+                            this.refresh();
                         }
                     } else {
                         // change color
@@ -407,6 +410,13 @@ export class GraphOperator {
                         label.className = "badge badge-pill badge-success badge-interval";
                         // reset
                         this.lockedInterval = undefined;
+                        let datewindow = this.mainGraph.xAxisRange();
+                        // find best collection 
+                        this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
+                            return collection.threshold && (datewindow[1] - (datewindow[0] - collection.interval)) <= (collection.threshold.max);
+                        });
+                        this.refresh();
+                        // this.update(undefined, undefined, true);
                     }
                 }
             });
@@ -1039,12 +1049,40 @@ export class GraphOperator {
                     });
 
 
+                    this.start = datewindow[0];
+                    this.end = datewindow[1];
+
                     if (!this.lockedInterval) {
                         choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                             return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
                         });
-                    } else {
+                    } else if (this.currentCollection) {
                         choosedCollection = this.currentCollection;
+                        // check limit
+                        let gAreaW = this.mainGraph.getArea().w;
+                        let currentInterval = this.currentCollection.interval;
+                        let maxShowP = 0;
+                        if (gAreaW) {
+                            // call start and end
+                            maxShowP = gAreaW * currentInterval;
+                        }
+                        // get current datewindow
+                        if (this.start > (this.end - maxShowP)) {
+                            // go ahead
+                        } else {
+                            this.start = this.end - (maxShowP / (this.mainGraph.getLabels().length - 1) * 2);
+                            // update datewindow
+                            if(this.ragnebarGraph){
+                                this.ragnebarGraph.updateOptions({
+                                    dateWindow: [this.start, this.end]
+                                });
+                            } else {
+                                this.mainGraph.updateOptions({
+                                    dateWindow: [this.start, this.end]
+                                });
+                            }
+
+                        }
                     }
 
                     let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
@@ -1074,14 +1112,11 @@ export class GraphOperator {
                     this.currentCollection = collection;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
 
-                    this.start = datewindow[0];
-                    this.end = datewindow[1];
-
-                    this.update();
+                    this.update(undefined, undefined, true);
                     if (!this.lockedInterval) {
                         this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
                     }
-                    
+
                 }
             }
 
@@ -1742,25 +1777,57 @@ export class GraphOperator {
         }
 
         // get correct collection then call update
-        if (datewindow[0] == this.start && datewindow[1] == this.end) {
-            // console.debug("no change!");
-        } else {
-            this.start = datewindow[0];
-            this.end = datewindow[1];
+        // if (datewindow[0] == this.start && datewindow[1] == this.end && !this.lockedInterval) {
+        //     // console.debug("no change!");
+        // } else {
+        this.start = datewindow[0];
+        this.end = datewindow[1];
 
-            this.currentView.graphConfig.collections.sort((a, b) => {
-                return a.interval > b.interval ? 1 : -1;
-            });
+        this.currentView.graphConfig.collections.sort((a, b) => {
+            return a.interval > b.interval ? 1 : -1;
+        });
 
+        if (!this.lockedInterval) {
             this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
                 return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
             });
-            let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
-            Object.assign(collection, this.currentCollection);
-            // check initScale
-            this.update(undefined, undefined, true);
+        } else if (this.currentCollection) {
+            // check if the datewindow acceptable
+            let gAreaW = this.mainGraph.getArea().w;
+
+            let currentInterval = this.currentCollection.interval;
+
+            let maxShowP = 0;
+            if (gAreaW) {
+                // call start and end
+                maxShowP = gAreaW * currentInterval;
+            }
+            // get current datewindow
+            if (this.start > (this.end - maxShowP)) {
+                // go ahead
+            } else {
+                this.start = this.end - (maxShowP / (this.mainGraph.getLabels().length - 1) * 2);
+                // update datewindow
+                if(this.ragnebarGraph){
+                    this.ragnebarGraph.updateOptions({
+                        dateWindow: [this.start, this.end]
+                    });
+                } else {
+                    this.mainGraph.updateOptions({
+                        dateWindow: [this.start, this.end]
+                    });
+                }
+            }
+        }
+
+        let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
+        Object.assign(collection, this.currentCollection);
+        // check initScale
+        this.update(undefined, undefined, true);
+        if (!this.lockedInterval) {
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
+        // }
 
 
     }
