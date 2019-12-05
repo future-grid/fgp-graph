@@ -125,6 +125,7 @@ export interface Callbacks {
     dataCallback?(data: any): void;
     highlightCallback?(datetime: any, series: any, points: any[]): void;
     clickCallback?(series: string): void;
+    dbClickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }
 

@@ -263,6 +263,9 @@ let vdConfig: ViewConfig = {
             },
             syncDateWindow: (dateWindow) => {
                 // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+            }, 
+            dbClickCallback: (series) => {
+                // console.debug("dbl callback");
             }
         }
     },
