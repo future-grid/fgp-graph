@@ -1,5 +1,5 @@
 import FgpGraph from "./index";
-import { ViewConfig, GraphExports, FilterType } from "./metadata/configurations";
+import { ViewConfig, GraphExports, FilterType, GraphSeries } from "./metadata/configurations";
 import { DataHandler } from "./services/dataService";
 import moment from 'moment-timezone';
 import { Formatters } from "./extras/formatters";
@@ -29,7 +29,8 @@ class DataService implements DataHandler {
     }
 
 
-    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[]): Promise<{ id: string; data: any[]; }[]> {
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?:Array<GraphSeries>): Promise<{ id: string; data: any[]; }[]> {
+        debugger;
         // console.debug("fetching data from server...");
         let tempDate = moment(range.start).startOf('day').valueOf();
         let existData: any[] = [];
@@ -143,6 +144,7 @@ const dataService: DataHandler = new DataService();
 dataService.source = "store";
 let vdConfig: ViewConfig = {
     name: "device view",
+    connectSeparatedPoints: true,
     graphConfig: {
         features: {
             zoom: true,
@@ -171,7 +173,7 @@ let vdConfig: ViewConfig = {
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902', visibility: false },
                     { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
+                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8', extraConfig: { name: "helloword" } }
                 ],
                 threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
                 yLabel: 'voltage',
@@ -185,7 +187,7 @@ let vdConfig: ViewConfig = {
                 series: [
                     { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
                     { label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'dots', exp: "data.minConsumptionVah", yIndex: 'left' }
+                    { label: "Min", type: 'dots', exp: "data.minConsumptionVah", yIndex: 'left' , extraConfig: { any: "anything" }}
                 ],
                 threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -263,7 +265,7 @@ let vdConfig: ViewConfig = {
             },
             syncDateWindow: (dateWindow) => {
                 // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
-            }, 
+            },
             dbClickCallback: (series) => {
                 // console.debug("dbl callback");
             }
@@ -515,6 +517,8 @@ graph1.initGraph();
 // // link graphs
 graph1.setChildren([graph2, graph3]);
 
+
+
 // graph2.setChildren([graph1]);   // problem with right and left axis 
 
 // let ueGraph = new FgpGraph(graphDiv, [vdConfigUE]);
@@ -524,13 +528,9 @@ graph1.setChildren([graph2, graph3]);
 // highlight on first graph
 
 
-// setTimeout(() => {
+setTimeout(() => {
 
-//     graph1.highlightSeries(["Avg"], 0);
+    graph1.highlightSeries(["Avg", "Max"], 0, "selection");
 
-//     setTimeout(() => {
-//         graph1.highlightSeries(["Max","Min"], 2);
-//     }, 2000);
-
-// }, 5000);
+}, 5000);
 

@@ -268,6 +268,9 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForAllSeries = (data: any) => {
+        const g = data.dygraph;
+        if (g.getOption('showLabelsOnHighlight') !== true) return '';
+
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
@@ -292,6 +295,9 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForSingleSeries = (data: any) => {
+        const g = data.dygraph;
+        if (g.getOption('showLabelsOnHighlight') !== true) return '';
+
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');

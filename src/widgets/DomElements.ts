@@ -227,92 +227,99 @@ export class GraphOperator {
     /**
      * call this method to highlight series
      */
-    public highlightSeries = (series: string[], duration: number) => {
+    public highlightSeries = (series: string[], duration: number, type?: string) => {
         let visibility: boolean[] = this.mainGraph.getOption("visibility");
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
         if (series && series.length > 0) {
-            // hide all the others 
-            let _updateVisibility: boolean[] = [];
+
+            if (type && type === "selection") {
+                // convert it to normal graph
+                let graph: any = this.mainGraph;
+                graph.setSelection(false, series[0]);
 
 
-            if (this.currentCollection) {
-                const _graphSeries = this.mainGraph.getLabels();
-                // get indexes
-                let _indexsShow: number[] = [];
-                _graphSeries.forEach((_series, _index) => {
-                    //
-                    if (_index != 0) {
-                        series.forEach((_showSeries, _showIndex) => {
-                            if (_showSeries === _series) {
-                                _indexsShow.push(_index);
-                            }
-                        });
-                    }
-                });
-                // set visibility
-                visibility.forEach((_v, _i) => {
-                    if (_indexsShow.indexOf(_i) == -1) {
-                        _v = false;
-                    }
-                    let exist: boolean = false;
-                    _indexsShow.forEach(_ei => {
-                        if (_ei === _i) {
-                            // found it
-                            exist = true;
+            } else {
+                // hide all the others 
+                let _updateVisibility: boolean[] = [];
+                if (this.currentCollection) {
+                    const _graphSeries = this.mainGraph.getLabels();
+                    // get indexes
+                    let _indexsShow: number[] = [];
+                    _graphSeries.forEach((_series, _index) => {
+                        //
+                        if (_index != 0) {
+                            series.forEach((_showSeries, _showIndex) => {
+                                if (_showSeries === _series) {
+                                    _indexsShow.push(_index);
+                                }
+                            });
                         }
                     });
-                    if (!exist) {
-                        _updateVisibility.push(false);
-                    } else {
-                        _updateVisibility.push(true);
-                    }
-                });
-
-                this.mainGraph.updateOptions({
-                    visibility: _updateVisibility,
-                    axes: {
-                        x: {
-                            axisLabelFormatter: formatters.axisLabel
-                        },
-                        y: {
-                            valueRange: ranges[0],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        },
-                        y2: ranges.length > 1 ? {
-                            valueRange: ranges[1],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        } : undefined
-                    }
-                });
-                if (duration > 0) {
-                    // take all visibility back
-                    setTimeout(() => {
-                        _updateVisibility = [];
-                        visibility.forEach(_v => {
-                            _updateVisibility.push(true);
-                        });
-                        this.mainGraph.updateOptions({
-                            visibility: _updateVisibility,
-                            axes: {
-                                x: {
-                                    axisLabelFormatter: formatters.axisLabel
-                                },
-                                y: {
-                                    valueRange: ranges[0],
-                                    axisLabelWidth: 80,
-                                    labelsKMB: true
-                                },
-                                y2: ranges.length > 1 ? {
-                                    valueRange: ranges[1],
-                                    axisLabelWidth: 80,
-                                    labelsKMB: true
-                                } : undefined
+                    // set visibility
+                    visibility.forEach((_v, _i) => {
+                        if (_indexsShow.indexOf(_i) == -1) {
+                            _v = false;
+                        }
+                        let exist: boolean = false;
+                        _indexsShow.forEach(_ei => {
+                            if (_ei === _i) {
+                                // found it
+                                exist = true;
                             }
                         });
-                    }, duration * 1000);
+                        if (!exist) {
+                            _updateVisibility.push(false);
+                        } else {
+                            _updateVisibility.push(true);
+                        }
+                    });
+
+                    this.mainGraph.updateOptions({
+                        visibility: _updateVisibility,
+                        axes: {
+                            x: {
+                                axisLabelFormatter: formatters.axisLabel
+                            },
+                            y: {
+                                valueRange: ranges[0],
+                                axisLabelWidth: 80,
+                                labelsKMB: true
+                            },
+                            y2: ranges.length > 1 ? {
+                                valueRange: ranges[1],
+                                axisLabelWidth: 80,
+                                labelsKMB: true
+                            } : undefined
+                        }
+                    });
+                    if (duration > 0) {
+                        // take all visibility back
+                        setTimeout(() => {
+                            _updateVisibility = [];
+                            visibility.forEach(_v => {
+                                _updateVisibility.push(true);
+                            });
+                            this.mainGraph.updateOptions({
+                                visibility: _updateVisibility,
+                                axes: {
+                                    x: {
+                                        axisLabelFormatter: formatters.axisLabel
+                                    },
+                                    y: {
+                                        valueRange: ranges[0],
+                                        axisLabelWidth: 80,
+                                        labelsKMB: true
+                                    },
+                                    y2: ranges.length > 1 ? {
+                                        valueRange: ranges[1],
+                                        axisLabelWidth: 80,
+                                        labelsKMB: true
+                                    } : undefined
+                                }
+                            });
+                        }, duration * 1000);
+                    }
                 }
             }
         } else {
@@ -841,6 +848,12 @@ export class GraphOperator {
                 if (config.name == intervalDropdown.value) {
                     // get the middle timestamp of current timewindow.
                     let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
+                    let halfConfigRequire = config.value / 2;
+
+
+
+
+
                     // if ragnebar graph not exist, ignore it.
                     if (this.ragnebarGraph) {
                         // shrink and grow base on middle datetime
@@ -861,6 +874,7 @@ export class GraphOperator {
                     this.currentCollection = choosedCollection;
                     this.currentView = this.currentView;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
+
                     this.start = (middleDatetime - config.value / 2);
                     this.end = (middleDatetime + config.value / 2) > timewindowEnd ? (middleDatetime + config.value / 2) : timewindowEnd;
 
@@ -1072,7 +1086,7 @@ export class GraphOperator {
                         } else {
                             this.start = this.end - (maxShowP * 1.5);
                             // update datewindow
-                            if(this.ragnebarGraph){
+                            if (this.ragnebarGraph) {
                                 this.ragnebarGraph.updateOptions({
                                     dateWindow: [this.start, this.end]
                                 });
@@ -1178,6 +1192,7 @@ export class GraphOperator {
                 legend: "follow",
                 legendFormatter: this.currentView.graphConfig.features.legend ? this.currentView.graphConfig.features.legend : formatters.legendForSingleSeries,
                 labelsKMB: true,
+                // showLabelsOnHighlight: false,
                 // drawAxesAtZero: true,
                 connectSeparatedPoints: this.currentView.connectSeparatedPoints ? this.currentView.connectSeparatedPoints : false,
                 axes: {
@@ -1808,7 +1823,7 @@ export class GraphOperator {
             } else {
                 this.start = this.end - (maxShowP * 1.5);
                 // update datewindow
-                if(this.ragnebarGraph){
+                if (this.ragnebarGraph) {
                     this.ragnebarGraph.updateOptions({
                         dateWindow: [this.start, this.end]
                     });
@@ -1891,12 +1906,10 @@ export class GraphOperator {
                     highlightCircleSize: 4
                 };
 
-
-
                 if (series.type == 'dots') {
                     mainGraphSeries[series.label]["strokeWidth"] = 0;
                     mainGraphSeries[series.label]["drawPoints"] = true;
-                } else if(series.type == 'step'){
+                } else if (series.type == 'step') {
                     mainGraphSeries[series.label]["stepPlot"] = true;
                 }
 
@@ -2077,7 +2090,7 @@ export class GraphOperator {
         if (graphCollection) {
             this.spinner.show();
             // get data for 
-            view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph))).then(resp => {
+            view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph)), graphCollection.series).then(resp => {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = { valueRange: [] };
                 let y2Scale: { valueRange: Array<number> } = { valueRange: [] };

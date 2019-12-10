@@ -251,9 +251,9 @@ export default class FgpGraph {
      * 
      * @memberof FgpGraph
      */
-    public highlightSeries = (series: string[], duration: number) => {
+    public highlightSeries = (series: string[], duration: number, type?:string) => {
         //
-        this.operator.highlightSeries(series, duration);
+        this.operator.highlightSeries(series, duration, type);
     }
 
 
