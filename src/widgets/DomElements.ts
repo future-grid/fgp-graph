@@ -1070,7 +1070,7 @@ export class GraphOperator {
                         if (this.start > (this.end - maxShowP)) {
                             // go ahead
                         } else {
-                            this.start = this.end - (maxShowP / (this.mainGraph.getLabels().length - 1) * 2);
+                            this.start = this.end - (maxShowP * 1.5);
                             // update datewindow
                             if(this.ragnebarGraph){
                                 this.ragnebarGraph.updateOptions({
@@ -1806,7 +1806,7 @@ export class GraphOperator {
             if (this.start > (this.end - maxShowP)) {
                 // go ahead
             } else {
-                this.start = this.end - (maxShowP / (this.mainGraph.getLabels().length - 1) * 2);
+                this.start = this.end - (maxShowP * 1.5);
                 // update datewindow
                 if(this.ragnebarGraph){
                     this.ragnebarGraph.updateOptions({
@@ -1896,6 +1896,8 @@ export class GraphOperator {
                 if (series.type == 'dots') {
                     mainGraphSeries[series.label]["strokeWidth"] = 0;
                     mainGraphSeries[series.label]["drawPoints"] = true;
+                } else if(series.type == 'step'){
+                    mainGraphSeries[series.label]["stepPlot"] = true;
                 }
 
                 if (series.yIndex != 'left') {
