@@ -850,19 +850,6 @@ export class GraphOperator {
                     let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
                     let halfConfigRequire = config.value / 2;
 
-
-
-
-
-                    // if ragnebar graph not exist, ignore it.
-                    if (this.ragnebarGraph) {
-                        // shrink and grow base on middle datetime
-                        this.ragnebarGraph.updateOptions({
-                            dateWindow: [(middleDatetime - config.value / 2), (middleDatetime + config.value / 2)]
-                        });
-                    }
-
-
                     // find the correct collection and update graph
                     choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
                         return collection.threshold && (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
@@ -874,10 +861,28 @@ export class GraphOperator {
                     this.currentCollection = choosedCollection;
                     this.currentView = this.currentView;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
-
-                    this.start = (middleDatetime - config.value / 2);
-                    this.end = (middleDatetime + config.value / 2) > timewindowEnd ? (middleDatetime + config.value / 2) : timewindowEnd;
-
+                    if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
+                        this.start = this.xBoundary[0];
+                        this.end = this.xBoundary[1];
+                    } else if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) < this.xBoundary[1])) {
+                        //
+                        this.start = this.xBoundary[0];
+                        this.end = this.xBoundary[0] + halfConfigRequire * 2;
+                    } else if ((middleDatetime - halfConfigRequire) > this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
+                        this.end = this.xBoundary[1];
+                        this.start = this.xBoundary[1] - halfConfigRequire * 2;
+                    } else {
+                        this.start = (middleDatetime - halfConfigRequire);
+                        this.end = (middleDatetime + halfConfigRequire); 
+                    }
+                
+                    // if ragnebar graph not exist, ignore it.
+                    if (this.ragnebarGraph) {
+                        // shrink and grow base on middle datetime
+                        this.ragnebarGraph.updateOptions({
+                            dateWindow: [this.start, this.end]
+                        });
+                    }
                     this.update();
                     this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
                     if (interactionCallback) {
