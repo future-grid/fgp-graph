@@ -237,8 +237,6 @@ export class GraphOperator {
                 // convert it to normal graph
                 let graph: any = this.mainGraph;
                 graph.setSelection(false, series[0]);
-
-
             } else {
                 // hide all the others 
                 let _updateVisibility: boolean[] = [];
@@ -251,7 +249,7 @@ export class GraphOperator {
                         if (_index != 0) {
                             series.forEach((_showSeries, _showIndex) => {
                                 if (_showSeries === _series) {
-                                    _indexsShow.push(_index);
+                                    _indexsShow.push(_index - 1);
                                 }
                             });
                         }

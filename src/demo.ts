@@ -529,7 +529,7 @@ graph1.setChildren([graph2, graph3]);
 
 setTimeout(() => {
 
-    graph1.highlightSeries(["Avg", "Max"], 0, "selection");
+    graph1.highlightSeries(["Avg", "Min"], 0, "");
 
 }, 5000);
 
