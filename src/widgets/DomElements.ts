@@ -1914,6 +1914,11 @@ export class GraphOperator {
                     mainGraphSeries[series.label]["drawPoints"] = true;
                 } else if (series.type == 'step') {
                     mainGraphSeries[series.label]["stepPlot"] = true;
+                } else {
+                    // disable step and show 
+                    mainGraphSeries[series.label]["stepPlot"] = false;
+                    mainGraphSeries[series.label]["strokeWidth"] = 1;
+                    mainGraphSeries[series.label]["drawPoints"] = false;
                 }
 
                 if (series.yIndex != 'left') {
