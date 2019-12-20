@@ -1213,6 +1213,22 @@ export class GraphOperator {
             mainGraphLabels.forEach(label => {
                 fullVisibility.push(true);
             });
+
+            let interactionModelConfig:any = {
+                'mousedown': interactionModel.mouseDown,
+                'mouseup': interactionModel.mouseUp,
+                'mouseenter': interactionModel.mouseEnter,
+            };
+
+
+            if(this.currentView.graphConfig.features.zoom){
+                interactionModelConfig["mousemove"] = interactionModel.mouseMove;
+            }
+            if(this.currentView.graphConfig.features.scroll){
+                interactionModelConfig["mousewheel"] = interactionModel.mouseScroll;
+                interactionModelConfig["DOMMouseScroll"] = interactionModel.mouseScroll;
+                interactionModelConfig["wheel"] = interactionModel.mouseScroll;
+            }
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -1247,17 +1263,9 @@ export class GraphOperator {
                         this.currentView.interaction.callback.clickCallback(currentSelection);
                     }
                 },
-                interactionModel: {
-                    'mousedown': interactionModel.mouseDown,
-                    'mouseup': interactionModel.mouseUp,
-                    'mousemove': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.zoom) ? undefined : interactionModel.mouseMove,
-                    'mousewheel': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
-                    'DOMMouseScroll': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
-                    'wheel': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
-                    'mouseenter': interactionModel.mouseEnter,
-                },
-                drawCallback: (dygraph, is_initial) => {
-                    const xAxisRange: Array<number> = dygraph.xAxisRange();
+                interactionModel: interactionModelConfig,
+                drawCallback: (g, is_initial) => {
+                    const xAxisRange: Array<number> = g.xAxisRange();
                     currentDatewindow = [xAxisRange[0], xAxisRange[1]];
                     if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
                         startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');

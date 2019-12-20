@@ -191,8 +191,8 @@ let vdConfig: ViewConfig = {
     connectSeparatedPoints: true,
     graphConfig: {
         features: {
-            zoom: true,
-            scroll: true,
+            zoom: false,
+            scroll: false,
             rangeBar: true,
             legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image]
