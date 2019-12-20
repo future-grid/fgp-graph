@@ -1,10 +1,19 @@
 import Dygraph from 'dygraphs';
-import { ViewConfig, GraphCollection, DomAttrs, GraphSeries, Entity, GraphExports, filterFunc, FilterType } from '../metadata/configurations';
+import {
+    ViewConfig,
+    GraphCollection,
+    DomAttrs,
+    GraphSeries,
+    Entity,
+    GraphExports,
+    filterFunc,
+    FilterType
+} from '../metadata/configurations';
 import moment from 'moment-timezone';
-import { Synchronizer } from '../extras/synchronizer';
-import { DataHandler, ExportUtils, LoadingSpinner } from '../services/dataService';
-import { GraphInteractions } from '../extras/interactions';
-import { Formatters, hsvToRGB } from '../extras/formatters';
+import {Synchronizer} from '../extras/synchronizer';
+import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService';
+import {GraphInteractions} from '../extras/interactions';
+import {Formatters, hsvToRGB} from '../extras/formatters';
 
 
 export class DropdownButton {
@@ -12,13 +21,14 @@ export class DropdownButton {
     private select: HTMLSelectElement;
 
     private btns: Array<{ id: string, label: string, selected?: boolean }>;
+
     constructor(select: HTMLSelectElement, buttons: Array<{ id: string, label: string, selected?: boolean, formatter?: any }>) {
         this.select = select;
         this.btns = buttons;
     }
 
     /**
-     * generate options
+     * generate option
      *
      * @memberof DropdownButton
      */
@@ -49,6 +59,7 @@ export class DropdownMenu {
         this.opts = opts;
         this.callback = callback;
     }
+
     render = () => {
         this.dropdown.innerHTML = '';
         let div: HTMLElement = document.createElement('div');
@@ -141,15 +152,14 @@ export class DomElementOperator {
 }
 
 
-
 export class GraphOperator {
 
     public static FIELD_PATTERN = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
     defaultGraphRanges: Array<{ name: string, value: number, show?: boolean }> = [
-        { name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true },
-        { name: "7 days", value: 604800000, show: true },
-        { name: "1 month", value: 2592000000, show: false }
+        {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
+        {name: "7 days", value: 604800000, show: true},
+        {name: "1 month", value: 2592000000, show: false}
     ];
 
     createElement = (type: string, attrs: Array<DomAttrs>): HTMLElement => {
@@ -199,6 +209,7 @@ export class GraphOperator {
     private lockedInterval: { name: string, interval: number } | undefined;
 
 
+
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
         this.mainGraph = mainGraph;
         this.ragnebarGraph = rangeGraph;
@@ -210,10 +221,10 @@ export class GraphOperator {
         this.currentGraphData = [];
         this.spinner = new LoadingSpinner(this.graphContainer);
         this.xBoundary = [0, 0];
-        let yAxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn-container' }];
+        let yAxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-yaxis-btn-container'}];
         this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
 
-        let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn-container' }];
+        let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
     }
 
@@ -254,24 +265,34 @@ export class GraphOperator {
                             });
                         }
                     });
-                    // set visibility
-                    visibility.forEach((_v, _i) => {
-                        if (_indexsShow.indexOf(_i) == -1) {
-                            _v = false;
-                        }
-                        let exist: boolean = false;
-                        _indexsShow.forEach(_ei => {
-                            if (_ei === _i) {
-                                // found it
-                                exist = true;
+
+                    if(_indexsShow.length === 0){
+                        // not found
+                        // set visibility
+                        visibility.forEach((_v, _i) => {
+                            _updateVisibility.push(true);
+                        });
+                    } else {
+                        // set visibility
+                        visibility.forEach((_v, _i) => {
+                            if (_indexsShow.indexOf(_i) == -1) {
+                                _v = false;
+                            }
+                            let exist: boolean = false;
+                            _indexsShow.forEach(_ei => {
+                                if (_ei === _i) {
+                                    // found it
+                                    exist = true;
+                                }
+                            });
+                            if (!exist) {
+                                _updateVisibility.push(false);
+                            } else {
+                                _updateVisibility.push(true);
                             }
                         });
-                        if (!exist) {
-                            _updateVisibility.push(false);
-                        } else {
-                            _updateVisibility.push(true);
-                        }
-                    });
+                    }
+
 
                     this.mainGraph.updateOptions({
                         visibility: _updateVisibility,
@@ -367,9 +388,12 @@ export class GraphOperator {
         // add children
         collections.forEach(_collection => {
             //
-            let labelAttrs: Array<DomAttrs> = [{ key: 'class', value: 'badge badge-pill badge-secondary badge-interval' }];
+            let labelAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'badge badge-pill badge-secondary badge-interval'
+            }];
             if (choosedCollection && _collection.name == choosedCollection.name) {
-                labelAttrs = [{ key: 'class', value: 'badge badge-pill badge-success badge-interval' }];
+                labelAttrs = [{key: 'class', value: 'badge badge-pill badge-success badge-interval'}];
             }
             let label: HTMLElement = this.createElement('span', labelAttrs);
             label.setAttribute("data-interval-locked", "false");
@@ -404,7 +428,7 @@ export class GraphOperator {
                                     this.currentCollection = choosedCollection = collection;
                                 }
                             });
-                            this.lockedInterval = { "name": intervalName, "interval": Number(_interval) };
+                            this.lockedInterval = {"name": intervalName, "interval": Number(_interval)};
                             // call refresh
                             // this.update(undefined, undefined, true);
                             this.refresh();
@@ -446,11 +470,11 @@ export class GraphOperator {
         series.forEach((_series, _index) => {
             if (visibility && visibility[_index] != undefined) {
                 opts.push(
-                    { checked: visibility[_index], name: _series, label: _series }
+                    {checked: visibility[_index], name: _series, label: _series}
                 );
             } else {
                 opts.push(
-                    { checked: true, name: _series, label: _series }
+                    {checked: true, name: _series, label: _series}
                 );
             }
 
@@ -500,7 +524,7 @@ export class GraphOperator {
             view.graphConfig.features.exports.forEach(_export => {
                 if (_export === GraphExports.Data) {
                     // create button and add it into header
-                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-data" }];
+                    let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-data"}];
                     let btnData = DomElementOperator.createElement('button', btnAttrs);
                     btnData.addEventListener("click", (event) => {
                         // export data
@@ -545,7 +569,7 @@ export class GraphOperator {
                     });
                     buttons[0].appendChild(btnData);
                 } else if (_export === GraphExports.Image) {
-                    let btnAttrs: Array<DomAttrs> = [{ key: "class", value: "fgp-export-button fgp-btn-export-image" }];
+                    let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-image"}];
                     let btnImage = DomElementOperator.createElement('button', btnAttrs);
                     btnImage.addEventListener("click", (event) => {
                         const graphContainer = this.graphContainer;
@@ -646,7 +670,7 @@ export class GraphOperator {
                 }
             }
         }
-    }
+    };
 
     private setVisibility = (series: Array<string>) => {
         // set visibility
@@ -692,7 +716,7 @@ export class GraphOperator {
                 } : undefined
             }
         });
-    }
+    };
 
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
@@ -731,7 +755,7 @@ export class GraphOperator {
         // dropdown list filter buttons
         if (view.graphConfig.filters && view.graphConfig.filters.dropdown) {
             // put it into dropdown\
-            let filtersDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-filter-dropdown" }];
+            let filtersDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-filter-dropdown"}];
             let filtersDropdown = DomElementOperator.createElement('select', filtersDropdownAttrs);
 
             buttons[0].appendChild(filtersDropdown);
@@ -743,8 +767,8 @@ export class GraphOperator {
 
             view.graphConfig.filters.dropdown.forEach(filter => {
                 //
-                dropdownOpts.push({ id: filter.label, label: filter.label });
-                reference.push({ name: filter.label, func: filter.func, type: filter.type });
+                dropdownOpts.push({id: filter.label, label: filter.label});
+                reference.push({name: filter.label, func: filter.func, type: filter.type});
             });
 
             const filterDropdonwOptions = new DropdownButton(<HTMLSelectElement>filtersDropdown, [...dropdownOpts]);
@@ -778,11 +802,13 @@ export class GraphOperator {
         let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
-        let bottomAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-bottom' }];
+        let bottomAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-bottom'}];
         let bottom = null;
 
         this.currentView.graphConfig.entities.forEach(entity => {
-            entities.push(entity.id);
+            if (!entity.fragment) {
+                entities.push(entity.id);
+            }
         });
 
         // find fields from configuration
@@ -823,7 +849,7 @@ export class GraphOperator {
         let dropdownOpts: Array<{ id: string, label: string, selected?: boolean }> = [];
         graphRangesConfig.forEach(config => {
             dropdownOpts.push(
-                { id: config.name, label: config.name, selected: config.show }
+                {id: config.name, label: config.name, selected: config.show}
             );
         });
 
@@ -871,9 +897,9 @@ export class GraphOperator {
                         this.start = this.xBoundary[1] - halfConfigRequire * 2;
                     } else {
                         this.start = (middleDatetime - halfConfigRequire);
-                        this.end = (middleDatetime + halfConfigRequire); 
+                        this.end = (middleDatetime + halfConfigRequire);
                     }
-                
+
                     // if ragnebar graph not exist, ignore it.
                     if (this.ragnebarGraph) {
                         // shrink and grow base on middle datetime
@@ -903,21 +929,24 @@ export class GraphOperator {
             // put fields together
             fieldsForCollection = fieldsForCollection.concat(_tempFields);
         });
+        this.graphContainer.addEventListener("mouseout", (e) => {
+            if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                this.currentView.interaction.callback.highlightCallback(0, null, []);
+            }
+        });
 
 
         // 
         this.currentView.dataService.fetchFirstNLast([this.currentView.graphConfig.rangeEntity.name], this.currentView.graphConfig.rangeEntity.type, this.currentView.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
             // get first and last records, just need start and end timestamp
-            let first: any = { timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf() };
-            let last: any = { timestamp: 0 };
+            let first: any = {timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf()};
+            let last: any = {timestamp: 0};
             // if init range exist put the second on here
             if (this.currentView.initRange && this.currentView.initRange.end) {
                 last.timestamp = this.currentView.initRange.end;
             }
 
             // get all first and last then find out which first is the smalllest and last is the largest
-            // entities.forEach(entity => {
-            //
             resp.forEach(entityData => {
                 if (entityData.id == this.currentView.graphConfig.rangeEntity.name) {
                     if (entityData.data && entityData.data.first && entityData.data.first.timestamp) {
@@ -935,14 +964,13 @@ export class GraphOperator {
                     }
                 }
             });
-            // });
 
             // init empty graph with start and end  no other data
             let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
             if (!firstRanges) {
                 // throw errors;
                 console.warn("non default range for range-bar, use default 7 days");
-                firstRanges = { name: "7 days", value: 604800000, show: true };
+                firstRanges = {name: "7 days", value: 604800000, show: true};
             }
 
             // get fields and labels
@@ -997,7 +1025,7 @@ export class GraphOperator {
             // check visibility config
             let initVisibility: Array<boolean> = [];
 
-            if (choosedCollection && entities.length == 1) {
+            if (choosedCollection && this.currentView.graphConfig.entities.length == 1) {
                 mainGraphLabels = [];
                 choosedCollection.series.forEach((series, _index) => {
                     mainGraphLabels.push(series.label);
@@ -1014,7 +1042,7 @@ export class GraphOperator {
                     }
                 });
 
-            } else if (choosedCollection && entities.length > 1 && choosedCollection.series && choosedCollection.series[0]) {
+            } else if (choosedCollection && this.currentView.graphConfig.entities.length > 1 && choosedCollection.series && choosedCollection.series[0]) {
                 mainGraphLabels = [];
                 entities.forEach((entity, _index) => {
                     mainGraphLabels.push(entity);
@@ -1102,7 +1130,7 @@ export class GraphOperator {
                         }
                     }
 
-                    let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
+                    let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
                     Object.assign(collection, choosedCollection);
 
 
@@ -1111,14 +1139,14 @@ export class GraphOperator {
                             if (_index == 0) {
                                 //left
                                 if (collection && collection.initScales && !collection.initScales.left) {
-                                    collection.initScales.left = { min: 0, max: 0 };
+                                    collection.initScales.left = {min: 0, max: 0};
                                 } else if (collection && collection.initScales && collection.initScales.left) {
                                     collection.initScales.left.min = element[0];
                                     collection.initScales.left.max = element[1];
                                 }
                             } else if (_index == 1) {
                                 if (collection && collection.initScales && !collection.initScales.right) {
-                                    collection.initScales.right = { min: 0, max: 0 };
+                                    collection.initScales.right = {min: 0, max: 0};
                                 } else if (collection && collection.initScales && collection.initScales.right) {
                                     collection.initScales.right.min = element[0];
                                     collection.initScales.right.max = element[1];
@@ -1147,7 +1175,7 @@ export class GraphOperator {
                             if (_index == 0) {
                                 //left
                                 if (this.currentCollection && this.currentCollection.initScales && !this.currentCollection.initScales.left) {
-                                    this.currentCollection.initScales.left = { min: 0, max: 0 };
+                                    this.currentCollection.initScales.left = {min: 0, max: 0};
                                 } else if (this.currentCollection && this.currentCollection.initScales && this.currentCollection.initScales.left) {
                                     this.currentCollection.initScales.left.min = element[0];
                                     this.currentCollection.initScales.left.max = element[1];
@@ -1155,7 +1183,7 @@ export class GraphOperator {
 
                             } else if (_index == 1) {
                                 if (this.currentCollection && this.currentCollection.initScales && !this.currentCollection.initScales.right) {
-                                    this.currentCollection.initScales.right = { min: 0, max: 0 };
+                                    this.currentCollection.initScales.right = {min: 0, max: 0};
                                 } else if (this.currentCollection && this.currentCollection.initScales && this.currentCollection.initScales.right) {
                                     this.currentCollection.initScales.right.min = element[0];
                                     this.currentCollection.initScales.right.max = element[1];
@@ -1174,9 +1202,9 @@ export class GraphOperator {
             // create a interaction model instance
             let interactionModel: GraphInteractions = new GraphInteractions(callbackFuncForInteractions, [first.timestamp, last.timestamp]);
 
-            let dateLabelLeftAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-left' }];
+            let dateLabelLeftAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-range-bar-date-label-left'}];
             let startLabelLeft: HTMLElement = DomElementOperator.createElement('label', dateLabelLeftAttrs);
-            let dateLabelRightAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-range-bar-date-label-right' }];
+            let dateLabelRightAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-range-bar-date-label-right'}];
             let endLabelRight: HTMLElement = DomElementOperator.createElement('label', dateLabelRightAttrs);
 
             let currentSelection = "";
@@ -1207,9 +1235,9 @@ export class GraphOperator {
                     y2: y2Scale
                 },
                 highlightSeriesBackgroundAlpha: this.currentView.highlightSeriesBackgroundAlpha ? this.currentView.highlightSeriesBackgroundAlpha : 0.5,
-                highlightSeriesOpts: { strokeWidth: 1 },
+                highlightSeriesOpts: {strokeWidth: 1},
                 highlightCallback: (e, x, ps, row, seriesName) => {
-                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                    if (currentSelection != seriesName && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                         this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
                     currentSelection = seriesName;
@@ -1222,10 +1250,10 @@ export class GraphOperator {
                 interactionModel: {
                     'mousedown': interactionModel.mouseDown,
                     'mouseup': interactionModel.mouseUp,
-                    'mousemove': interactionModel.mouseMove,
-                    'mousewheel': interactionModel.mouseScroll,
-                    'DOMMouseScroll': interactionModel.mouseScroll,
-                    'wheel': interactionModel.mouseScroll,
+                    'mousemove': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.zoom) ? undefined : interactionModel.mouseMove,
+                    'mousewheel': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
+                    'DOMMouseScroll': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
+                    'wheel': (this.currentView.graphConfig.features && !this.currentView.graphConfig.features.scroll) ? undefined :  interactionModel.mouseScroll,
                     'mouseenter': interactionModel.mouseEnter,
                 },
                 drawCallback: (dygraph, is_initial) => {
@@ -1435,14 +1463,17 @@ export class GraphOperator {
             // zoom and pan buttons for x-axis
 
 
-            let xAxisButtonAreaAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn-container' }];
+            let xAxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn-container'}];
             let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
 
             // add buttons 
-            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in' }];
-            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
-            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
-            let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-right' }];
+            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in'}];
+            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'}];
+            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'}];
+            let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-pan-right'
+            }];
 
             //
             let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
@@ -1566,10 +1597,22 @@ export class GraphOperator {
             // check if exist or not
             if (this.graphContainer.getElementsByClassName("fgp-graph-yaxis-btn").length == 0) {
                 // add buttons 
-                let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in' }];
-                let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
-                let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
-                let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-yaxis-btn fgp-btn-pan-right' }];
+                let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in'
+                }];
+                let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'
+                }];
+                let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'
+                }];
+                let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-yaxis-btn fgp-btn-pan-right'
+                }];
                 //
                 let yAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomInBtnAttrs);
                 yAxisZoomInBtn.setAttribute("fgp-ctrl", "y-zoom-in");
@@ -1595,10 +1638,22 @@ export class GraphOperator {
             // add buttons for y and y2 ctrl
             if (this.graphContainer.getElementsByClassName("fgp-graph-y2axis-btn").length == 0) {
                 // add buttons 
-                let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in' }];
-                let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out' }];
-                let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left' }];
-                let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-y2axis-btn fgp-btn-pan-right' }];
+                let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in'
+                }];
+                let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'
+                }];
+                let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'
+                }];
+                let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{
+                    key: 'class',
+                    value: 'fgp-graph-y2axis-btn fgp-btn-pan-right'
+                }];
 
                 //
                 let y2AxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', y2AxisZoomInBtnAttrs);
@@ -1670,7 +1725,10 @@ export class GraphOperator {
 
                 // create 2 labels for start and end
 
-                let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{ key: 'style', value: 'height:22px;' }]);
+                let dateLabels: HTMLElement = DomElementOperator.createElement('div', [{
+                    key: 'style',
+                    value: 'height:22px;'
+                }]);
                 dateLabels.appendChild(startLabelLeft);
                 dateLabels.appendChild(endLabelRight);
                 dateLabels.appendChild(xAxisBtnArea);
@@ -1678,7 +1736,7 @@ export class GraphOperator {
 
                 bottom = DomElementOperator.createElement('div', bottomAttrs);
                 bottom.appendChild(dateLabels);
-                let rangeBarAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-rangebar' }];
+                let rangeBarAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-rangebar'}];
                 let rangeBar: HTMLElement = DomElementOperator.createElement('div', rangeBarAttrs);
                 bottom.appendChild(rangeBar);
                 this.graphContainer.appendChild(bottom);
@@ -1689,7 +1747,7 @@ export class GraphOperator {
                 ], {
                     xAxisHeight: 0,
                     axes: {
-                        x: { drawAxis: false },
+                        x: {drawAxis: false},
                         y: {
                             axisLabelWidth: 80
                         },
@@ -1738,7 +1796,7 @@ export class GraphOperator {
                             // ready to update children
                             interactionCallback();
                         }
-                    }, { once: true });
+                    }, {once: true});
                 }
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
@@ -1766,7 +1824,9 @@ export class GraphOperator {
             const seriesName: string[] = [];
             if (this.currentView.graphConfig.entities.length > 1) {
                 this.currentView.graphConfig.entities.forEach(entity => {
-                    seriesName.push(entity.name);
+                    if (!entity.fragment) {
+                        seriesName.push(entity.name);
+                    }
                 });
             } else {
                 // single device with multiple lines
@@ -1781,7 +1841,7 @@ export class GraphOperator {
             this.updateSeriesDropdown(this.header, seriesName, this.mainGraph, initVisibility);
 
         });
-    }
+    };
 
 
     refresh = () => {
@@ -1838,7 +1898,7 @@ export class GraphOperator {
             }
         }
 
-        let collection: GraphCollection = { label: "", name: "", series: [], interval: 0 };
+        let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
         Object.assign(collection, this.currentCollection);
         // check initScale
         this.update(undefined, undefined, true);
@@ -1868,14 +1928,16 @@ export class GraphOperator {
         const mainEntities: Array<string> = [];
         let mainDeviceType: string = "";
         view.graphConfig.entities.forEach(entity => {
-            mainEntities.push(entity.id);
-            mainDeviceType = entity.type;
+            if (!entity.fragment) {
+                mainEntities.push(entity.id);
+                mainDeviceType = entity.type;
+            }
         });
 
         // get fields for main graph
         let fieldsForMainGraph: string[] = [];
-        let yAxis: any = { min: null, max: null };
-        let yAxis2: any = { min: null, max: null };
+        let yAxis: any = {min: null, max: null};
+        let yAxis2: any = {min: null, max: null};
         let yIndexs: Array<number> = [];
         let y2Indexs: Array<number> = [];
         let colors: Array<string> = [];
@@ -1928,7 +1990,6 @@ export class GraphOperator {
         }
 
 
-
         let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } }, isY2?: boolean, isY?: boolean } => {
             // update main graph
             let graphData: any[] = [];
@@ -1962,7 +2023,7 @@ export class GraphOperator {
             _dates.sort();
             // rest labels
             mainLabels = [];
-            if (entities.length == 1) {
+            if (this.currentView.graphConfig.entities.length == 1) {
                 // get collection config
                 collection.series.forEach((series: GraphSeries, _index: number) => {
                     mainLabels.push(series.label);
@@ -2024,10 +2085,12 @@ export class GraphOperator {
 
                     });
                 });
-            } else if (entities.length > 1 && collection.series && collection.series[0]) {
+            } else if (this.currentView.graphConfig.entities.length > 1 && collection.series && collection.series[0]) {
 
-                entities.forEach(entity => {
-                    mainLabels.push(entity);
+                this.currentView.graphConfig.entities.forEach(entity => {
+                    if (!entity.fragment) {
+                        mainLabels.push(entity.name);
+                    }
                 });
 
                 const exp = collection.series[0].exp;
@@ -2092,16 +2155,19 @@ export class GraphOperator {
                     });
                 });
             }
-            return { data: finalData, axis: { y: yAxis, y2: yAxis2 } };
+            return {data: finalData, axis: {y: yAxis, y2: yAxis2}};
         }
 
         if (graphCollection) {
             this.spinner.show();
             // get data for 
-            view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForMainGraph)), graphCollection.series).then(resp => {
+            view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, {
+                start: start,
+                end: end
+            }, Array.from(new Set(fieldsForMainGraph)), graphCollection.series).then(resp => {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
-                let yScale: { valueRange: Array<number> } = { valueRange: [] };
-                let y2Scale: { valueRange: Array<number> } = { valueRange: [] };
+                let yScale: { valueRange: Array<number> } = {valueRange: []};
+                let y2Scale: { valueRange: Array<number> } = {valueRange: []};
 
 
                 if (yIndexs.length == 0) {
@@ -2212,8 +2278,6 @@ export class GraphOperator {
         }
 
 
-
-
         if (view.graphConfig.features.rangeBar) {
             // get fields for range-bar 
             const rangeEntities: Array<string> = [view.graphConfig.rangeEntity.id];
@@ -2231,7 +2295,10 @@ export class GraphOperator {
                 }
             });
             // for range
-            view.dataService.fetchdata(rangeEntities, rangeDeviceType, rangeCollection.name, { start: start, end: end }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
+            view.dataService.fetchdata(rangeEntities, rangeDeviceType, rangeCollection.name, {
+                start: start,
+                end: end
+            }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
                 // merge data
                 const currentDatewindowData = prepareGraphData(resp, rangeEntities, rangeCollection);
                 let preData: Array<any> = rangebarGraph.file_;
