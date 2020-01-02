@@ -1,6 +1,6 @@
 {
   "name": "@future-grid/fgp-graph",
-  "version": "19.6.22-RC.1",
+  "version": "19.6.22-RC.24",
   "description": "fgp-graph is a chart lib based on Dygraphs",
   "main": "dist/fgp-graph.bundle.js",
   "module": "lib/index.js",
@@ -42,7 +42,8 @@
     "typescript": "^3.5.3",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8",
-    "webpack-dev-server": "^3.7.2"
+    "webpack-dev-server": "^3.7.2",
+    "typescript-logging": "^0.6.4"
   },
   "dependencies": {
     "dygraphs": "^2.1.0",

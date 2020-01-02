@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas';
+import { GraphSeries } from '../metadata/configurations';
 export interface DataHandler {
 
     source: string;
@@ -11,7 +12,7 @@ export interface DataHandler {
      * @returns {Array<{ id: string, data: Array<any> }>}
      * @memberof DataHandler
      */
-    fetchdata(ids: Array<string>, deviceType:string, interval: string, range: { start: number; end: number }, fields?: Array<string>): Promise<Array<{ id: string, data: Array<any> }>>;
+    fetchdata(ids: Array<string>, deviceType:string, interval: string, range: { start: number; end: number }, fields?: Array<string>, seriesConfig?: Array<GraphSeries>): Promise<Array<{ id: string, data: Array<any> }>>;
 
     fetchFirstNLast(ids: Array<string>, devieType:string, interval: string, fields?: Array<string>): Promise<Array<{ id: string, data: { first: any, last: any } }>>;
 }

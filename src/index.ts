@@ -140,8 +140,6 @@ export default class FgpGraph {
 
     }
 
-
-
     /**
      * init graph with configuration
      * 
@@ -251,10 +249,16 @@ export default class FgpGraph {
      * 
      * @memberof FgpGraph
      */
-    public highlightSeries = (series: string[], duration: number) => {
+    public highlightSeries = (series: string[], duration: number, type?:string) => {
         //
-        this.operator.highlightSeries(series, duration);
+        this.operator.highlightSeries(series, duration, type);
     }
 
+    /**
+     * reload data for graph. base on series not changed!
+     */
+    public reloadData = () => {
+        this.operator.update(undefined, undefined, true);
+    }
 
 }

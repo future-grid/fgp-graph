@@ -2,6 +2,37 @@ import Dygraph from 'dygraphs';
 import moment from 'moment-timezone';
 import { GraphConstant } from '../metadata/configurations';
 
+export function hsvToRGB(hue: number, saturation: number, value: number) {
+    let red: number = 0;
+    let green: number = 0;
+    let blue: number = 0;
+    if (saturation === 0) {
+        red = value;
+        green = value;
+        blue = value;
+    } else {
+        let i = Math.floor(hue * 6);
+        let f = (hue * 6) - i;
+        let p = value * (1 - saturation);
+        let q = value * (1 - (saturation * f));
+        let t = value * (1 - (saturation * (1 - f)));
+        switch (i) {
+            case 1: red = q; green = value; blue = p; break;
+            case 2: red = p; green = value; blue = t; break;
+            case 3: red = p; green = q; blue = value; break;
+            case 4: red = t; green = p; blue = value; break;
+            case 5: red = value; green = p; blue = q; break;
+            case 6: // fall through
+            case 0: red = value; green = t; blue = p; break;
+        }
+    }
+    red = Math.floor(255 * red + 0.5);
+    green = Math.floor(255 * green + 0.5);
+    blue = Math.floor(255 * blue + 0.5);
+    return 'rgb(' + red + ',' + green + ',' + blue + ')';
+}
+
+
 export class Formatters {
 
     /**
@@ -80,9 +111,9 @@ export class Formatters {
 
 
     private pickDateTickGranularity = (a: any, b: any, pixels: any, opts: any) => {
-        var pixels_per_tick = opts('pixelsPerLabel');
-        for (var i = 0; i < 21; i++) {
-            var num_ticks = this.numDateTicks(a, b, i);
+        let pixels_per_tick = opts('pixelsPerLabel');
+        for (let i = 0; i < 21; i++) {
+            let num_ticks = this.numDateTicks(a, b, i);
             if (pixels / num_ticks >= pixels_per_tick) {
                 return i;
             }
@@ -102,7 +133,7 @@ export class Formatters {
             opts("axisLabelFormatter"));
         let ticks = [];
         let t;
-        
+
         if (granularity < GraphConstant.MONTHLY) {
             // Generate one tick mark for every fixed interval of time.
             let spacing = this.SHORT_SPACINGS[granularity];
@@ -111,7 +142,7 @@ export class Formatters {
             let g = spacing / 1000;
             let d = moment(start).tz(this.timezone ? this.timezone : moment.tz.guess());
             d.millisecond(0);
-            var x;
+            let x;
             if (g <= 60) {  // seconds
                 x = d.second(); d.second(x - x % g);
             } else {
@@ -141,25 +172,26 @@ export class Formatters {
             let check_dst = (spacing >= this.SHORT_SPACINGS[GraphConstant.TWO_DAILY]);
             for (t = start; t <= end; t += spacing) {
                 let d = moment(t).tz(this.timezone ? this.timezone : moment.tz.guess());
-
+                // console.info(check_dst , d.utcOffset() , start_offset_min);
                 if (check_dst && d.utcOffset() != start_offset_min) {
-                    var delta_min = d.utcOffset() - start_offset_min;
+                    let delta_min = d.utcOffset() - start_offset_min;
                     t += delta_min * 60 * 1000;
                     d = moment(t).tz(this.timezone ? this.timezone : moment.tz.guess());
                     start_offset_min = d.utcOffset();
 
                     // Check whether we've backed into the previous timezone again.
-                    // This can happen during a "spring forward" transition. In this case,
+                    // This can happen during a "day light" transition. In this case,
                     // it's best to skip this tick altogether (we may be shooting for a
                     // non-existent time like the 2AM that's skipped) and go to the next
                     // one.
+
                     if (moment(t + spacing).tz(this.timezone ? this.timezone : moment.tz.guess()).utcOffset() != start_offset_min) {
                         t += spacing;
                         d = moment(t).tz(this.timezone ? this.timezone : moment.tz.guess());
                         start_offset_min = d.utcOffset();
                     }
                 }
-
+                // todo:  check day light saving...
                 ticks.push({
                     v: t,
                     label: formatter(d, granularity, opts, dygraph)
@@ -209,14 +241,9 @@ export class Formatters {
         }
 
         return ticks;
-    }
-
-
-
-
+    };
 
     DateTickerTZ = (a: any, b: any, pixels: any, opts: any, dygraph: Dygraph, vals: any) => {
-
         let granularity = this.pickDateTickGranularity(a, b, pixels, opts);
         if (granularity >= 0) {
             return this.getDateAxis(a, b, granularity, opts, dygraph); // use own function here
@@ -224,7 +251,7 @@ export class Formatters {
             // this can happen if self.width_ is zero.
             return [];
         }
-    }
+    };
 
 
 
@@ -237,21 +264,24 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForAllSeries = (data: any) => {
+        const g = data.dygraph;
+        if (g.getOption('showLabelsOnHighlight') !== true) return '';
+
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
-        var html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
         data.series.forEach(function (series: any) {
             if (!series.isVisible) return;
-            var labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
+            let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
             }
             html += '<br>' + series.dashHTML + ' ' + labeledData;
         });
         return html;
-    }
+    };
 
     /**
      * 
@@ -261,6 +291,9 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForSingleSeries = (data: any) => {
+        const g = data.dygraph;
+        if (g.getOption('showLabelsOnHighlight') !== true) return '';
+
         if (data.x == null) {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');

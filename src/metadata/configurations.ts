@@ -25,6 +25,7 @@ export interface Features {
     connectPoints?: boolean;
     legend?: any;
     exports?: GraphExports[]; // png
+    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean }
 }
 
 /**
@@ -39,6 +40,7 @@ export interface Entity {
     name: string;
     description?: string;
     extension?: any;
+    fragment?:boolean;
 }
 
 /**
@@ -61,11 +63,12 @@ export interface DomAttrs {
  */
 export interface GraphSeries {
     label: string;
-    color?: string;
+    color?: string | undefined;
     exp: string;
     type: string;
     yIndex?: string;
     visibility?: boolean;  // only worked in single device view
+    extraConfig?: any;
 }
 
 /**
@@ -86,11 +89,15 @@ export interface GraphCollection {
     fill?: boolean;
 }
 
-export type filterFunc = () => Array<string>;
-
+export enum FilterType {
+    HIGHLIGHT = "highlight",
+    COLORS = "color"
+}
+export type filterFunc = (labels?: Array<string>) => Array<string>;
 export interface FilterConfig {
     label: string;
     func: filterFunc;
+    type?: FilterType;
 }
 
 /**
@@ -105,7 +112,7 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
-    filters?: Array<FilterConfig>;
+    filters?: { "buttons"?: Array<FilterConfig>, "dropdown"?: Array<FilterConfig> };
 }
 
 
@@ -120,6 +127,7 @@ export interface Callbacks {
     dataCallback?(data: any): void;
     highlightCallback?(datetime: any, series: any, points: any[]): void;
     clickCallback?(series: string): void;
+    dbClickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }
 
