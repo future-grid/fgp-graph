@@ -10,6 +10,7 @@ class DataService implements DataHandler {
     };
 
 
+    //private kk:Array<string> = [];
 
     private rangeData: any[] = [];
 
@@ -19,7 +20,7 @@ class DataService implements DataHandler {
         this.rangeData = [{
             id: "meter1",
             data: {
-                first: {timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -28,7 +29,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter2",
             data: {
-                first: {timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -37,7 +38,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter3",
             data: {
-                first: {timestamp: new Date("2019/06/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -46,7 +47,7 @@ class DataService implements DataHandler {
         }, {
             id: "substation1",
             data: {
-                first: {timestamp: new Date("2019/06/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/10/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     avgConsumptionVah: this.randomNumber(252, 255)
@@ -319,8 +320,8 @@ let vdConfig: ViewConfig = {
         {name: "1 month", value: 2592000000}
     ],
     initRange: {
-        start: moment("2019-06-01").add(10, 'days').startOf('day').valueOf(),
-        end: moment().subtract(15, 'days').endOf('day').valueOf()
+        start: moment("2019-10-01").add(0, 'days').startOf('day').valueOf(),
+        end: moment("2019-10-10").subtract(0, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {
