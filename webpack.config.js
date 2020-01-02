@@ -26,7 +26,7 @@ module.exports = {
         dygraphs: 'Dygraph',
         moment: 'moment',
         timezone: 'moment-timezone',
-        html2canvas: 'html2canvas'
+        //html2canvas: 'html2canvas'
     },
     module: {
         rules: [
