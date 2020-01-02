@@ -25,6 +25,7 @@ export interface Features {
     connectPoints?: boolean;
     legend?: any;
     exports?: GraphExports[]; // png
+    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean }
 }
 
 /**
@@ -39,6 +40,7 @@ export interface Entity {
     name: string;
     description?: string;
     extension?: any;
+    fragment?:boolean;
 }
 
 /**
@@ -61,10 +63,12 @@ export interface DomAttrs {
  */
 export interface GraphSeries {
     label: string;
-    color?: string;
+    color?: string | undefined;
     exp: string;
     type: string;
     yIndex?: string;
+    visibility?: boolean;  // only worked in single device view
+    extraConfig?: any;
 }
 
 /**
@@ -85,6 +89,17 @@ export interface GraphCollection {
     fill?: boolean;
 }
 
+export enum FilterType {
+    HIGHLIGHT = "highlight",
+    COLORS = "color"
+}
+export type filterFunc = (labels?: Array<string>) => Array<string>;
+export interface FilterConfig {
+    label: string;
+    func: filterFunc;
+    type?: FilterType;
+}
+
 /**
  * graph configuration
  *
@@ -97,6 +112,7 @@ export interface GraphConfig {
     rangeEntity: Entity;
     collections: Array<GraphCollection>;
     rangeCollection: GraphCollection;
+    filters?: { "buttons"?: Array<FilterConfig>, "dropdown"?: Array<FilterConfig> };
 }
 
 
@@ -109,10 +125,12 @@ export interface GraphConfig {
  */
 export interface Callbacks {
     dataCallback?(data: any): void;
-    highlighCallback?(datetime: any, series: any, points: any[]): void;
+    highlightCallback?(datetime: any, series: any, points: any[]): void;
     clickCallback?(series: string): void;
+    dbClickCallback?(series: string): void;
     syncDateWindow?(dateWindow: number[]): void;
 }
+
 /**
  * View config
  *
@@ -127,6 +145,39 @@ export interface ViewConfig {
     ranges?: Array<{ name: string, value: number, show?: boolean }>;
     timezone?: string;
     initRange?: { start: number, end: number };
-    interaction?: { callback?: Callbacks }
+    interaction?: { callback?: Callbacks };
+    connectSeparatedPoints?: boolean;
+    highlightSeriesBackgroundAlpha?: number;
+}
 
+/**
+ * datetime ranges index
+ *
+ * @export
+ * @enum {number}
+ */
+export enum GraphConstant {
+    SECONDLY = 0,
+    TWO_SECONDLY = 1,
+    FIVE_SECONDLY = 2,
+    TEN_SECONDLY = 3,
+    THIRTY_SECONDLY = 4,
+    MINUTELY = 5,
+    TWO_MINUTELY = 6,
+    FIVE_MINUTELY = 7,
+    TEN_MINUTELY = 8,
+    THIRTY_MINUTELY = 9,
+    HOURLY = 10,
+    TWO_HOURLY = 11,
+    SIX_HOURLY = 12,
+    DAILY = 13,
+    TWO_DAILY = 14,
+    WEEKLY = 15,
+    MONTHLY = 16,
+    QUARTERLY = 17,
+    BIANNUAL = 18,
+    ANNUAL = 19,
+    DECADAL = 20,
+    CENTENNIAL = 21,
+    NUM_GRANULARITIES = 22
 }
