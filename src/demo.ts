@@ -326,7 +326,7 @@ let vdConfig: ViewConfig = {
     interaction: {
         callback: {
             highlightCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
                 // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));

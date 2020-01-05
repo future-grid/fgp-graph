@@ -144,7 +144,6 @@ export class DomElementOperator {
             } else {
                 throw new Error("Duplicate Attrs " + attr.key);
             }
-
         });
         return dom;
     }
@@ -168,9 +167,8 @@ export class GraphOperator {
         attrs.forEach(attr => {
             dom.setAttribute(attr.key, attr.value);
         });
-
         return dom;
-    }
+    };
 
     private mainGraph: Dygraph;
 
@@ -188,7 +186,7 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
-    private currentGraphData: { id: string, data: any[] }[];
+    private currentGraphData: any[];
 
     private graphContainer: HTMLElement;
 
@@ -223,7 +221,6 @@ export class GraphOperator {
         this.xBoundary = [0, 0];
         let yAxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-yaxis-btn-container'}];
         this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
-
         let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
     }
@@ -232,7 +229,7 @@ export class GraphOperator {
         if (this.spinner) {
             this.spinner.show();
         }
-    }
+    };
 
 
     /**
@@ -312,6 +309,8 @@ export class GraphOperator {
                             } : undefined
                         }
                     });
+
+
                     if (duration > 0) {
                         // take all visibility back
                         setTimeout(() => {
@@ -366,7 +365,7 @@ export class GraphOperator {
                 }
             });
         }
-    }
+    };
 
     /**
      * update labels
@@ -400,8 +399,6 @@ export class GraphOperator {
             label.setAttribute("data-interval-name", _collection.label);
             label.setAttribute("data-interval-value", _collection.interval + '');
             label.innerText = _collection.label;
-
-
             // make interval label lockable
             label.addEventListener('click', (e: MouseEvent) => {
                 if (e.target) {
@@ -419,7 +416,6 @@ export class GraphOperator {
                         // change color
                         label.setAttribute("data-interval-locked", "true");
                         label.className = "badge badge-pill badge-warning badge-interval";
-
                         // setup lockec
                         if (intervalName && _interval) {
                             // update choosedCollection
@@ -452,20 +448,16 @@ export class GraphOperator {
 
             firstLabelArea.appendChild(label);
         });
-
-
-    }
+    };
 
 
     private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?: Array<boolean>) => {
         let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
-
         if (dropdown && dropdown[0]) {
             dropdown[0].innerHTML = "";
         }
         let select: HTMLElement = <HTMLSelectElement>this.createElement("div", []);
         dropdown[0].appendChild(select);
-
         let opts: Array<{ checked: boolean, name: string, label: string }> = [];
         series.forEach((_series, _index) => {
             if (visibility && visibility[_index] != undefined) {
@@ -477,7 +469,6 @@ export class GraphOperator {
                     {checked: true, name: _series, label: _series}
                 );
             }
-
         });
 
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
@@ -509,9 +500,8 @@ export class GraphOperator {
                     } : undefined
                 }
             });
-
         }).render();
-    }
+    };
 
     private updateExportButtons = (view: ViewConfig) => {
         if (view.graphConfig.features && view.graphConfig.features.exports) {
@@ -585,9 +575,7 @@ export class GraphOperator {
                 }
             });
         }
-
-
-    }
+    };
 
     private setColors = (colors: Array<string>) => {
         // check if length match or not
@@ -597,7 +585,6 @@ export class GraphOperator {
         let val = 0.5;
         // get current y and y2 axis scaling max and min
         let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-
         if (graphLabels.length - 1 === colors.length) {
             this.mainGraph.updateOptions({
                 colors: colors,
@@ -880,10 +867,10 @@ export class GraphOperator {
                     });
 
                     //update 
-                    this.mainGraph = this.mainGraph;
-                    this.ragnebarGraph = this.ragnebarGraph;
+                    // this.mainGraph = this.mainGraph;
+                    // this.ragnebarGraph = this.ragnebarGraph;
                     this.currentCollection = choosedCollection;
-                    this.currentView = this.currentView;
+                    // this.currentView = this.currentView;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
                     if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
                         this.start = this.xBoundary[0];
@@ -984,7 +971,7 @@ export class GraphOperator {
                 }
             });
 
-            // get choosed collection by width....
+            // get choose collection by width....
             if (!choosedCollection && firstRanges) {
                 // cal with width
                 const width: number = this.graphContainer.offsetWidth;
@@ -1805,7 +1792,7 @@ export class GraphOperator {
                             interactionCallback();
                         }
                     }, {once: true});
-                }
+                };
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element: any = rangeBarHandles[i];
@@ -1916,7 +1903,7 @@ export class GraphOperator {
         // }
 
 
-    }
+    };
 
 
     update = (first?: number, last?: number, refersh?: boolean) => {
@@ -2164,7 +2151,7 @@ export class GraphOperator {
                 });
             }
             return {data: finalData, axis: {y: yAxis, y2: yAxis2}};
-        }
+        };
 
         if (graphCollection) {
             this.spinner.show();
@@ -2243,11 +2230,11 @@ export class GraphOperator {
                 }
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
-                console.debug("Graph is clean now!~");
+                // console.debug("Graph is clean now!~");
                 if (graphData.data) {
                     this.currentGraphData = [];
                     graphData.data.forEach(_data => {
-                        _data[0] = new Date(_data[0])
+                        _data[0] = new Date(_data[0]);
                         this.currentGraphData.push(_data);
                     });
                 }
@@ -2255,6 +2242,8 @@ export class GraphOperator {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
                 }
+
+                // console.info(this.currentGraphData);
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
@@ -2281,13 +2270,10 @@ export class GraphOperator {
                         }
                     }
                 });
-
             });
         }
-
-
         if (view.graphConfig.features.rangeBar) {
-            // get fields for range-bar 
+            // get fields for range-bar
             const rangeEntities: Array<string> = [view.graphConfig.rangeEntity.id];
             const rangeDeviceType: string = view.graphConfig.rangeEntity.type;
             // get fields for main graph
@@ -2332,7 +2318,7 @@ export class GraphOperator {
 
                 let rangeSeries: any = {};
                 let labels = [];
-                // check if ther is a y2
+                // check if there is a y2
                 rangeCollection.series.forEach((series, _index) => {
                     labels.push(series.label);
                     rangeSeries[series.label] = {
@@ -2365,7 +2351,5 @@ export class GraphOperator {
                 });
             });
         }
-
     }
-
 }
