@@ -127,7 +127,6 @@ export class SelectWithCheckbox {
             this.select.add(optElement);
         });
     }
-
 }
 
 
@@ -207,7 +206,6 @@ export class GraphOperator {
     private lockedInterval: { name: string, interval: number } | undefined;
 
 
-
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
         this.mainGraph = mainGraph;
         this.ragnebarGraph = rangeGraph;
@@ -224,6 +222,18 @@ export class GraphOperator {
         let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
     }
+
+    public recreateElement = (el: HTMLElement, withChildren: boolean) => {
+        if (withChildren && el) {
+            if (el.parentNode) {
+                el.parentNode.replaceChild(el.cloneNode(true), el);
+            }
+        } else if (el && el.parentNode) {
+            let newEl = el.cloneNode(false);
+            while (el.hasChildNodes() && el.firstChild) newEl.appendChild(el.firstChild);
+            el.parentNode.replaceChild(newEl, el);
+        }
+    };
 
     public showSpinner = () => {
         if (this.spinner) {
@@ -263,7 +273,7 @@ export class GraphOperator {
                         }
                     });
 
-                    if(_indexsShow.length === 0){
+                    if (_indexsShow.length === 0) {
                         // not found
                         // set visibility
                         visibility.forEach((_v, _i) => {
@@ -416,9 +426,9 @@ export class GraphOperator {
                         // change color
                         label.setAttribute("data-interval-locked", "true");
                         label.className = "badge badge-pill badge-warning badge-interval";
-                        // setup lockec
+                        // setup locked
                         if (intervalName && _interval) {
-                            // update choosedCollection
+                            // update choose Collection
                             collections.map(collection => {
                                 if (collection.label === intervalName) {
                                     this.currentCollection = choosedCollection = collection;
@@ -1201,21 +1211,27 @@ export class GraphOperator {
                 fullVisibility.push(true);
             });
 
-            let interactionModelConfig:any = {
+            let interactionModelConfig: any = {
                 'mousedown': interactionModel.mouseDown,
                 'mouseup': interactionModel.mouseUp,
                 'mouseenter': interactionModel.mouseEnter,
             };
 
+            if (this.currentView.graphConfig.features.rangeLocked) {
+                // remove all event listener. can't zooming, scrolling and panning
+            } else {
+                // disable scrolling. scrolling will change datetime window
+                if (this.currentView.graphConfig.features.scroll) {
+                    interactionModelConfig["mousewheel"] = interactionModel.mouseScroll;
+                    interactionModelConfig["DOMMouseScroll"] = interactionModel.mouseScroll;
+                    interactionModelConfig["wheel"] = interactionModel.mouseScroll;
+                }
+            }
 
-            if(this.currentView.graphConfig.features.zoom){
+            if (this.currentView.graphConfig.features.zoom) {
                 interactionModelConfig["mousemove"] = interactionModel.mouseMove;
             }
-            if(this.currentView.graphConfig.features.scroll){
-                interactionModelConfig["mousewheel"] = interactionModel.mouseScroll;
-                interactionModelConfig["DOMMouseScroll"] = interactionModel.mouseScroll;
-                interactionModelConfig["wheel"] = interactionModel.mouseScroll;
-            }
+
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -1471,26 +1487,25 @@ export class GraphOperator {
             }];
 
             //
-            let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
-            xAxisZoomInBtn.setAttribute("fgp-ctrl", "x-zoom-in");
-            let xAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomOutBtnAttrs);
-            xAxisZoomOutBtn.setAttribute("fgp-ctrl", "x-zoom-out");
-            let xAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanLeftBtnAttrs);
-            xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
-            let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
-            xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
-
-
-            xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisPanRightBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            // add buttons into container
-            xAxisBtnArea.appendChild(xAxisPanLeftBtn);
-            xAxisBtnArea.appendChild(xAxisZoomInBtn);
-            xAxisBtnArea.appendChild(xAxisZoomOutBtn);
-            xAxisBtnArea.appendChild(xAxisPanRightBtn);
-
+            if (!this.currentView.graphConfig.features.rangeLocked) {
+                let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
+                xAxisZoomInBtn.setAttribute("fgp-ctrl", "x-zoom-in");
+                let xAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomOutBtnAttrs);
+                xAxisZoomOutBtn.setAttribute("fgp-ctrl", "x-zoom-out");
+                let xAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanLeftBtnAttrs);
+                xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
+                let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
+                xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
+                xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisPanRightBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                // add buttons into container
+                xAxisBtnArea.appendChild(xAxisPanLeftBtn);
+                xAxisBtnArea.appendChild(xAxisZoomInBtn);
+                xAxisBtnArea.appendChild(xAxisZoomOutBtn);
+                xAxisBtnArea.appendChild(xAxisPanRightBtn);
+            }
             // add buttons for y and y2 ctrl
             const ctrlVBtnsEventListener: EventListener = (e) => {
 
@@ -1762,10 +1777,10 @@ export class GraphOperator {
                         // only run first draw
                         if (isInitial) {
                             // find zoomhandle
-                            const handles = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                            const handles:HTMLCollectionOf<Element> = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
                             // left handle  just in case the right handle overlap the left one
                             if (handles[0] instanceof HTMLElement) {
-                                handles[0].style.zIndex = "11";
+                                (<HTMLElement>handles[0]).style.zIndex = "11";
                             }
                         }
 
@@ -1796,10 +1811,18 @@ export class GraphOperator {
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element: any = rangeBarHandles[i];
-                    let style: any = element.getAttribute("style");
-                    style.replace("z-index: 10;", "z-index: " + (10 + i) + ";");
-                    element.setAttribute("style", style);
+                    // left one on the top
+                    if(i === 0){
+                        element.style.zIndex = (10 + 1);
+                    } else {
+                        element.style.zIndex = (10);
+                    }
                     element.addEventListener('mousedown', rangebarMousedownFunc);
+                    if (this.currentView.graphConfig.features.rangeLocked) {
+                        // change cursor
+                        element.style.cursor = 'default';
+                        element.style.pointerEvents = 'none';
+                    }
                 }
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);

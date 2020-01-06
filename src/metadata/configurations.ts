@@ -4,7 +4,6 @@ import { DataHandler } from "../services/dataService";
 /**
  *2 types of exporting graph data and save as image 
  *
- * @export
  * @enum {number}
  */
 export enum GraphExports {
@@ -13,10 +12,13 @@ export enum GraphExports {
 }
 
 /**
- *enable or disable graph features
- *
- * @export
- * @interface Features
+ * @zoom enable or disable zooming
+ * @scroll enable or disable scrolling
+ * @rangeBar show or hide rangeBar
+ * @connectPoints connect points when series interval are different.
+ * @legend type of legend (single or multiple)
+ * @ctrlButtons show or hide control buttons
+ * @rangeLocked lock range bar
  */
 export interface Features {
     zoom: boolean;
@@ -25,14 +27,19 @@ export interface Features {
     connectPoints?: boolean;
     legend?: any;
     exports?: GraphExports[]; // png
-    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean }
+    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean },
+    rangeLocked?: boolean
 }
 
 /**
  * device entity
  *
- * @export
- * @interface Entity
+ * @id
+ * @name
+ * @type type of entity
+ * @description
+ * @fragment
+ * @extension object for extra info
  */
 export interface Entity {
     id: string;
@@ -46,8 +53,8 @@ export interface Entity {
 /**
  * div dom element
  *
- * @export
- * @interface DomAttrs
+ * @key
+ * @value value of attr
  */
 export interface DomAttrs {
     key: string;
@@ -58,8 +65,13 @@ export interface DomAttrs {
 /**
  *graph series configuration
  *
- * @export
- * @interface GraphSeries
+ * @label
+ * @color color for current series if undefined then use default color
+ * @exp expression for cal
+ * @type line dot or step
+ * @yIndex left or right
+ * @visibility show or hide from init
+ * @extraConfig use for different type of device
  */
 export interface GraphSeries {
     label: string;
@@ -74,8 +86,15 @@ export interface GraphSeries {
 /**
  *graph collection
  *
- * @export
- * @interface GraphCollection
+ * @label
+ * @name
+ * @series lines
+ * @interval use to cal the gap base on data interval
+ * @yLabel label of y
+ * @y2Label label of y2
+ * @threshold interval changes base on this threshold
+ * @initScale y and y2 init range
+ * @file fill area
  */
 export interface GraphCollection {
     label: string;
@@ -89,11 +108,21 @@ export interface GraphCollection {
     fill?: boolean;
 }
 
+/**
+ * type of filter buttons
+ */
 export enum FilterType {
     HIGHLIGHT = "highlight",
     COLORS = "color"
 }
 export type filterFunc = (labels?: Array<string>) => Array<string>;
+
+/**
+ * filter config
+ * @label shown on button or dropdown list
+ * @func callback function
+ * @type filter type button or dropdown list
+ */
 export interface FilterConfig {
     label: string;
     func: filterFunc;
@@ -103,8 +132,12 @@ export interface FilterConfig {
 /**
  * graph configuration
  *
- * @export
- * @interface GraphConfig
+ * @features enable or disable features
+ * @entities series entity
+ * @rangeEntity use for range bar
+ * @collection configuration of series
+ * @rangeCollection range bar line configuration (should just put one line here)
+ * @filters button or dropdown list config
  */
 export interface GraphConfig {
     features: Features;
@@ -118,10 +151,13 @@ export interface GraphConfig {
 
 
 /**
- *graph callback configuraiton
+ *graph callback configuration
  *
- * @export
- * @interface Callbacks
+ * @dataCallback any time the datewindow changed, call this method to send data back to outside
+ * @highlightCallback send one series back to outside on hover the graph
+ * @clickCallback send one series back on click the graph
+ * @dbClickCallback send one series back on dblclick the graph
+ * @syncDateWindow send [start, end] back to outside
  */
 export interface Callbacks {
     dataCallback?(data: any): void;
@@ -134,8 +170,16 @@ export interface Callbacks {
 /**
  * View config
  *
- * @export
- * @interface ViewConfig
+ * @name view name, will show this name in dropdown list
+ * @graphConfig graph config
+ * @dataService dataservice instance
+ * @show show or hide
+ * @ranges dropdownlist for 7 days 1 month etc
+ * @timezone datetime zone
+ * @initRange init datewindow range
+ * @interaction callbacks
+ * @connectSeparatedPoints connect or disconnect points when series interval are different
+ * @highlightSeriesBackgroundAlpha show or hide background base on the alpha
  */
 export interface ViewConfig {
     name: string;

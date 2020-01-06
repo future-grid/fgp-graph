@@ -192,11 +192,12 @@ let vdConfig: ViewConfig = {
     connectSeparatedPoints: true,
     graphConfig: {
         features: {
-            zoom: false,
-            scroll: false,
+            zoom: true,
+            scroll: true,
             rangeBar: true,
             legend: formatters.legendForAllSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            exports: [GraphExports.Data, GraphExports.Image],
+            rangeLocked: true
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},
