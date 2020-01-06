@@ -55,82 +55,160 @@ If you are a dygrpahs user, please don't put dygraphs options in fgp-graph. fgp-
 ```javascript
 let vdConfig: ViewConfig = {
     name: "device view",
+    connectSeparatedPoints: true,  // connect points when series intervals are different
     graphConfig: {
         features: {
-            zoom: true,
-            scroll: true,
-            rangeBar: true,
-            legend: formatters.legendForAllSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            zoom: false,   // enable or disable zooming
+            scroll: false, // enable or disable scrolling
+            rangeBar: true, // show or hide range bar
+            legend: formatters.legendForAllSeries, // single or multiple series info in legend
+            exports: [GraphExports.Data, GraphExports.Image], // export data and image
+            rangeLocked: true // lock range bar
         },
-        entities: [
-            { id: "substation1", type: "substation", name: "**F**substation" },
+        entities: [        // entities --- series
+            {id: "substation1", type: "substation", name: "substation1"},
         ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
+        rangeEntity: {id: "substation1", type: "substation", name: "substation1"},
         rangeCollection: {
             label: 'substation_day',
             name: 'substation_interval_day',
             interval: 86400000,
             series: [
-                { label: "Avg", type: 'line', exp: "data.avgConsumptionVah" }
+                {label: "Avg", type: 'line', exp: "data.avgConsumptionVah"}
             ]
         },
-        collections: [
+        collections: [     // series for different level
             {
                 label: 'substation_raw',
                 name: 'substation_interval',
                 interval: 3600000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
+                    {
+                        label: "Avg",
+                        type: 'line',
+                        exp: "data.avgConsumptionVah",
+                        yIndex: 'left',
+                        color: '#058902',
+                        visibility: false
+                    },
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808'},
+                    {
+                        label: "Min",
+                        type: 'line',
+                        exp: "data.minConsumptionVah",
+                        yIndex: 'left',
+                        color: '#210aa8',
+                        extraConfig: {name: "helloword"}
+                    }
                 ],
-                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
+                threshold: {min: 0, max: (1000 * 60 * 60 * 24 * 10)},    //  0 ~ 10 days
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                initScales: { left: { min: 245, max: 260 } },
-                fill: false
+                initScales: {left: {min: 245, max: 260}},
+                fill: true
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
                 interval: 86400000,
                 series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
+                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'left'},
+                    {
+                        label: "Min",
+                        type: 'dots',
+                        exp: "data.minConsumptionVah",
+                        yIndex: 'left',
+                        extraConfig: {any: "anything"}
+                    }
                 ],
-                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
+                threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
                 y2Label: 'voltage',
-                initScales: { left: { min: 230, max: 260 } },
+                initScales: {left: {min: 230, max: 260}},
                 fill: false
             }
-        ]
+        ],
+        filters: {   // extra buttons for filtering data
+            "buttons": [
+                {
+                    label: "All"
+                    , func: () => {
+                        return ["Min", "Max", "Avg"];
+                    }
+                },
+                {
+                    label: "Min"
+                    , func: (): Array<string> => {
+                        return ["Min"];
+                    }
+                },
+                {
+                    label: "Max"
+                    , func: () => {
+                        return ["Max"];
+                    }
+                },
+                {
+                    label: "Avg"
+                    , func: () => {
+                        return ["Avg"];
+                    }
+                },
+                {
+                    label: "Colors",
+                    type: FilterType.COLORS,
+                    func: (labels?: Array<string>) => {
+                        let colors: Array<string> = [];
+                        // generate colors 
+                        if (labels) {
+                            labels.forEach(element => {
+                                colors.push("#FF0000");
+                            });
+
+                        }
+                        return colors;
+                    }
+                },
+                {
+                    label: "reset Colors",
+                    type: FilterType.COLORS,
+                    func: (labels?: Array<string>) => {
+                        return [];
+                    }
+                }
+            ]
+        }
 
     },
-    dataService: dataService,
-    show: true,
-    ranges: [
-        { name: "7 days", value: 604800000, show: true },
-        { name: "1 month", value: 2592000000 }
+    dataService: dataService,  // data source
+    show: true,   // show or hide 
+    ranges: [     // dropdown list of ranges
+        {name: "7 days", value: 604800000, show: true},
+        {name: "1 month", value: 2592000000}
     ],
-    initRange: {
-        start: moment().subtract(10, 'days').startOf('day').valueOf(),
-        end: moment().add(1, 'days').valueOf()
+    initRange: {   // init datetime range on startup
+        start: moment("2019-10-01").add(0, 'days').startOf('day').valueOf(),
+        end: moment("2019-10-10").subtract(0, 'days').endOf('day').valueOf()
     },
-    interaction: {
+    interaction: {  // just callbacks 
         callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+            highlightCallback: (datetime, series, points) => {
+                console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
-                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+            },
+            dbClickCallback: (series) => {
+                // console.debug("dbl callback");
             }
         }
     },
-    timezone: 'Australia/Melbourne'
+    timezone: 'Australia/Melbourne', // timezone for graph
+    highlightSeriesBackgroundAlpha: 1
+    // timezone: 'Pacific/Auckland'
 };
 
+// create graph instance
 let fgpGraph = new FgpGraph(document.getElementById('graphArea'), [
           vdConfig
     ]);
@@ -217,6 +295,8 @@ this is another way to tell graph what timewindow you want to show first. graph 
   default: none
   provider: GraphExports.Data and GraphExports.Image
 
++ **rangeLocked**
+  lock range bar and not allow user to change it, but panning still working.
 ###### Entities
 array of devices
 
