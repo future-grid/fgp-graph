@@ -196,7 +196,8 @@ let vdConfig: ViewConfig = {
             scroll: false,
             rangeBar: true,
             legend: formatters.legendForAllSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            exports: [GraphExports.Data, GraphExports.Image],
+            rangeLocked: true
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},

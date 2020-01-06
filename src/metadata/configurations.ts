@@ -25,7 +25,8 @@ export interface Features {
     connectPoints?: boolean;
     legend?: any;
     exports?: GraphExports[]; // png
-    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean }
+    ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean },
+    rangeLocked?: boolean
 }
 
 /**
