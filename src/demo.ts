@@ -9,10 +9,7 @@ class DataService implements DataHandler {
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
 
-
-    //private kk:Array<string> = [];
-
-    private rangeData: any[] = [];
+    rangeData: any[] = [];
 
     private deviceData: any[] = [];
 
@@ -197,7 +194,7 @@ let vdConfig: ViewConfig = {
             rangeBar: true,
             legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
-            rangeLocked: true
+            rangeLocked: false   // lock or unlock range bar
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},
@@ -246,7 +243,7 @@ let vdConfig: ViewConfig = {
                 interval: 86400000,
                 series: [
                     {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'right'},
                     {
                         label: "Min",
                         type: 'dots',

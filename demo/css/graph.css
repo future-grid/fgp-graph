@@ -69,24 +69,51 @@
     margin-left: 5px;
 }
 
+.fgp-btn-v {
+    display: none;
+}
+
 .fgp-graph-xaxis-btn-container {
     position: absolute;
     left: 50%;
     transform: translate(-50%);
+    width: 80px;
+    height: 20px;
 }
 .fgp-graph-yaxis-btn-container{
     position: absolute;
     transform: rotate(90deg);
+    left: -8px;
     top: 60px;
+    width: 80px;
+    height: 20px;
+    /*background-color: #00b0e8;*/
 }
 
 .fgp-graph-y2axis-btn-container{
     position: absolute;
     transform: rotate(90deg);
     top: 60px;
-    right: 1px;
+    right: -8px;
+    width: 80px;
+    height: 20px;
+    /*background-color: #00b0e8;*/
 }
 
+.fgp-graph-yaxis-btn-container:hover > .fgp-btn-v{
+    display: inline-block;
+    background-color: white;
+}
+
+.fgp-graph-y2axis-btn-container:hover > .fgp-btn-v{
+    display: inline-block;
+    background-color: white;
+}
+
+.fgp-graph-xaxis-btn-container:hover > .fgp-btn-v{
+    display: inline-block;
+    background-color: white;
+}
 
 .fgp-graph-xaxis-btn {
     width: 16px;

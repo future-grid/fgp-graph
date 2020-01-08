@@ -191,7 +191,7 @@ export default class FgpGraph {
                         });
                     }
                 });
-            }
+            };
 
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
@@ -207,7 +207,7 @@ export default class FgpGraph {
                 });
             }
         }
-    }
+    };
 
 
 
@@ -228,7 +228,7 @@ export default class FgpGraph {
                 });
             }
         }
-    }
+    };
 
     /**
      *bind children graphs
@@ -238,7 +238,7 @@ export default class FgpGraph {
      */
     public setChildren = (graphs: Array<FgpGraph>) => {
         this.childrenGraphs = this.childrenGraphs.concat(graphs);
-    }
+    };
 
     /**
      * highlight line on graph
@@ -252,13 +252,12 @@ export default class FgpGraph {
     public highlightSeries = (series: string[], duration: number, type?:string) => {
         //
         this.operator.highlightSeries(series, duration, type);
-    }
+    };
 
     /**
      * reload data for graph. base on series not changed!
      */
     public reloadData = () => {
         this.operator.update(undefined, undefined, true);
-    }
-
+    };
 }
