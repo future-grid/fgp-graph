@@ -180,6 +180,8 @@ class DataService implements DataHandler {
 let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
 let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
+
+
 let formatters: Formatters = new Formatters("Australia/Melbourne");
 // data not needed in the future
 const dataService: DataHandler = new DataService();
@@ -338,6 +340,13 @@ let vdConfig: ViewConfig = {
     highlightSeriesBackgroundAlpha: 1
     // timezone: 'Pacific/Auckland'
 };
+
+
+const changeGraphSize = (graphDiv: HTMLElement, size: number) => {
+    graphDiv.style.height = size + "px";
+};
+
+
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -346,7 +355,31 @@ let vsConfig: ViewConfig = {
             scroll: true,
             rangeBar: true,
             legend: formatters.legendForSingleSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            exports: [GraphExports.Data, GraphExports.Image],
+            toolbar: {
+                buttons: [{
+                    label: 'height: 300px', prop: {}, func: (prop: any) => {
+                        // do nothing, just show it in dropdown
+                        changeGraphSize(graphDiv, 300);
+                    }
+                }],
+                dropdown: [[{
+                    label: 'height', prop: {}, func: (prop: any) => {
+                        // do nothing, just show it in dropdown
+                        changeGraphSize(graphDiv, 300);
+                    }
+                }, {
+                    label: '500px', prop: {}, func: (prop: any) => {
+                        // do what you need to do here. such as change height
+                        changeGraphSize(graphDiv, 500);
+                    }
+                }, {
+                    label: '800px', prop: {}, func: (prop: any) => {
+                        // do what you need to do here. such as change height
+                        changeGraphSize(graphDiv, 800);
+                    }
+                }]]
+            }
         },
         entities: [
             {id: "meter1", type: "meter", name: "meter1"},
@@ -420,7 +453,7 @@ let vsConfig: ViewConfig = {
                 console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                console.debug("choose series: ", series);
             }
         }
     },
@@ -576,6 +609,24 @@ let vsConfig3: ViewConfig = {
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
+
+// testing resize graph without resizing window
+// setTimeout(()=>{
+//     graphDiv.style.height = "700px";
+//
+//     setTimeout(()=>{
+//         graphDiv.style.display = "none";
+//
+//         setTimeout(()=>{
+//             graphDiv.style.display = "block";
+//             graphDiv.style.height = "300px";
+//         }, 2000);
+//
+//     }, 2000);
+//
+// }, 5000);
+
+
 // // link graphs
 // graph1.setChildren([graph2, graph3]);
 

@@ -1,14 +1,33 @@
-import { DataHandler } from "../services/dataService";
+import {DataHandler} from "../services/dataService";
 
 
 /**
- *2 types of exporting graph data and save as image 
+ *2 types of exporting graph data and save as image
  *
  * @enum {number}
  */
 export enum GraphExports {
     Image = "image",
     Data = "data"
+}
+
+export interface ToolbarBtn {
+    label: string,
+    prop: any,
+
+    func(prop: any): void
+}
+
+export interface ToolbarDropdown {
+    label: string,
+    prop: any,
+
+    func(prop: any): void
+}
+
+export interface ToolbarConfig {
+    buttons?: ToolbarBtn[],
+    dropdown?: Array<ToolbarDropdown[]>
 }
 
 /**
@@ -28,7 +47,8 @@ export interface Features {
     legend?: any;
     exports?: GraphExports[]; // png
     ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean },
-    rangeLocked?: boolean
+    rangeLocked?: boolean,
+    toolbar?: ToolbarConfig;
 }
 
 /**
@@ -47,7 +67,7 @@ export interface Entity {
     name: string;
     description?: string;
     extension?: any;
-    fragment?:boolean;
+    fragment?: boolean;
 }
 
 /**
@@ -115,6 +135,7 @@ export enum FilterType {
     HIGHLIGHT = "highlight",
     COLORS = "color"
 }
+
 export type filterFunc = (labels?: Array<string>) => Array<string>;
 
 /**
@@ -149,7 +170,6 @@ export interface GraphConfig {
 }
 
 
-
 /**
  *graph callback configuration
  *
@@ -161,9 +181,13 @@ export interface GraphConfig {
  */
 export interface Callbacks {
     dataCallback?(data: any): void;
+
     highlightCallback?(datetime: any, series: any, points: any[]): void;
+
     clickCallback?(series: string): void;
+
     dbClickCallback?(series: string): void;
+
     syncDateWindow?(dateWindow: number[]): void;
 }
 

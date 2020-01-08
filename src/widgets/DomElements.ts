@@ -7,7 +7,7 @@ import {
     Entity,
     GraphExports,
     filterFunc,
-    FilterType
+    FilterType, ToolbarConfig
 } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import {Synchronizer} from '../extras/synchronizer';
@@ -718,6 +718,66 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
+
+
+        // check toolbar buttons and dropdown list
+        let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
+        if (toolbarArea && toolbarArea[0]) {
+            toolbarArea[0].innerHTML = '';
+        }
+
+
+        if (view.graphConfig.features.toolbar) {
+            const toolbarConfig: ToolbarConfig = view.graphConfig.features.toolbar;
+            //
+            if (toolbarConfig.buttons) {
+                toolbarConfig.buttons.forEach(btn => {
+                    //
+                    let button: HTMLSpanElement = document.createElement("button");
+                    button.className = "fgp-toolbar-button";
+                    button.textContent = btn.label;
+                    button.addEventListener('click', (event) => {
+                        //
+                        btn.func(btn.prop);
+                    });
+                    toolbarArea[0].appendChild(button);
+                });
+            }
+
+            if (toolbarConfig.dropdown) {
+                let toolbarDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-toolbar-dropdown"}];
+                toolbarConfig.dropdown.forEach(dropdown => {
+                    let toolbarDropdown = DomElementOperator.createElement('select', toolbarDropdownAttrs);
+                    let dropdownOpts: Array<{ id: string, label: string }> = [];
+                    // create options
+                    dropdown.forEach(opt => {
+                        dropdownOpts.push({id: opt.label, label: opt.label});
+                    });
+
+                    const toolbarDropdonwOptions = new DropdownButton(<HTMLSelectElement>toolbarDropdown, [...dropdownOpts]);
+                    toolbarDropdonwOptions.render();
+                    toolbarDropdown.onchange = (e) => {
+                        const toolbarDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
+                        const currentValue: string = toolbarDropdown.value;
+                        //
+                        dropdown.forEach(opt => {
+                            if(opt.label === currentValue){
+                                // call func
+                                opt.func(opt.prop);
+                            }
+                        });
+                    };
+                    toolbarArea[0].appendChild(toolbarDropdown);
+                });
+
+
+
+
+            }
+
+        }
+
+
         let buttons = this.header.getElementsByClassName("fgp-filter-buttons");
         if (buttons && buttons[0]) {
             buttons[0].innerHTML = "";
@@ -1478,10 +1538,22 @@ export class GraphOperator {
             let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
 
             // add buttons 
-            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in fgp-btn-v'}];
-            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out fgp-btn-v'}];
-            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left fgp-btn-v'}];
-            let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{key: 'class',value: 'fgp-graph-xaxis-btn fgp-btn-pan-right fgp-btn-v'}];
+            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in fgp-btn-v'
+            }];
+            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out fgp-btn-v'
+            }];
+            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-pan-left fgp-btn-v'
+            }];
+            let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-pan-right fgp-btn-v'
+            }];
 
             //
             if (!this.currentView.graphConfig.features.rangeLocked) {
@@ -1774,7 +1846,7 @@ export class GraphOperator {
                         // only run first draw
                         if (isInitial) {
                             // find zoomhandle
-                            const handles:HTMLCollectionOf<Element> = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                            const handles: HTMLCollectionOf<Element> = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
                             // left handle  just in case the right handle overlap the left one
                             if (handles[0] instanceof HTMLElement) {
                                 (<HTMLElement>handles[0]).style.zIndex = "11";
@@ -1809,7 +1881,7 @@ export class GraphOperator {
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element: any = rangeBarHandles[i];
                     // left one on the top
-                    if(i === 0){
+                    if (i === 0) {
                         element.style.zIndex = (10 + 1);
                     } else {
                         element.style.zIndex = (10);

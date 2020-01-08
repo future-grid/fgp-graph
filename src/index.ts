@@ -1,7 +1,9 @@
 import Dygraph from "dygraphs";
 
-import { DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports } from "./metadata/configurations";
-import { DropdownButton, DomElementOperator, GraphOperator } from "./widgets/DomElements";
+import {DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports} from "./metadata/configurations";
+import {DropdownButton, DomElementOperator, GraphOperator} from "./widgets/DomElements";
+
+import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 
 export default class FgpGraph {
 
@@ -50,7 +52,7 @@ export default class FgpGraph {
 
     /**
      *Creates an instance of FgpGraph.
-     * @param {HTMLElement} dom 
+     * @param {HTMLElement} dom
      * graph container
      * @param {Array<ViewConfig>} viewConfigs
      * graph configuration
@@ -59,58 +61,77 @@ export default class FgpGraph {
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
 
         this.defaultGraphRanges = [
-            { name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true },
-            { name: "7 days", value: 604800000, show: true },
-            { name: "1 month", value: 2592000000, show: false }
+            {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
+            {name: "7 days", value: 604800000, show: true},
+            {name: "1 month", value: 2592000000, show: false}
         ];
         this.parentDom = dom;
 
         this.serialnumber = (Math.random() * 10000 | 0) + 1;
 
-        let viewsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-views-dropdown" }];
+        let viewsDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-views-dropdown"}];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
 
-        let intervalsDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-intervals-dropdown" }];
+        let intervalsDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-intervals-dropdown"}];
         this.intervalsDropdown = DomElementOperator.createElement('select', intervalsDropdownAttrs);
 
-        let intervalsLabelsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-interval-labels" }];
+        let intervalsLabelsAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-interval-labels"}];
         this.intervalLabelsArea = DomElementOperator.createElement('div', intervalsLabelsAttrs);
 
-        let seriesDropdownAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-series-dropdown" }];
+        let seriesDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-series-dropdown"}];
         this.seriesDropdown = DomElementOperator.createElement('div', seriesDropdownAttrs);
 
 
-        let buttonsAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-buttons" }];
+        let buttonsAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-buttons"}];
         const buttonsArea = DomElementOperator.createElement('div', buttonsAttrs);
 
-        let filterAttrs: Array<DomAttrs> = [{ key: 'class', value: "fgp-filter-buttons" }];
+        let filterAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-filter-buttons"}];
         const filterArea = DomElementOperator.createElement('div', filterAttrs);
 
+        let toolbarAreaAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-toolbar-area"}];
+        const toolbarArea = DomElementOperator.createElement('div', toolbarAreaAttrs);
 
 
-        let headerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-header' }];
+        let headerAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-header'}];
         this.header = DomElementOperator.createElement('div', headerAttrs);
         this.header.appendChild(buttonsArea);
         this.header.appendChild(filterArea);
+        this.header.appendChild(toolbarArea);
         this.header.appendChild(this.viewsDropdown);
         this.header.appendChild(this.intervalsDropdown);
         this.header.appendChild(this.seriesDropdown);
         this.header.appendChild(this.intervalLabelsArea);
         // create doms
-        let containerAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-container noselect' }];
+        let containerAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-container noselect'}];
         this.graphContainer = DomElementOperator.createElement('div', containerAttrs);
         this.graphContainer.appendChild(this.header);
 
-        let bodyAttrs: Array<DomAttrs> = [{ key: 'class', value: 'fgp-graph-body' }];
+        let bodyAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-body'}];
         this.body = DomElementOperator.createElement('div', bodyAttrs);
         this.graphContainer.appendChild(this.body);
         this.parentDom.appendChild(this.graphContainer);
         this.viewConfigs = viewConfigs;
+        // listening for div resizing.......
+        const divResizeRo = new ResizeObserver((roes: ResizeObserverEntry[], observer) => {
+            roes.forEach((domObserverEntry) => {
+                if (this.graph && domObserverEntry.target.className== 'fgp-graph-body') {
+                    console.log("resizing dom: ", domObserverEntry.target.className, 'if someone see a infinite loop here, please report it to author!');
+                    if(isNaN(domObserverEntry.contentRect.width) || isNaN(domObserverEntry.contentRect.height)){
+                    } else {
+                        // resize graph manually, because dygraph resizing base on window object.
+                        this.graph.resize(NaN, NaN);
+                    }
+                } else {
+                    console.log("resizing not support for: ", domObserverEntry.target.className);
+                }
+            });
+        });
+        divResizeRo.observe(this.body);
     }
 
     /**
      *update datewindow for children graphs
-     * @param datewindow 
+     * @param datewindow
      * @param currentView
      * @private
      * @memberof FgpGraph
@@ -142,7 +163,7 @@ export default class FgpGraph {
 
     /**
      * init graph with configuration
-     * 
+     *
      * @private
      * @memberof FgpGraph
      */
@@ -157,7 +178,7 @@ export default class FgpGraph {
                     // init graph 
                     showView = view;
                 }
-                dropdownOpts.push({ id: view.name, label: view.name, selected: view.show });
+                dropdownOpts.push({id: view.name, label: view.name, selected: view.show});
             });
             // add options into view dropdown list
             const viewsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.viewsDropdown, [...dropdownOpts]);
@@ -192,7 +213,6 @@ export default class FgpGraph {
                     }
                 });
             };
-
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
@@ -208,8 +228,6 @@ export default class FgpGraph {
             }
         }
     };
-
-
 
 
     /**
@@ -232,7 +250,7 @@ export default class FgpGraph {
 
     /**
      *bind children graphs
-     * @param graphs 
+     * @param graphs
      * children graphs
      * @memberof FgpGraph
      */
@@ -242,14 +260,14 @@ export default class FgpGraph {
 
     /**
      * highlight line on graph
-     * @param series  
+     * @param series
      * name of lines
-     * @param duration 
+     * @param duration
      * unhighlight after <duration> seconds  0 means highlight forever
-     * 
+     *
      * @memberof FgpGraph
      */
-    public highlightSeries = (series: string[], duration: number, type?:string) => {
+    public highlightSeries = (series: string[], duration: number, type?: string) => {
         //
         this.operator.highlightSeries(series, duration, type);
     };
