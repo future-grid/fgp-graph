@@ -161,6 +161,7 @@ export interface FilterConfig {
  * @filters button or dropdown list config
  */
 export interface GraphConfig {
+    hideHeader?: boolean;
     features: Features;
     entities: Array<Entity>;
     rangeEntity: Entity;
@@ -217,6 +218,16 @@ export interface ViewConfig {
     connectSeparatedPoints?: boolean;
     highlightSeriesBackgroundAlpha?: number;
 }
+
+/**
+ *
+ */
+export interface ViewOptions {
+    name?: string;   // should think about it what can be changed.
+    dataService?: DataHandler;
+    connectSeparatedPoints?: boolean;
+}
+
 
 /**
  * datetime ranges index

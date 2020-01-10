@@ -1,6 +1,13 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 // const MinifyPlugin = require('babel-minify-webpack-plugin');
 module.exports = {
+    plugins: [
+        new CopyPlugin([
+            { from: 'src/style/graph.css', to: '../lib/css/graph.css'},
+            { from: 'src/style/graph.css', to: '../demo/css/graph.css'}
+        ])
+    ],
     entry: {
         'fgp-graph-demo': './src/demo.ts',
         'fgp-graph': './src/index.ts'

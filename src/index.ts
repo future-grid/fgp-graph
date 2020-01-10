@@ -1,9 +1,9 @@
 import Dygraph from "dygraphs";
 
-import {DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports} from "./metadata/configurations";
+import {DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports, ViewOptions} from "./metadata/configurations";
 import {DropdownButton, DomElementOperator, GraphOperator} from "./widgets/DomElements";
 
-import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
+import {ResizeObserver, ResizeObserverEntry} from '@juggle/resize-observer';
 
 export default class FgpGraph {
 
@@ -104,6 +104,7 @@ export default class FgpGraph {
         // create doms
         let containerAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-container noselect'}];
         this.graphContainer = DomElementOperator.createElement('div', containerAttrs);
+
         this.graphContainer.appendChild(this.header);
 
         let bodyAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-body'}];
@@ -114,9 +115,9 @@ export default class FgpGraph {
         // listening for div resizing.......
         const divResizeRo = new ResizeObserver((roes: ResizeObserverEntry[], observer) => {
             roes.forEach((domObserverEntry) => {
-                if (this.graph && domObserverEntry.target.className== 'fgp-graph-body') {
+                if (this.graph && domObserverEntry.target.className == 'fgp-graph-body') {
                     console.log("resizing dom: ", domObserverEntry.target.className, 'if someone see a infinite loop here, please report it to author!');
-                    if(isNaN(domObserverEntry.contentRect.width) || isNaN(domObserverEntry.contentRect.height)){
+                    if (isNaN(domObserverEntry.contentRect.width) || isNaN(domObserverEntry.contentRect.height)) {
                     } else {
                         // resize graph manually, because dygraph resizing base on window object.
                         this.graph.resize(NaN, NaN);
@@ -277,5 +278,14 @@ export default class FgpGraph {
      */
     public reloadData = () => {
         this.operator.update(undefined, undefined, true);
+    };
+
+    /**
+     * do it later
+     * @param config
+     */
+    public updateConfig = (config: ViewOptions) => {
+        //
+        return "not enabled in this version";
     };
 }

@@ -4,6 +4,7 @@ import {DataHandler} from "./services/dataService";
 import moment from 'moment-timezone';
 import {Formatters} from "./extras/formatters";
 
+
 class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included 
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -190,6 +191,7 @@ let vdConfig: ViewConfig = {
     name: "device view",
     connectSeparatedPoints: true,
     graphConfig: {
+        hideHeader: true,
         features: {
             zoom: true,
             scroll: true,

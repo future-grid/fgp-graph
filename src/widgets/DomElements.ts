@@ -719,6 +719,10 @@ export class GraphOperator {
         this.currentView = view;
         this.updateExportButtons(view);
 
+        if(view.graphConfig.hideHeader){
+            this.header.style.display = 'none';
+        }
+
 
         // check toolbar buttons and dropdown list
         let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
