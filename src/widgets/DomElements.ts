@@ -687,11 +687,8 @@ export class GraphOperator {
 
 
         labels.map((value, index, array) => {
-            if (series.includes(value)) {
-                visibility[index] = true;
-            } else {
-                visibility[index] = false;
-            }
+            // never hide mark lines
+            visibility[index] = series.includes(value) || value.indexOf("_markline") != -1;
         });
 
         // set visibility
@@ -719,7 +716,7 @@ export class GraphOperator {
         this.currentView = view;
         this.updateExportButtons(view);
 
-        if(view.graphConfig.hideHeader){
+        if (view.graphConfig.hideHeader) {
             this.header.style.display = 'none';
         }
 
@@ -765,7 +762,7 @@ export class GraphOperator {
                         const currentValue: string = toolbarDropdown.value;
                         //
                         dropdown.forEach(opt => {
-                            if(opt.label === currentValue){
+                            if (opt.label === currentValue) {
                                 // call func
                                 opt.func(opt.prop);
                             }
@@ -773,8 +770,6 @@ export class GraphOperator {
                     };
                     toolbarArea[0].appendChild(toolbarDropdown);
                 });
-
-
 
 
             }
@@ -1224,7 +1219,7 @@ export class GraphOperator {
                     }
 
                 }
-            }
+            };
 
             let callbackFuncForInteractions = (e: MouseEvent, yAxisRange: Array<Array<number>>, refreshData: any) => {
                 if (refreshData) {
@@ -1294,6 +1289,19 @@ export class GraphOperator {
 
             if (this.currentView.graphConfig.features.zoom) {
                 interactionModelConfig["mousemove"] = interactionModel.mouseMove;
+            }
+
+            // check if we need to put a markline on map
+            if (choosedCollection && choosedCollection.markLines) {
+                choosedCollection.markLines.forEach(markLine => {
+                    mainGraphLabels.push(markLine.label);
+                    if (initVisibility.length > 0) {
+                        initVisibility.push(true);
+                    }
+                    initialData.forEach(initData => {
+                        initData.push(null);
+                    });
+                });
             }
 
             // create graph instance
@@ -1945,10 +1953,6 @@ export class GraphOperator {
             datewindow[1] = xAxisRange[1];
         }
 
-        // get correct collection then call update
-        // if (datewindow[0] == this.start && datewindow[1] == this.end && !this.lockedInterval) {
-        //     // console.debug("no change!");
-        // } else {
         this.start = datewindow[0];
         this.end = datewindow[1];
 
@@ -1996,9 +2000,6 @@ export class GraphOperator {
         if (!this.lockedInterval) {
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
-        // }
-
-
     };
 
 
@@ -2327,23 +2328,83 @@ export class GraphOperator {
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
                 // console.debug("Graph is clean now!~");
+
+
+                // check if we need to put marks line there
+                if (graphCollection && graphCollection.markLines) {
+                    graphCollection.markLines.forEach(markLine => {
+                        mainLabels.push(markLine.label + '_markline');
+                        if (colors.length > 0 && markLine.color) {
+                            // add color
+                            colors.push(markLine.color);
+                        }
+                    });
+                }
+
+
                 if (graphData.data) {
                     this.currentGraphData = [];
+
                     graphData.data.forEach(_data => {
+                        // convert timestamp to date
                         _data[0] = new Date(_data[0]);
+                        if (graphCollection && graphCollection.markLines) {
+                            graphCollection.markLines.forEach(markLine => {
+                                _data.push(markLine.value);
+                            });
+                        }
                         this.currentGraphData.push(_data);
                     });
                 }
                 if (view.graphConfig.entities.length > 1) {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
+                } else if (graphCollection && graphCollection.markLines) {
+                    graphCollection.markLines.forEach(markLine => {
+                        mainGraphSeries[markLine.label + '_markline'] = {
+                            strokeWidth: 2,
+                            drawPoints: false,
+                            highlightCircleSize: 0,
+                            axis: 'y',
+                            color: markLine.color,
+                            strokePattern: Dygraph.DOT_DASH_LINE
+                        };
+                    });
                 }
 
-                // console.info(this.currentGraphData);
+                console.log(this.currentGraphData, mainGraphSeries, mainLabels);
+
+                const latestVisibility: Array<boolean> = [];
+
+                const orgVisibility: Array<boolean> = mainGraph.getOption('visibility');
+
+                if (orgVisibility.length != mainLabels.length && graphCollection) {
+                    let initVisibility: boolean[] = [];
+                    let seriesNames: Array<string> = [];
+                    graphCollection.series.forEach((series, _index) => {
+                        if (series.visibility == undefined || series.visibility == true) {
+                            initVisibility[_index] = true;
+                        } else if (series.visibility == false) {
+                            initVisibility[_index] = false;
+                        }
+                        seriesNames.push(series.label);
+                    });
+
+                    // set visibility, need to think about init visibility
+                    mainLabels.forEach((label, _index) => {
+                        latestVisibility[_index] = initVisibility[_index] != undefined ? initVisibility[_index] : true;
+                    });
+
+                    // update dropdown list
+                    this.updateSeriesDropdown(this.header, seriesNames, this.mainGraph, initVisibility);
+                }
+                //
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    visibility: latestVisibility.length > 0 ? latestVisibility : orgVisibility,
                     colors: colors.length == 0 ? undefined : colors,
                     labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
@@ -2366,6 +2427,26 @@ export class GraphOperator {
                         }
                     }
                 });
+
+                mainGraph.ready(() => {
+                    // do we need to update annotations
+                    if (graphCollection && graphCollection.markLines) {
+                        const annos: Array<dygraphs.Annotation> = [];
+                        graphCollection.markLines.forEach((line, _index) => {
+                            annos.push({
+                                series: line.label + '_markline',
+                                x: this.currentGraphData[this.currentGraphData.length - 2][0].getTime(),
+                                shortText: line.label,
+                                width: 100,
+                                height: 23,
+                                tickHeight: 1,
+                            });
+                        });
+                        console.log(annos);
+                        mainGraph.setAnnotations(annos);
+                    }
+                });
+
             });
         }
         if (view.graphConfig.features.rangeBar) {

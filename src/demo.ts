@@ -18,7 +18,7 @@ class DataService implements DataHandler {
         this.rangeData = [{
             id: "meter1",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -27,7 +27,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter2",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -36,7 +36,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter3",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -45,7 +45,7 @@ class DataService implements DataHandler {
         }, {
             id: "substation1",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     avgConsumptionVah: this.randomNumber(252, 255)
@@ -191,7 +191,7 @@ let vdConfig: ViewConfig = {
     name: "device view",
     connectSeparatedPoints: true,
     graphConfig: {
-        hideHeader: true,
+        hideHeader: false,
         features: {
             zoom: true,
             scroll: true,
@@ -217,6 +217,7 @@ let vdConfig: ViewConfig = {
                 label: 'substation_raw',
                 name: 'substation_interval',
                 interval: 3600000,
+                markLines: [{value: 256, label: '256', color: '#FF0000'}, {value: 248, label: '248', color: '#FF0000'}],
                 series: [
                     {
                         label: "Avg",
@@ -240,21 +241,22 @@ let vdConfig: ViewConfig = {
                 yLabel: 'voltage',
                 y2Label: 'voltage',
                 initScales: {left: {min: 245, max: 260}},
-                fill: true
+                fill: false
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
                 interval: 86400000,
+                markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
                     {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'right'},
-                    {
-                        label: "Min",
-                        type: 'dots',
-                        exp: "data.minConsumptionVah",
-                        yIndex: 'left',
-                        extraConfig: {any: "anything"}
-                    }
+                    // {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'right'},
+                    // {
+                    //     label: "Min",
+                    //     type: 'dots',
+                    //     exp: "data.minConsumptionVah",
+                    //     yIndex: 'left',
+                    //     extraConfig: {any: "anything"}
+                    // }
                 ],
                 threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -322,8 +324,8 @@ let vdConfig: ViewConfig = {
         {name: "1 month", value: 2592000000}
     ],
     initRange: {
-        start: moment("2019-10-01").add(0, 'days').startOf('day').valueOf(),
-        end: moment("2019-10-10").subtract(0, 'days').endOf('day').valueOf()
+        start: moment("2019-11-01").add(0, 'days').startOf('day').valueOf(),
+        end: moment("2019-12-01").subtract(0, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {

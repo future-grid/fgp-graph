@@ -264,6 +264,7 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForAllSeries = (data: any) => {
+
         const g = data.dygraph;
         if (g.getOption('showLabelsOnHighlight') !== true) return '';
 
@@ -273,7 +274,7 @@ export class Formatters {
         }
         let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
         data.series.forEach(function (series: any) {
-            if (!series.isVisible) return;
+            if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
             let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
@@ -302,7 +303,7 @@ export class Formatters {
         let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
 
         data.series.forEach(function (series: any) {
-            if (!series.isVisible) return;
+            if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
             let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
