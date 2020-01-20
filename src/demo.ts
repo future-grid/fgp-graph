@@ -184,6 +184,7 @@ let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDiv
 
 
 let formatters: Formatters = new Formatters("Australia/Melbourne");
+formatters.setFormat('DD MMM YYYY h:mm a');
 // data not needed in the future
 const dataService: DataHandler = new DataService();
 dataService.source = "store";
@@ -196,6 +197,7 @@ let vdConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: true,
+
             legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
             rangeLocked: false   // lock or unlock range bar

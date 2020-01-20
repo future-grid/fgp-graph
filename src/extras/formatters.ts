@@ -42,6 +42,8 @@ export class Formatters {
      */
     public timezone: string;
 
+    public dateformat?: string;
+
     private TICK_PLACEMENT: any[];
 
     private SHORT_SPACINGS: any[];
@@ -102,6 +104,16 @@ export class Formatters {
         this.SHORT_SPACINGS[GraphConstant.WEEKLY] = 1000 * 604800;
         this.SHORT_SPACINGS[GraphConstant.TWO_DAILY] = 1000 * 86400 * 2;
     }
+
+
+    /**
+     * update date format for legend and range-bar
+     * @param format
+     */
+    public setFormat = (format: string) =>{
+        this.dateformat = format;
+    };
+
 
 
     private numDateTicks = (start_time: number, end_time: number, granularity: number) => {
@@ -272,7 +284,7 @@ export class Formatters {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
-        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format(this.dateformat ? this.dateformat : 'lll z');
         data.series.forEach(function (series: any) {
             if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
             let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
@@ -300,7 +312,7 @@ export class Formatters {
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
 
-        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format(this.dateformat ? this.dateformat : 'lll z');
 
         data.series.forEach(function (series: any) {
             if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
