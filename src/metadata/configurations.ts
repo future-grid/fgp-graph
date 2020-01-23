@@ -42,9 +42,9 @@ export interface ToolbarConfig {
 export interface Features {
     zoom: boolean;
     scroll: boolean;
-    rangeBar: boolean;
+    rangeBar: boolean | { show: boolean, format: string };
     connectPoints?: boolean;
-    legend?: any;
+    legend?(data: any): string;
     exports?: GraphExports[]; // png
     ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean },
     rangeLocked?: boolean,
@@ -126,7 +126,7 @@ export interface GraphCollection {
     threshold?: { min: number, max: number };
     initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
     fill?: boolean;
-    markLines?: Array<{ value: number, label: string, color?: string}>;
+    markLines?: Array<{ value: number, label: string, color?: string }>;
 }
 
 /**

@@ -196,9 +196,8 @@ let vdConfig: ViewConfig = {
         features: {
             zoom: true,
             scroll: true,
-            rangeBar: true,
-
-            legend: formatters.legendForAllSeries,
+            rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
+            legend:  formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
             rangeLocked: false   // lock or unlock range bar
         },

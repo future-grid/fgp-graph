@@ -1343,8 +1343,14 @@ export class GraphOperator {
                     const xAxisRange: Array<number> = g.xAxisRange();
                     currentDatewindow = [xAxisRange[0], xAxisRange[1]];
                     if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
-                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        if (typeof (this.currentView.graphConfig.features.rangeBar) === "boolean") {
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        } else if (this.currentView.graphConfig.features.rangeBar.format) {
+                            const format: string = this.currentView.graphConfig.features.rangeBar.format;
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                        }
                     }
                     if (this.spinner && this.spinner.isLoading) {
                         // remove spinner from container
@@ -1853,8 +1859,14 @@ export class GraphOperator {
                     legend: 'never',
                     drawCallback: (dygraph, isInitial) => {
                         const xAxisRange: Array<number> = dygraph.xAxisRange();
-                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        if (typeof (this.currentView.graphConfig.features.rangeBar) === "boolean") {
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        } else if (this.currentView.graphConfig.features.rangeBar.format) {
+                            const format: string = this.currentView.graphConfig.features.rangeBar.format;
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                        }
                         // only run first draw
                         if (isInitial) {
                             // find zoomhandle
