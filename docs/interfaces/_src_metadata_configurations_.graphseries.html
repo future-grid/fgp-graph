@@ -75,10 +75,25 @@
 						<p>graph series configuration</p>
 					</div>
 					<dl class="tsd-comment-tags">
-						<dt>export</dt>
+						<dt>label</dt>
 						<dd></dd>
-						<dt>interface</dt>
-						<dd><p>GraphSeries</p>
+						<dt>color</dt>
+						<dd><p>color for current series if undefined then use default color</p>
+						</dd>
+						<dt>exp</dt>
+						<dd><p>expression for cal</p>
+						</dd>
+						<dt>type</dt>
+						<dd><p>line dot or step</p>
+						</dd>
+						<dt>yindex</dt>
+						<dd><p>left or right</p>
+						</dd>
+						<dt>visibility</dt>
+						<dd><p>show or hide from init</p>
+						</dd>
+						<dt>extraconfig</dt>
+						<dd><p>use for different type of device</p>
 						</dd>
 					</dl>
 				</div>
@@ -100,8 +115,10 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#color" class="tsd-kind-icon">color</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#exp" class="tsd-kind-icon">exp</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#extraconfig" class="tsd-kind-icon">extra<wbr>Config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#label" class="tsd-kind-icon">label</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#visibility" class="tsd-kind-icon">visibility</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.graphseries.html#yindex" class="tsd-kind-icon">y<wbr>Index</a></li>
 							</ul>
 						</section>
@@ -113,10 +130,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="color" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> color</h3>
-					<div class="tsd-signature tsd-kind-icon">color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<div class="tsd-signature tsd-kind-icon">color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L64">src/metadata/configurations.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L78">src/metadata/configurations.ts:78</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -126,7 +143,17 @@
 					<div class="tsd-signature tsd-kind-icon">exp<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L65">src/metadata/configurations.ts:65</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L79">src/metadata/configurations.ts:79</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="extraconfig" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> extra<wbr>Config</h3>
+					<div class="tsd-signature tsd-kind-icon">extra<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L83">src/metadata/configurations.ts:83</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -136,7 +163,7 @@
 					<div class="tsd-signature tsd-kind-icon">label<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L63">src/metadata/configurations.ts:63</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L77">src/metadata/configurations.ts:77</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -146,7 +173,17 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L66">src/metadata/configurations.ts:66</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L80">src/metadata/configurations.ts:80</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="visibility" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> visibility</h3>
+					<div class="tsd-signature tsd-kind-icon">visibility<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L82">src/metadata/configurations.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -156,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">y<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L67">src/metadata/configurations.ts:67</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L81">src/metadata/configurations.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -203,6 +240,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_src_metadata_configurations_.filtertype.html" class="tsd-kind-icon">Filter<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
 						<a href="../enums/_src_metadata_configurations_.graphconstant.html" class="tsd-kind-icon">Graph<wbr>Constant</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
@@ -219,6 +259,9 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.features.html" class="tsd-kind-icon">Features</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_src_metadata_configurations_.filterconfig.html" class="tsd-kind-icon">Filter<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.graphcollection.html" class="tsd-kind-icon">Graph<wbr>Collection</a>
@@ -238,10 +281,16 @@
 								<a href="_src_metadata_configurations_.graphseries.html#exp" class="tsd-kind-icon">exp</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_src_metadata_configurations_.graphseries.html#extraconfig" class="tsd-kind-icon">extra<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.graphseries.html#label" class="tsd-kind-icon">label</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.graphseries.html#type" class="tsd-kind-icon">type</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_src_metadata_configurations_.graphseries.html#visibility" class="tsd-kind-icon">visibility</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.graphseries.html#yindex" class="tsd-kind-icon">y<wbr>Index</a>
@@ -252,6 +301,9 @@
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.viewconfig.html" class="tsd-kind-icon">View<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_metadata_configurations_.html#filterfunc" class="tsd-kind-icon">filter<wbr>Func</a>
 					</li>
 				</ul>
 			</nav>

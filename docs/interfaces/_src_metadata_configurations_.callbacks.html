@@ -72,13 +72,23 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>graph callback configuraiton</p>
+						<p>graph callback configuration</p>
 					</div>
 					<dl class="tsd-comment-tags">
-						<dt>export</dt>
-						<dd></dd>
-						<dt>interface</dt>
-						<dd><p>Callbacks</p>
+						<dt>datacallback</dt>
+						<dd><p>any time the datewindow changed, call this method to send data back to outside</p>
+						</dd>
+						<dt>highlightcallback</dt>
+						<dd><p>send one series back to outside on hover the graph</p>
+						</dd>
+						<dt>clickcallback</dt>
+						<dd><p>send one series back on click the graph</p>
+						</dd>
+						<dt>dbclickcallback</dt>
+						<dd><p>send one series back on dblclick the graph</p>
+						</dd>
+						<dt>syncdatewindow</dt>
+						<dd><p>send [start, end] back to outside</p>
 						</dd>
 					</dl>
 				</div>
@@ -100,7 +110,8 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#clickcallback" class="tsd-kind-icon">click<wbr>Callback</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#datacallback" class="tsd-kind-icon">data<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#highlighcallback" class="tsd-kind-icon">highligh<wbr>Callback</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#dbclickcallback" class="tsd-kind-icon">db<wbr>Click<wbr>Callback</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#highlightcallback" class="tsd-kind-icon">highlight<wbr>Callback</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_src_metadata_configurations_.callbacks.html#syncdatewindow" class="tsd-kind-icon">sync<wbr>Date<wbr>Window</a></li>
 							</ul>
 						</section>
@@ -119,7 +130,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L113">src/metadata/configurations.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L165">src/metadata/configurations.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -142,7 +153,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L111">src/metadata/configurations.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L163">src/metadata/configurations.ts:163</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -156,16 +167,39 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="highlighcallback" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> highligh<wbr>Callback</h3>
+					<a name="dbclickcallback" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> db<wbr>Click<wbr>Callback</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">highligh<wbr>Callback<span class="tsd-signature-symbol">(</span>datetime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">db<wbr>Click<wbr>Callback<span class="tsd-signature-symbol">(</span>series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L112">src/metadata/configurations.ts:112</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L166">src/metadata/configurations.ts:166</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>series: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="highlightcallback" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> highlight<wbr>Callback</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">highlight<wbr>Callback<span class="tsd-signature-symbol">(</span>datetime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L164">src/metadata/configurations.ts:164</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -194,7 +228,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L114">src/metadata/configurations.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L167">src/metadata/configurations.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -250,6 +284,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_src_metadata_configurations_.filtertype.html" class="tsd-kind-icon">Filter<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
 						<a href="../enums/_src_metadata_configurations_.graphconstant.html" class="tsd-kind-icon">Graph<wbr>Constant</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
@@ -267,7 +304,10 @@
 								<a href="_src_metadata_configurations_.callbacks.html#datacallback" class="tsd-kind-icon">data<wbr>Callback</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_src_metadata_configurations_.callbacks.html#highlighcallback" class="tsd-kind-icon">highligh<wbr>Callback</a>
+								<a href="_src_metadata_configurations_.callbacks.html#dbclickcallback" class="tsd-kind-icon">db<wbr>Click<wbr>Callback</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_src_metadata_configurations_.callbacks.html#highlightcallback" class="tsd-kind-icon">highlight<wbr>Callback</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.callbacks.html#syncdatewindow" class="tsd-kind-icon">sync<wbr>Date<wbr>Window</a>
@@ -286,6 +326,9 @@
 						<a href="_src_metadata_configurations_.features.html" class="tsd-kind-icon">Features</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_src_metadata_configurations_.filterconfig.html" class="tsd-kind-icon">Filter<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.graphcollection.html" class="tsd-kind-icon">Graph<wbr>Collection</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
@@ -296,6 +339,9 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.viewconfig.html" class="tsd-kind-icon">View<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_metadata_configurations_.html#filterfunc" class="tsd-kind-icon">filter<wbr>Func</a>
 					</li>
 				</ul>
 			</nav>

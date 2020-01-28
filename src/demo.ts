@@ -4,15 +4,13 @@ import {DataHandler} from "./services/dataService";
 import moment from 'moment-timezone';
 import {Formatters} from "./extras/formatters";
 
+
 class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included 
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
 
-
-    //private kk:Array<string> = [];
-
-    private rangeData: any[] = [];
+    rangeData: any[] = [];
 
     private deviceData: any[] = [];
 
@@ -20,7 +18,7 @@ class DataService implements DataHandler {
         this.rangeData = [{
             id: "meter1",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -29,7 +27,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter2",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -38,7 +36,7 @@ class DataService implements DataHandler {
         }, {
             id: "meter3",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), voltage: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), voltage: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     voltage: this.randomNumber(252, 255)
@@ -47,7 +45,7 @@ class DataService implements DataHandler {
         }, {
             id: "substation1",
             data: {
-                first: {timestamp: new Date("2019/10/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
+                first: {timestamp: new Date("2019/11/01").getTime(), avgConsumptionVah: this.randomNumber(252, 255)},
                 last: {
                     timestamp: moment().add(1, 'days').startOf('day').valueOf(),
                     avgConsumptionVah: this.randomNumber(252, 255)
@@ -183,7 +181,10 @@ class DataService implements DataHandler {
 let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;
 let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDivElement;
 let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
+
+
 let formatters: Formatters = new Formatters("Australia/Melbourne");
+formatters.setFormat('DD MMM YYYY h:mm a');
 // data not needed in the future
 const dataService: DataHandler = new DataService();
 dataService.source = "store";
@@ -191,12 +192,14 @@ let vdConfig: ViewConfig = {
     name: "device view",
     connectSeparatedPoints: true,
     graphConfig: {
+        hideHeader: false,
         features: {
-            zoom: false,
-            scroll: false,
-            rangeBar: true,
-            legend: formatters.legendForAllSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            zoom: true,
+            scroll: true,
+            rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
+            legend:  formatters.legendForAllSeries,
+            exports: [GraphExports.Data, GraphExports.Image],
+            rangeLocked: false   // lock or unlock range bar
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},
@@ -215,6 +218,7 @@ let vdConfig: ViewConfig = {
                 label: 'substation_raw',
                 name: 'substation_interval',
                 interval: 3600000,
+                markLines: [{value: 256, label: '256', color: '#FF0000'}, {value: 248, label: '248', color: '#FF0000'}],
                 series: [
                     {
                         label: "Avg",
@@ -238,21 +242,22 @@ let vdConfig: ViewConfig = {
                 yLabel: 'voltage',
                 y2Label: 'voltage',
                 initScales: {left: {min: 245, max: 260}},
-                fill: true
+                fill: false
             }, {
                 label: 'substation_day',
                 name: 'substation_interval_day',
                 interval: 86400000,
+                markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
                     {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'left'},
-                    {
-                        label: "Min",
-                        type: 'dots',
-                        exp: "data.minConsumptionVah",
-                        yIndex: 'left',
-                        extraConfig: {any: "anything"}
-                    }
+                    // {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'right'},
+                    // {
+                    //     label: "Min",
+                    //     type: 'dots',
+                    //     exp: "data.minConsumptionVah",
+                    //     yIndex: 'left',
+                    //     extraConfig: {any: "anything"}
+                    // }
                 ],
                 threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
                 yLabel: 'voltage',
@@ -320,13 +325,13 @@ let vdConfig: ViewConfig = {
         {name: "1 month", value: 2592000000}
     ],
     initRange: {
-        start: moment("2019-10-01").add(0, 'days').startOf('day').valueOf(),
-        end: moment("2019-10-10").subtract(0, 'days').endOf('day').valueOf()
+        start: moment("2019-11-01").add(0, 'days').startOf('day').valueOf(),
+        end: moment("2019-12-01").subtract(0, 'days').endOf('day').valueOf()
     },
     interaction: {
         callback: {
             highlightCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             syncDateWindow: (dateWindow) => {
                 // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
@@ -340,6 +345,13 @@ let vdConfig: ViewConfig = {
     highlightSeriesBackgroundAlpha: 1
     // timezone: 'Pacific/Auckland'
 };
+
+
+const changeGraphSize = (graphDiv: HTMLElement, size: number) => {
+    graphDiv.style.height = size + "px";
+};
+
+
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -348,7 +360,31 @@ let vsConfig: ViewConfig = {
             scroll: true,
             rangeBar: true,
             legend: formatters.legendForSingleSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
+            exports: [GraphExports.Data, GraphExports.Image],
+            toolbar: {
+                buttons: [{
+                    label: 'height: 300px', prop: {}, func: (prop: any) => {
+                        // do nothing, just show it in dropdown
+                        changeGraphSize(graphDiv, 300);
+                    }
+                }],
+                dropdown: [[{
+                    label: 'height', prop: {}, func: (prop: any) => {
+                        // do nothing, just show it in dropdown
+                        changeGraphSize(graphDiv, 300);
+                    }
+                }, {
+                    label: '500px', prop: {}, func: (prop: any) => {
+                        // do what you need to do here. such as change height
+                        changeGraphSize(graphDiv, 500);
+                    }
+                }, {
+                    label: '800px', prop: {}, func: (prop: any) => {
+                        // do what you need to do here. such as change height
+                        changeGraphSize(graphDiv, 800);
+                    }
+                }]]
+            }
         },
         entities: [
             {id: "meter1", type: "meter", name: "meter1"},
@@ -422,7 +458,7 @@ let vsConfig: ViewConfig = {
                 console.debug("selected series: ", series);    // too many messages in console
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                console.debug("choose series: ", series);
             }
         }
     },
@@ -578,6 +614,24 @@ let vsConfig3: ViewConfig = {
 // graph1
 let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
 graph1.initGraph();
+
+// testing resize graph without resizing window
+// setTimeout(()=>{
+//     graphDiv.style.height = "700px";
+//
+//     setTimeout(()=>{
+//         graphDiv.style.display = "none";
+//
+//         setTimeout(()=>{
+//             graphDiv.style.display = "block";
+//             graphDiv.style.height = "300px";
+//         }, 2000);
+//
+//     }, 2000);
+//
+// }, 5000);
+
+
 // // link graphs
 // graph1.setChildren([graph2, graph3]);
 
