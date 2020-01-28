@@ -137,7 +137,7 @@ export default class FgpGraph {
      * @private
      * @memberof FgpGraph
      */
-    private dateWindowHandler = (dateWindow: Array<number>, currentView?: ViewConfig) => {
+    private dateWindowHandler = (dateWindow: [number, number], currentView?: ViewConfig) => {
 
 
         if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
@@ -236,7 +236,7 @@ export default class FgpGraph {
      * @param datewindow
      * @memberof FgpGraph
      */
-    public updateDatewinow = (datewindow: Array<number>) => {
+    public updateDatewinow = (datewindow: [number, number]) => {
         // update graph 
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
@@ -245,6 +245,7 @@ export default class FgpGraph {
                 this.graph.updateOptions({
                     dateWindow: datewindow
                 });
+                this.operator.update(undefined, undefined, true, datewindow);
             }
         }
     };

@@ -2015,7 +2015,7 @@ export class GraphOperator {
     };
 
 
-    update = (first?: number, last?: number, refersh?: boolean) => {
+    update = (first?: number, last?: number, refersh?: boolean, range?: [number, number]) => {
 
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
@@ -2023,6 +2023,12 @@ export class GraphOperator {
         let rangeCollection = this.rangeCollection;
         let start = this.start;
         let end = this.end;
+
+        if(range && range.length === 2){
+            // rest start and end
+            start = this.start = range[0];
+            end = this.end = range[1];
+        }
 
         let view = this.currentView;
 
