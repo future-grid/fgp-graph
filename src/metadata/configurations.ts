@@ -164,7 +164,7 @@ export interface FilterConfig {
  * @filters button or dropdown list config
  */
 export interface GraphConfig {
-    hideHeader?: boolean;
+    hideHeader?: boolean | { views: boolean, intervals: boolean, toolbar: boolean, series: boolean };
     features: Features;
     entities: Array<Entity>;
     rangeEntity: Entity;

@@ -209,7 +209,7 @@ export default class FgpGraph {
                 }
 
                 // update dropdownlist
-                if(view){
+                if(view && this.viewsDropdown){
                     (<HTMLSelectElement>this.viewsDropdown).value = view;
                 }
             }
@@ -256,6 +256,10 @@ export default class FgpGraph {
                     });
                 });
             }
+
+
+
+
         }
     };
 

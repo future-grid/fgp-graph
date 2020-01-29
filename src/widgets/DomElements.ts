@@ -719,12 +719,6 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
-
-        if (view.graphConfig.hideHeader) {
-            this.header.style.display = 'none';
-        }
-
-
         // check toolbar buttons and dropdown list
         let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
         if (toolbarArea && toolbarArea[0]) {
@@ -859,6 +853,10 @@ export class GraphOperator {
         }
 
 
+
+
+
+
         let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
@@ -981,6 +979,64 @@ export class GraphOperator {
                 }
             });
         };
+
+
+        if (view.graphConfig.hideHeader && view.graphConfig.hideHeader === true) {
+            this.header.style.display = 'none';
+        } else {
+            let viewDrops = this.header.getElementsByClassName('fgp-views-dropdown');
+            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.views === true){
+                // hide views
+
+                // only have one
+                if(viewDrops && viewDrops[0]){
+                    (<HTMLSelectElement>viewDrops[0]).style.display = "none";
+                }
+            }else {
+                if(viewDrops && viewDrops[0]){
+                    (<HTMLSelectElement>viewDrops[0]).style.display = "";
+                }
+            }
+
+            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.toolbar === true){
+                // hide views
+                let toolbar = this.header.getElementsByClassName('fgp-filter-buttons');
+                // only have one
+                if(toolbar && toolbar[0]){
+                    (<HTMLElement>toolbar[0]).style.display = "none";
+                }
+            }
+            let intervalDrops = this.header.getElementsByClassName('fgp-intervals-dropdown');
+            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.intervals === true){
+                // hide views
+
+                // only have one
+                if(intervalDrops && intervalDrops[0]){
+                    (<HTMLElement>intervalDrops[0]).style.display = "none";
+                }
+            }else {
+                if(intervalDrops && intervalDrops[0]){
+                    (<HTMLElement>intervalDrops[0]).style.display = "";
+                }
+            }
+
+            //
+            let seriesDrops = this.header.getElementsByClassName('fgp-series-dropdown');
+            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.series === true){
+                // hide views
+
+                // only have one
+                if(seriesDrops && seriesDrops[0]){
+                    (<HTMLElement>seriesDrops[0]).style.display = "none";
+                }
+            } else {
+                if(seriesDrops && seriesDrops[0]){
+                    (<HTMLElement>seriesDrops[0]).style.display = "";
+                }
+            }
+
+
+        }
 
         // get fields
         let fieldsForCollection: any[] = [];

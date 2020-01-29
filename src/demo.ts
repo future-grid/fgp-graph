@@ -192,7 +192,8 @@ let vdConfig: ViewConfig = {
     name: "device view",
     connectSeparatedPoints: true,
     graphConfig: {
-        hideHeader: false,
+        hideHeader: {views: false, intervals: true, toolbar: true, series: true},
+        // hideHeader: false,
         features: {
             zoom: true,
             scroll: true,
@@ -630,9 +631,9 @@ let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig], {
 graph1.initGraph();
 
 
-setTimeout(()=> {
-    graph1.changeView('scatter view');
-}, 5000);
+// setTimeout(()=> {
+//     graph1.changeView('scatter view');
+// }, 5000);
 
 
 
