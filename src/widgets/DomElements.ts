@@ -14,6 +14,7 @@ import {Synchronizer} from '../extras/synchronizer';
 import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService';
 import {GraphInteractions} from '../extras/interactions';
 import {Formatters, hsvToRGB} from '../extras/formatters';
+import {EventHandlers} from "../metadata/graphoptions";
 
 
 export class DropdownButton {
@@ -205,14 +206,17 @@ export class GraphOperator {
 
     private lockedInterval: { name: string, interval: number } | undefined;
 
+    private eventListeners?:EventHandlers;
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
+
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, eventListeners?: EventHandlers) {
         this.mainGraph = mainGraph;
         this.ragnebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
         this.intervalsDropdown = intervalsDropdown;
+        this.eventListeners = eventListeners;
         this.header = header;
         this.currentGraphData = [];
         this.spinner = new LoadingSpinner(this.graphContainer);
@@ -926,6 +930,11 @@ export class GraphOperator {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
+
+                    if(this.eventListeners && this.eventListeners.onIntervalChange){
+                        this.eventListeners.onIntervalChange(config);
+                    }
+
                     // get the middle timestamp of current timewindow.
                     let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
                     let halfConfigRequire = config.value / 2;
@@ -2024,7 +2033,7 @@ export class GraphOperator {
         let start = this.start;
         let end = this.end;
 
-        if(range && range.length === 2){
+        if (range && range.length === 2) {
             // rest start and end
             start = this.start = range[0];
             end = this.end = range[1];

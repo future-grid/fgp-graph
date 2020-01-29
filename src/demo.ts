@@ -197,7 +197,7 @@ let vdConfig: ViewConfig = {
             zoom: true,
             scroll: true,
             rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
-            legend:  formatters.legendForAllSeries,
+            legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
             rangeLocked: false   // lock or unlock range bar
         },
@@ -612,7 +612,21 @@ let vsConfig3: ViewConfig = {
 // let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
 // graph2.initGraph();
 // graph1
-let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig]);
+
+
+let viewChangeListener = (view: ViewConfig) => {
+    console.log("view changed!", view.name);
+};
+
+let intervalChangeListener = (interval: { name: string; value: number; show?: boolean }) => {
+    console.log('interval changed!', interval);
+};
+
+
+let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig], {
+    onViewChange: viewChangeListener,
+    onIntervalChange: intervalChangeListener
+});
 graph1.initGraph();
 
 // testing resize graph without resizing window

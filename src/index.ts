@@ -5,6 +5,8 @@ import {DropdownButton, DomElementOperator, GraphOperator} from "./widgets/DomEl
 
 import {ResizeObserver, ResizeObserverEntry} from '@juggle/resize-observer';
 
+import { EventHandlers } from './metadata/graphoptions';
+
 export default class FgpGraph {
 
     private graphContainer: HTMLElement;
@@ -50,6 +52,8 @@ export default class FgpGraph {
 
     private callbackDelayTimer: any = 0;
 
+    private eventListeners?: EventHandlers;
+
     /**
      *Creates an instance of FgpGraph.
      * @param {HTMLElement} dom
@@ -58,7 +62,7 @@ export default class FgpGraph {
      * graph configuration
      * @memberof FgpGraph
      */
-    constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>) {
+    constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>, eventHandlers?: EventHandlers) {
 
         this.defaultGraphRanges = [
             {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
@@ -66,6 +70,11 @@ export default class FgpGraph {
             {name: "1 month", value: 2592000000, show: false}
         ];
         this.parentDom = dom;
+
+        if(eventHandlers){
+            this.eventListeners = eventHandlers;
+        }
+
 
         this.serialnumber = (Math.random() * 10000 | 0) + 1;
 
@@ -169,7 +178,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public initGraph = () => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this.eventListeners);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
@@ -191,6 +200,7 @@ export default class FgpGraph {
                 // find view 
                 this.viewConfigs.forEach(config => {
                     if (config.name === choosedView) {
+
                         this.operator.init(config, (graph: Dygraph) => {
                             this.graph = graph;
 
@@ -211,8 +221,16 @@ export default class FgpGraph {
                                 }
                             });
                         });
+
+                        // check if we need to tell others the view changed.
+                        if(this.eventListeners && this.eventListeners.onViewChange){
+                            //f call
+                            this.eventListeners.onViewChange(config);
+                        }
                     }
                 });
+
+
             };
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {

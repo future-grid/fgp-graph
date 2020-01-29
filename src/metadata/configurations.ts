@@ -44,7 +44,9 @@ export interface Features {
     scroll: boolean;
     rangeBar: boolean | { show: boolean, format: string };
     connectPoints?: boolean;
+
     legend?(data: any): string;
+
     exports?: GraphExports[]; // png
     ctrlButtons?: { x?: boolean, y?: boolean, y2?: boolean },
     rangeLocked?: boolean,
