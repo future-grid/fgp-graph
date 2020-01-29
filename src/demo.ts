@@ -629,6 +629,13 @@ let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig], {
 });
 graph1.initGraph();
 
+
+setTimeout(()=> {
+    graph1.changeView('scatter view');
+}, 5000);
+
+
+
 // testing resize graph without resizing window
 // setTimeout(()=>{
 //     graphDiv.style.height = "700px";

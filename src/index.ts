@@ -5,7 +5,7 @@ import {DropdownButton, DomElementOperator, GraphOperator} from "./widgets/DomEl
 
 import {ResizeObserver, ResizeObserverEntry} from '@juggle/resize-observer';
 
-import { EventHandlers } from './metadata/graphoptions';
+import {EventHandlers} from './metadata/graphoptions';
 
 export default class FgpGraph {
 
@@ -71,7 +71,7 @@ export default class FgpGraph {
         ];
         this.parentDom = dom;
 
-        if(eventHandlers){
+        if (eventHandlers) {
             this.eventListeners = eventHandlers;
         }
 
@@ -169,7 +169,52 @@ export default class FgpGraph {
             }
         });
 
-    }
+    };
+
+    /**
+     * func for switching view
+     * @param view
+     */
+    public changeView = (view: string) => {
+        // change view
+        // find view
+        this.viewConfigs.forEach(config => {
+            if (config.name === view) {
+
+                this.operator.init(config, (graph: Dygraph) => {
+                    this.graph = graph;
+
+                    this.childrenGraphs.forEach(graph => {
+                        // call updateDatewinow
+                        if (graph.serialnumber != this.serialnumber) {
+                            // update data
+                            graph.operator.refresh();
+                        }
+                    });
+
+                }, () => {
+                    this.childrenGraphs.forEach(graph => {
+                        // call updateDatewinow
+                        if (graph.serialnumber != this.serialnumber) {
+                            // update data
+                            graph.operator.refresh();
+                        }
+                    });
+                });
+
+                // check if we need to tell others the view changed.
+                if (this.eventListeners && this.eventListeners.onViewChange) {
+                    //f call
+                    this.eventListeners.onViewChange(config);
+                }
+
+                // update dropdownlist
+                if(view){
+                    (<HTMLSelectElement>this.viewsDropdown).value = view;
+                }
+            }
+        });
+    };
 
     /**
      * init graph with configuration
@@ -196,41 +241,7 @@ export default class FgpGraph {
             // add callback handler
             this.viewsDropdown.onchange = (e) => {
                 const choosedView = (<HTMLSelectElement>e.target).value;
-                // change view
-                // find view 
-                this.viewConfigs.forEach(config => {
-                    if (config.name === choosedView) {
-
-                        this.operator.init(config, (graph: Dygraph) => {
-                            this.graph = graph;
-
-                            this.childrenGraphs.forEach(graph => {
-                                // call updateDatewinow
-                                if (graph.serialnumber != this.serialnumber) {
-                                    // update data
-                                    graph.operator.refresh();
-                                }
-                            });
-
-                        }, () => {
-                            this.childrenGraphs.forEach(graph => {
-                                // call updateDatewinow
-                                if (graph.serialnumber != this.serialnumber) {
-                                    // update data
-                                    graph.operator.refresh();
-                                }
-                            });
-                        });
-
-                        // check if we need to tell others the view changed.
-                        if(this.eventListeners && this.eventListeners.onViewChange){
-                            //f call
-                            this.eventListeners.onViewChange(config);
-                        }
-                    }
-                });
-
-
+                this.changeView(choosedView);
             };
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
@@ -307,4 +318,6 @@ export default class FgpGraph {
         //
         return "not enabled in this version";
     };
+
+
 }
