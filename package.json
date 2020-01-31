@@ -56,11 +56,11 @@
     "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "@juggle/resize-observer": "^3.0.2",
     "dygraphs": "^2.1.0",
     "html2canvas": "^1.0.0-rc.3",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26",
-    "@juggle/resize-observer": "^3.0.2"
+    "moment-timezone": "^0.5.26"
   },
   "bugs": {
     "url": "https://github.com/future-grid/fgp-graph/issues"
