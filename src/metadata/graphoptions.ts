@@ -1,7 +1,8 @@
 import {ViewConfig} from "./configurations";
+import FgpGraph from "../index";
 
 export interface EventHandlers {
-    onViewChange?(view: ViewConfig): void;
+    onViewChange?(g: FgpGraph, view: ViewConfig): void;
 
-    onIntervalChange?(interval: { name: string, value: number, show?: boolean }): void;
+    onIntervalChange?(g: FgpGraph, interval: { name: string, value: number, show?: boolean }): void;
 }

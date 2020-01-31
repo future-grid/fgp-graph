@@ -15,6 +15,7 @@ import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService'
 import {GraphInteractions} from '../extras/interactions';
 import {Formatters, hsvToRGB} from '../extras/formatters';
 import {EventHandlers} from "../metadata/graphoptions";
+import FgpGraph from "../index";
 
 
 export class DropdownButton {
@@ -206,11 +207,13 @@ export class GraphOperator {
 
     private lockedInterval: { name: string, interval: number } | undefined;
 
-    private eventListeners?:EventHandlers;
+    private eventListeners?: EventHandlers;
 
+    private graphInstance: FgpGraph;
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, eventListeners?: EventHandlers) {
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers) {
         this.mainGraph = mainGraph;
+        this.graphInstance = fgpGraph;
         this.ragnebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
         this.datewindowCallback = datewindowCallback;
@@ -853,10 +856,6 @@ export class GraphOperator {
         }
 
 
-
-
-
-
         let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
         let entities: Array<string> = [];
@@ -929,8 +928,8 @@ export class GraphOperator {
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
 
-                    if(this.eventListeners && this.eventListeners.onIntervalChange){
-                        this.eventListeners.onIntervalChange(config);
+                    if (this.eventListeners && this.eventListeners.onIntervalChange) {
+                        this.eventListeners.onIntervalChange(this.graphInstance, config);
                     }
 
                     // get the middle timestamp of current timewindow.
@@ -985,52 +984,52 @@ export class GraphOperator {
             this.header.style.display = 'none';
         } else {
             let viewDrops = this.header.getElementsByClassName('fgp-views-dropdown');
-            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.views === true){
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.views === true) {
                 // hide views
 
                 // only have one
-                if(viewDrops && viewDrops[0]){
+                if (viewDrops && viewDrops[0]) {
                     (<HTMLSelectElement>viewDrops[0]).style.display = "none";
                 }
-            }else {
-                if(viewDrops && viewDrops[0]){
+            } else {
+                if (viewDrops && viewDrops[0]) {
                     (<HTMLSelectElement>viewDrops[0]).style.display = "";
                 }
             }
 
-            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.toolbar === true){
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.toolbar === true) {
                 // hide views
                 let toolbar = this.header.getElementsByClassName('fgp-filter-buttons');
                 // only have one
-                if(toolbar && toolbar[0]){
+                if (toolbar && toolbar[0]) {
                     (<HTMLElement>toolbar[0]).style.display = "none";
                 }
             }
             let intervalDrops = this.header.getElementsByClassName('fgp-intervals-dropdown');
-            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.intervals === true){
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.intervals === true) {
                 // hide views
 
                 // only have one
-                if(intervalDrops && intervalDrops[0]){
+                if (intervalDrops && intervalDrops[0]) {
                     (<HTMLElement>intervalDrops[0]).style.display = "none";
                 }
-            }else {
-                if(intervalDrops && intervalDrops[0]){
+            } else {
+                if (intervalDrops && intervalDrops[0]) {
                     (<HTMLElement>intervalDrops[0]).style.display = "";
                 }
             }
 
             //
             let seriesDrops = this.header.getElementsByClassName('fgp-series-dropdown');
-            if(view.graphConfig.hideHeader && view.graphConfig.hideHeader.series === true){
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.series === true) {
                 // hide views
 
                 // only have one
-                if(seriesDrops && seriesDrops[0]){
+                if (seriesDrops && seriesDrops[0]) {
                     (<HTMLElement>seriesDrops[0]).style.display = "none";
                 }
             } else {
-                if(seriesDrops && seriesDrops[0]){
+                if (seriesDrops && seriesDrops[0]) {
                     (<HTMLElement>seriesDrops[0]).style.display = "";
                 }
             }

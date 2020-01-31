@@ -9,11 +9,11 @@ import {EventHandlers} from './metadata/graphoptions';
 
 export default class FgpGraph {
 
-    private graphContainer: HTMLElement;
+    graphContainer: HTMLElement;
 
-    private header: HTMLElement;
+    header: HTMLElement;
 
-    private body: HTMLElement;
+    body: HTMLElement;
 
     private bottom!: HTMLElement;
 
@@ -21,38 +21,37 @@ export default class FgpGraph {
 
     private rangeBarGraph!: Dygraph;
 
-    private viewConfigs: Array<ViewConfig>;
-
-    private defaultGraphRanges: Array<{ name: string, value: number, show?: boolean }>;
+    viewConfigs: Array<ViewConfig>;
 
     private parentDom: HTMLElement;
 
-    private viewsDropdown: HTMLElement;
+    viewsDropdown: HTMLElement;
 
-    private intervalsDropdown: HTMLElement;
+    intervalsDropdown: HTMLElement;
 
-    private intervalLabelsArea: HTMLElement;
+    intervalLabelsArea: HTMLElement;
 
-    private seriesDropdown: HTMLElement;
+    seriesDropdown: HTMLElement;
 
     private exportButtons!: HTMLElement[];
 
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
-    private childrenGraphs: Array<FgpGraph> = [];
+    private children: Array<FgpGraph> = [];
 
     // store locally
     private rangeBarData: any = [];
 
     private currentDateWindow: number[] = [];
 
-    public serialnumber = -1;
+    id: string;
 
     private operator!: GraphOperator;
 
     private callbackDelayTimer: any = 0;
 
-    private eventListeners?: EventHandlers;
+    eventListeners?: EventHandlers;
+
 
     /**
      *Creates an instance of FgpGraph.
@@ -64,11 +63,6 @@ export default class FgpGraph {
      */
     constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>, eventHandlers?: EventHandlers) {
 
-        this.defaultGraphRanges = [
-            {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
-            {name: "7 days", value: 604800000, show: true},
-            {name: "1 month", value: 2592000000, show: false}
-        ];
         this.parentDom = dom;
 
         if (eventHandlers) {
@@ -76,7 +70,17 @@ export default class FgpGraph {
         }
 
 
-        this.serialnumber = (Math.random() * 10000 | 0) + 1;
+        this.id = (Math.random() * 10000 | 0) + 1 + '';
+
+        // if id exist then change id to id
+        if (this.parentDom.getAttribute('id')) {
+            this.id = this.parentDom.id;
+        }
+
+        //
+        if (this.parentDom.getAttribute("fgp-graph-id")) {
+            this.id = <string>this.parentDom.getAttribute("fgp-graph-id");
+        }
 
         let viewsDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-views-dropdown"}];
         this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
@@ -162,9 +166,9 @@ export default class FgpGraph {
 
         this.currentDateWindow = dateWindow;
 
-        this.childrenGraphs.forEach(graph => {
+        this.children.forEach(graph => {
             // call updateDatewinow
-            if (graph.serialnumber != this.serialnumber) {
+            if (graph.id != this.id) {
                 graph.updateDatewinow(dateWindow);
             }
         });
@@ -184,18 +188,18 @@ export default class FgpGraph {
                 this.operator.init(config, (graph: Dygraph) => {
                     this.graph = graph;
 
-                    this.childrenGraphs.forEach(graph => {
+                    this.children.forEach(graph => {
                         // call updateDatewinow
-                        if (graph.serialnumber != this.serialnumber) {
+                        if (graph.id != this.id) {
                             // update data
                             graph.operator.refresh();
                         }
                     });
 
                 }, () => {
-                    this.childrenGraphs.forEach(graph => {
+                    this.children.forEach(graph => {
                         // call updateDatewinow
-                        if (graph.serialnumber != this.serialnumber) {
+                        if (graph.id != this.id) {
                             // update data
                             graph.operator.refresh();
                         }
@@ -205,11 +209,11 @@ export default class FgpGraph {
                 // check if we need to tell others the view changed.
                 if (this.eventListeners && this.eventListeners.onViewChange) {
                     //f call
-                    this.eventListeners.onViewChange(config);
+                    this.eventListeners.onViewChange(this, config);
                 }
 
                 // update dropdownlist
-                if(view && this.viewsDropdown){
+                if (view && this.viewsDropdown) {
                     (<HTMLSelectElement>this.viewsDropdown).value = view;
                 }
             }
@@ -223,7 +227,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public initGraph = () => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this.eventListeners);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
@@ -247,19 +251,15 @@ export default class FgpGraph {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
                 }, () => {
-                    this.childrenGraphs.forEach(graph => {
+                    this.children.forEach(graph => {
                         // call updateDatewinow
-                        if (graph.serialnumber != this.serialnumber) {
+                        if (graph.id != this.id) {
                             // update data
                             graph.operator.refresh();
                         }
                     });
                 });
             }
-
-
-
-
         }
     };
 
@@ -290,7 +290,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public setChildren = (graphs: Array<FgpGraph>) => {
-        this.childrenGraphs = this.childrenGraphs.concat(graphs);
+        this.children = this.children.concat(graphs);
     };
 
     /**
@@ -322,6 +322,5 @@ export default class FgpGraph {
         //
         return "not enabled in this version";
     };
-
 
 }

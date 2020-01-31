@@ -183,7 +183,7 @@ let graphDiv2: HTMLDivElement = document.getElementById("graphArea2") as HTMLDiv
 let graphDiv3: HTMLDivElement = document.getElementById("graphArea3") as HTMLDivElement;
 
 
-let formatters: Formatters = new Formatters("Australia/Melbourne");
+let formatters: Formatters = new Formatters("Australia/Perth");
 formatters.setFormat('DD MMM YYYY h:mm a');
 // data not needed in the future
 const dataService: DataHandler = new DataService();
@@ -342,7 +342,7 @@ let vdConfig: ViewConfig = {
             }
         }
     },
-    timezone: 'Australia/Melbourne',
+    timezone: 'Australia/Perth',
     highlightSeriesBackgroundAlpha: 1
     // timezone: 'Pacific/Auckland'
 };
@@ -607,19 +607,19 @@ let vsConfig3: ViewConfig = {
 };
 
 
-// let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
-// graph3.initGraph();
+let graph3 = new FgpGraph(graphDiv3, [vsConfig3]);
+graph3.initGraph();
 //
-// let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-// graph2.initGraph();
+let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+graph2.initGraph();
 // graph1
 
 
-let viewChangeListener = (view: ViewConfig) => {
+let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
     console.log("view changed!", view.name);
 };
 
-let intervalChangeListener = (interval: { name: string; value: number; show?: boolean }) => {
+let intervalChangeListener = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }) => {
     console.log('interval changed!', interval);
 };
 
@@ -655,7 +655,7 @@ graph1.initGraph();
 
 
 // // link graphs
-// graph1.setChildren([graph2, graph3]);
+graph1.setChildren([graph2, graph3]);
 
 
 // graph2.setChildren([graph1]);   // problem with right and left axis
