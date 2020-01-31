@@ -13,9 +13,10 @@ import moment from 'moment-timezone';
 import {Synchronizer} from '../extras/synchronizer';
 import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService';
 import {GraphInteractions} from '../extras/interactions';
-import {Formatters, hsvToRGB} from '../extras/formatters';
-import {EventHandlers} from "../metadata/graphoptions";
+import {Formatters} from '../extras/formatters';
+import {FgpColor, hsvToRGB} from '../services/colorService';
 import FgpGraph from "../index";
+import {EventHandlers} from "../metadata/graphoptions";
 
 
 export class DropdownButton {
@@ -2119,6 +2120,11 @@ export class GraphOperator {
         let mainLabels: Array<string> = [];
         let isY2: boolean = false;
         if (graphCollection) {
+
+            const num = graphCollection.series.length;
+            const half = Math.ceil(num / 2);
+            const sat = 1.0;
+            const val = 0.5;
             graphCollection.series.forEach((series, _index) => {
                 let _tempFields: string[] | null = (series.exp).match(GraphOperator.FIELD_PATTERN);
                 // replace all "data."" with ""
@@ -2129,6 +2135,12 @@ export class GraphOperator {
                 // put fields together
                 if (view.graphConfig.entities.length == 1 && series.color) {
                     colors.push(series.color);
+                } else {
+                    let half = Math.ceil(num / 2);
+                    let idx = _index % 2 ? (half + (_index + 1) / 2) : Math.ceil((_index + 1) / 2);
+                    let hue = (1.0 * idx / (1 + num));
+                    let colorStr = hsvToRGB(hue, sat, val);
+                    colors.push(colorStr);
                 }
 
                 if (series.yIndex && series.yIndex == 'right') {
@@ -2150,11 +2162,93 @@ export class GraphOperator {
                     mainGraphSeries[series.label]["drawPoints"] = true;
                 } else if (series.type == 'step') {
                     mainGraphSeries[series.label]["stepPlot"] = true;
+                } else if (series.type === 'bar') {
+                    mainGraphSeries[series.label]["plotter"] = (e: any) => {
+                        if (graphCollection) {
+                            let allSeries = graphCollection.series;
+                            const currentVs: Array<boolean> = this.mainGraph.getOption("visibility");
+                            const sets = e.allSeriesPoints;
+                            // find all bar series and get the real index
+                            let bars: Array<any> = [];
+                            let barIndex: Array<number> = [];
+                            allSeries.forEach((series, _index) => {
+                                if (series.type === 'bar') {
+                                    // check visibility here
+                                    bars.push(series);
+                                    barIndex.push(_index);
+                                }
+                            });
+
+                            //
+                            const g: any = e.dygraph;
+                            //
+                            const ctx: any = e.drawingContext;
+                            // y bottom
+                            const y_bottom = g.toDomYCoord(0);
+                            // Find the minimum separation between x-values.
+                            // This determines the bar width.
+                            let min_sep = Infinity;
+                            for (let j = 0; j < sets.length; j++) {
+                                let points = sets[j];
+                                for (let i = 1; i < points.length; i++) {
+                                    let sep = points[i].canvasx - points[i - 1].canvasx;
+                                    if (sep < min_sep) min_sep = sep;
+                                }
+                            }
+
+                            const barWidth = Math.floor(2.0 / 3 * min_sep);
+                            const fillColors: Array<string> = [];
+                            const strokeColors = g.getColors();
+
+                            strokeColors.forEach((c: string, _i: number) => {
+                                fillColors.push(new FgpColor(strokeColors[_i]).toRgbWithAlpha(.6));
+                            });
+
+
+                            // check current label visibility
+                            let finalBars: number = bars.length;
+
+
+                            currentVs.forEach((vs, _in) => {
+                                if (!vs && barIndex.includes(_in)) {
+                                    finalBars -= 1;
+                                }
+                            });
+
+                            for (let j = 0; j < finalBars; j++) {
+                                // find how many series disabled before this one
+                                let dsCount = 0;
+                                currentVs.forEach((vs, _in) => {
+                                    if (!vs && barIndex[j] > _in) {
+                                        dsCount++;
+                                    }
+                                });
+                                ctx.fillStyle = fillColors[barIndex[j] - dsCount];
+                                ctx.strokeStyle = strokeColors[barIndex[j] - dsCount];
+                                for (let i = 0; i < sets[barIndex[j] - dsCount].length; i++) {
+                                    let p = sets[barIndex[j] - dsCount][i];
+                                    let center_x = p.canvasx;
+                                    let x_left = -1;
+                                    // only one bar
+                                    if (finalBars === 1) {
+                                        x_left = center_x - (barWidth / 2);
+                                    } else {
+                                        x_left = center_x - (barWidth / 2) * (1 - j / (finalBars - 1));
+                                    }
+                                    ctx.fillRect(x_left, p.canvasy,
+                                        barWidth / finalBars, y_bottom - p.canvasy);
+                                    ctx.strokeRect(x_left, p.canvasy,
+                                        barWidth / finalBars, y_bottom - p.canvasy);
+                                }
+                            }
+                        }
+                    }
                 } else {
                     // disable step and show 
                     mainGraphSeries[series.label]["stepPlot"] = false;
                     mainGraphSeries[series.label]["strokeWidth"] = 1;
                     mainGraphSeries[series.label]["drawPoints"] = false;
+                    mainGraphSeries[series.label]["plotter"] = Dygraph.Plotters.linePlotter;
                 }
 
                 if (series.yIndex != 'left') {

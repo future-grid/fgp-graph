@@ -192,7 +192,7 @@ let vdConfig: ViewConfig = {
     name: "device view",
     connectSeparatedPoints: true,
     graphConfig: {
-        hideHeader: {views: false, intervals: true, toolbar: true, series: true},
+        hideHeader: {views: false, intervals: false, toolbar: false, series: false},
         // hideHeader: false,
         features: {
             zoom: true,
@@ -248,10 +248,10 @@ let vdConfig: ViewConfig = {
                 label: 'substation_day',
                 name: 'substation_interval_day',
                 interval: 86400000,
-                markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
+                // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
-                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    // {label: "Max", type: 'step', exp: "data.maxConsumptionVah", yIndex: 'right'},
+                    {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
