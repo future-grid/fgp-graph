@@ -2135,7 +2135,7 @@ export class GraphOperator {
                 // put fields together
                 if (view.graphConfig.entities.length == 1 && series.color) {
                     colors.push(series.color);
-                } else {
+                } else if(view.graphConfig.entities.length == 1) {
                     let half = Math.ceil(num / 2);
                     let idx = _index % 2 ? (half + (_index + 1) / 2) : Math.ceil((_index + 1) / 2);
                     let hue = (1.0 * idx / (1 + num));
@@ -2535,6 +2535,7 @@ export class GraphOperator {
                 if (view.graphConfig.entities.length > 1) {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
+                    colors = [];
                 } else if (graphCollection && graphCollection.markLines) {
                     graphCollection.markLines.forEach(markLine => {
                         mainGraphSeries[markLine.label + '_markline'] = {

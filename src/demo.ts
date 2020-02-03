@@ -83,7 +83,7 @@ class DataService implements DataHandler {
             existData.forEach(_ed => {
                 if (_ed.id.indexOf('meter') != -1) {
 
-                    if (_ed.id.indexOf('meter2') == -1) {
+                    // if (_ed.id.indexOf('meter2') == -1) {
                         // get existing data
                         if (_ed.interval == interval) {
                             // find data
@@ -103,7 +103,7 @@ class DataService implements DataHandler {
                                     'avgVoltage': this.randomNumber(250, 255)
                                 });
                             }
-                        }
+                        // }
                     }
 
                 } else if (_ed.id.indexOf('substation') != -1) {
@@ -251,7 +251,7 @@ let vdConfig: ViewConfig = {
                 // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
                     {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
+                    {label: "Max", type: 'bar', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
@@ -389,7 +389,7 @@ let vsConfig: ViewConfig = {
         },
         entities: [
             {id: "meter1", type: "meter", name: "meter1"},
-            // {id: "meter2", type: "meter", name: "meter2"},
+            {id: "meter2", type: "meter", name: "meter2"},
             // {id: "?", type: "meter", name: "?", fragment: true}
         ],
         rangeEntity: {id: "substation1", type: "substation", name: "substation1"},
