@@ -17,6 +17,8 @@ import {Formatters} from '../extras/formatters';
 import {FgpColor, hsvToRGB} from '../services/colorService';
 import FgpGraph from "../index";
 import {EventHandlers} from "../metadata/graphoptions";
+import RangeSelector from '../extras/RangeSelector';
+import Toolbar from "../extras/Toolbar";
 
 
 export class DropdownButton {
@@ -1430,7 +1432,8 @@ export class GraphOperator {
                     }
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
-                }
+                },
+                // plugins: [new Toolbar({collections: this.currentView.graphConfig.collections})]
             });
             // add dbl event
             if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback) {
@@ -1953,7 +1956,8 @@ export class GraphOperator {
                     }
                 });
 
-                // check 
+
+                // check
                 let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
                 sync.synchronize();
                 // readyCallback(this.mainGraph);
@@ -2101,11 +2105,11 @@ export class GraphOperator {
 
         // check if currentCollection doesnt exist in currentView then ignore it
         const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
-                return collection.name === this.currentCollection?.name;
+            return collection.name === this.currentCollection?.name;
         });
 
         // wrong collection and ignore it
-        if(!existCollection){
+        if (!existCollection) {
             return false;
         }
 
