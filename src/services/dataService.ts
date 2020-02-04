@@ -50,6 +50,7 @@ export class LoadingSpinner {
 }
 
 export class ExportUtils {
+
     public static exportCsv(content: string, fileName: string) {
         // simulate click "<a>"
         let downloadDom: HTMLAnchorElement = document.createElement('a');

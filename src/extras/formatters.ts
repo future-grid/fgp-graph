@@ -2,36 +2,6 @@ import Dygraph from 'dygraphs';
 import moment from 'moment-timezone';
 import { GraphConstant } from '../metadata/configurations';
 
-export function hsvToRGB(hue: number, saturation: number, value: number) {
-    let red: number = 0;
-    let green: number = 0;
-    let blue: number = 0;
-    if (saturation === 0) {
-        red = value;
-        green = value;
-        blue = value;
-    } else {
-        let i = Math.floor(hue * 6);
-        let f = (hue * 6) - i;
-        let p = value * (1 - saturation);
-        let q = value * (1 - (saturation * f));
-        let t = value * (1 - (saturation * (1 - f)));
-        switch (i) {
-            case 1: red = q; green = value; blue = p; break;
-            case 2: red = p; green = value; blue = t; break;
-            case 3: red = p; green = q; blue = value; break;
-            case 4: red = t; green = p; blue = value; break;
-            case 5: red = value; green = p; blue = q; break;
-            case 6: // fall through
-            case 0: red = value; green = t; blue = p; break;
-        }
-    }
-    red = Math.floor(255 * red + 0.5);
-    green = Math.floor(255 * green + 0.5);
-    blue = Math.floor(255 * blue + 0.5);
-    return 'rgb(' + red + ',' + green + ',' + blue + ')';
-}
-
 
 export class Formatters {
 
@@ -41,6 +11,8 @@ export class Formatters {
      * @memberof Formatters
      */
     public timezone: string;
+
+    public dateformat?: string;
 
     private TICK_PLACEMENT: any[];
 
@@ -102,6 +74,16 @@ export class Formatters {
         this.SHORT_SPACINGS[GraphConstant.WEEKLY] = 1000 * 604800;
         this.SHORT_SPACINGS[GraphConstant.TWO_DAILY] = 1000 * 86400 * 2;
     }
+
+
+    /**
+     * update date format for legend and range-bar
+     * @param format
+     */
+    public setFormat = (format: string) =>{
+        this.dateformat = format;
+    };
+
 
 
     private numDateTicks = (start_time: number, end_time: number, granularity: number) => {
@@ -264,6 +246,7 @@ export class Formatters {
      * @memberof Formatters
      */
     legendForAllSeries = (data: any) => {
+
         const g = data.dygraph;
         if (g.getOption('showLabelsOnHighlight') !== true) return '';
 
@@ -271,9 +254,9 @@ export class Formatters {
             // This happens when there's no selection and {legend: 'always'} is set.
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
-        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format(this.dateformat ? this.dateformat : 'lll z');
         data.series.forEach(function (series: any) {
-            if (!series.isVisible) return;
+            if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
             let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';
@@ -299,10 +282,10 @@ export class Formatters {
             return '<br>' + data.series.map(function (series: any) { return series.dashHTML + ' ' + series.labelHTML }).join('<br>');
         }
 
-        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format('lll z');
+        let html = moment.tz(data.x, this.timezone ? this.timezone : moment.tz.guess()).format(this.dateformat ? this.dateformat : 'lll z');
 
         data.series.forEach(function (series: any) {
-            if (!series.isVisible) return;
+            if (!series.isVisible || series.label.indexOf('_markline')!=-1) return;
             let labeledData = series.labelHTML + ': ' + (series.yHTML ? series.yHTML : "");
             if (series.isHighlighted) {
                 labeledData = '<b style="color:' + series.color + ';">' + labeledData + '</b>';

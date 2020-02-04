@@ -7,13 +7,16 @@ import {
     Entity,
     GraphExports,
     filterFunc,
-    FilterType
+    FilterType, ToolbarConfig
 } from '../metadata/configurations';
 import moment from 'moment-timezone';
 import {Synchronizer} from '../extras/synchronizer';
 import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService';
 import {GraphInteractions} from '../extras/interactions';
-import {Formatters, hsvToRGB} from '../extras/formatters';
+import {Formatters} from '../extras/formatters';
+import {FgpColor, hsvToRGB} from '../services/colorService';
+import FgpGraph from "../index";
+import {EventHandlers} from "../metadata/graphoptions";
 
 
 export class DropdownButton {
@@ -127,7 +130,6 @@ export class SelectWithCheckbox {
             this.select.add(optElement);
         });
     }
-
 }
 
 
@@ -144,7 +146,6 @@ export class DomElementOperator {
             } else {
                 throw new Error("Duplicate Attrs " + attr.key);
             }
-
         });
         return dom;
     }
@@ -155,6 +156,8 @@ export class DomElementOperator {
 export class GraphOperator {
 
     public static FIELD_PATTERN = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
+
+    private graphId?: string;
 
     defaultGraphRanges: Array<{ name: string, value: number, show?: boolean }> = [
         {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
@@ -168,9 +171,8 @@ export class GraphOperator {
         attrs.forEach(attr => {
             dom.setAttribute(attr.key, attr.value);
         });
-
         return dom;
-    }
+    };
 
     private mainGraph: Dygraph;
 
@@ -188,7 +190,7 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
-    private currentGraphData: { id: string, data: any[] }[];
+    private currentGraphData: any[];
 
     private graphContainer: HTMLElement;
 
@@ -208,31 +210,47 @@ export class GraphOperator {
 
     private lockedInterval: { name: string, interval: number } | undefined;
 
+    private eventListeners?: EventHandlers;
 
+    private graphInstance: FgpGraph;
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any) {
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
         this.mainGraph = mainGraph;
+        this.graphId = id;
+        this.graphInstance = fgpGraph;
         this.ragnebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
         this.intervalsDropdown = intervalsDropdown;
+        this.eventListeners = eventListeners;
         this.header = header;
         this.currentGraphData = [];
         this.spinner = new LoadingSpinner(this.graphContainer);
         this.xBoundary = [0, 0];
         let yAxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-yaxis-btn-container'}];
         this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
-
         let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
     }
+
+    public recreateElement = (el: HTMLElement, withChildren: boolean) => {
+        if (withChildren && el) {
+            if (el.parentNode) {
+                el.parentNode.replaceChild(el.cloneNode(true), el);
+            }
+        } else if (el && el.parentNode) {
+            let newEl = el.cloneNode(false);
+            while (el.hasChildNodes() && el.firstChild) newEl.appendChild(el.firstChild);
+            el.parentNode.replaceChild(newEl, el);
+        }
+    };
 
     public showSpinner = () => {
         if (this.spinner) {
             this.spinner.show();
         }
-    }
+    };
 
 
     /**
@@ -266,7 +284,7 @@ export class GraphOperator {
                         }
                     });
 
-                    if(_indexsShow.length === 0){
+                    if (_indexsShow.length === 0) {
                         // not found
                         // set visibility
                         visibility.forEach((_v, _i) => {
@@ -312,6 +330,8 @@ export class GraphOperator {
                             } : undefined
                         }
                     });
+
+
                     if (duration > 0) {
                         // take all visibility back
                         setTimeout(() => {
@@ -366,7 +386,7 @@ export class GraphOperator {
                 }
             });
         }
-    }
+    };
 
     /**
      * update labels
@@ -400,8 +420,6 @@ export class GraphOperator {
             label.setAttribute("data-interval-name", _collection.label);
             label.setAttribute("data-interval-value", _collection.interval + '');
             label.innerText = _collection.label;
-
-
             // make interval label lockable
             label.addEventListener('click', (e: MouseEvent) => {
                 if (e.target) {
@@ -419,10 +437,9 @@ export class GraphOperator {
                         // change color
                         label.setAttribute("data-interval-locked", "true");
                         label.className = "badge badge-pill badge-warning badge-interval";
-
-                        // setup lockec
+                        // setup locked
                         if (intervalName && _interval) {
-                            // update choosedCollection
+                            // update choose Collection
                             collections.map(collection => {
                                 if (collection.label === intervalName) {
                                     this.currentCollection = choosedCollection = collection;
@@ -452,20 +469,16 @@ export class GraphOperator {
 
             firstLabelArea.appendChild(label);
         });
-
-
-    }
+    };
 
 
     private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?: Array<boolean>) => {
         let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
-
         if (dropdown && dropdown[0]) {
             dropdown[0].innerHTML = "";
         }
         let select: HTMLElement = <HTMLSelectElement>this.createElement("div", []);
         dropdown[0].appendChild(select);
-
         let opts: Array<{ checked: boolean, name: string, label: string }> = [];
         series.forEach((_series, _index) => {
             if (visibility && visibility[_index] != undefined) {
@@ -477,7 +490,6 @@ export class GraphOperator {
                     {checked: true, name: _series, label: _series}
                 );
             }
-
         });
 
         new DropdownMenu(select, opts, (series: string, checked: boolean) => {
@@ -509,9 +521,8 @@ export class GraphOperator {
                     } : undefined
                 }
             });
-
         }).render();
-    }
+    };
 
     private updateExportButtons = (view: ViewConfig) => {
         if (view.graphConfig.features && view.graphConfig.features.exports) {
@@ -585,9 +596,7 @@ export class GraphOperator {
                 }
             });
         }
-
-
-    }
+    };
 
     private setColors = (colors: Array<string>) => {
         // check if length match or not
@@ -597,7 +606,6 @@ export class GraphOperator {
         let val = 0.5;
         // get current y and y2 axis scaling max and min
         let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-
         if (graphLabels.length - 1 === colors.length) {
             this.mainGraph.updateOptions({
                 colors: colors,
@@ -690,11 +698,8 @@ export class GraphOperator {
 
 
         labels.map((value, index, array) => {
-            if (series.includes(value)) {
-                visibility[index] = true;
-            } else {
-                visibility[index] = false;
-            }
+            // never hide mark lines
+            visibility[index] = series.includes(value) || value.indexOf("_markline") != -1;
         });
 
         // set visibility
@@ -721,6 +726,63 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
+
+        // check toolbar buttons and dropdown list
+        let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
+        if (toolbarArea && toolbarArea[0]) {
+            toolbarArea[0].innerHTML = '';
+        }
+
+
+        if (view.graphConfig.features.toolbar) {
+            const toolbarConfig: ToolbarConfig = view.graphConfig.features.toolbar;
+            //
+            if (toolbarConfig.buttons) {
+                toolbarConfig.buttons.forEach(btn => {
+                    //
+                    let button: HTMLSpanElement = document.createElement("button");
+                    button.className = "fgp-toolbar-button";
+                    button.textContent = btn.label;
+                    button.addEventListener('click', (event) => {
+                        //
+                        btn.func(btn.prop);
+                    });
+                    toolbarArea[0].appendChild(button);
+                });
+            }
+
+            if (toolbarConfig.dropdown) {
+                let toolbarDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-toolbar-dropdown"}];
+                toolbarConfig.dropdown.forEach(dropdown => {
+                    let toolbarDropdown = DomElementOperator.createElement('select', toolbarDropdownAttrs);
+                    let dropdownOpts: Array<{ id: string, label: string }> = [];
+                    // create options
+                    dropdown.forEach(opt => {
+                        dropdownOpts.push({id: opt.label, label: opt.label});
+                    });
+
+                    const toolbarDropdonwOptions = new DropdownButton(<HTMLSelectElement>toolbarDropdown, [...dropdownOpts]);
+                    toolbarDropdonwOptions.render();
+                    toolbarDropdown.onchange = (e) => {
+                        const toolbarDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
+                        const currentValue: string = toolbarDropdown.value;
+                        //
+                        dropdown.forEach(opt => {
+                            if (opt.label === currentValue) {
+                                // call func
+                                opt.func(opt.prop);
+                            }
+                        });
+                    };
+                    toolbarArea[0].appendChild(toolbarDropdown);
+                });
+
+
+            }
+
+        }
+
+
         let buttons = this.header.getElementsByClassName("fgp-filter-buttons");
         if (buttons && buttons[0]) {
             buttons[0].innerHTML = "";
@@ -870,6 +932,11 @@ export class GraphOperator {
             const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
             graphRangesConfig.forEach(config => {
                 if (config.name == intervalDropdown.value) {
+
+                    if (this.eventListeners && this.eventListeners.onIntervalChange) {
+                        this.eventListeners.onIntervalChange(this.graphInstance, config);
+                    }
+
                     // get the middle timestamp of current timewindow.
                     let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
                     let halfConfigRequire = config.value / 2;
@@ -880,10 +947,10 @@ export class GraphOperator {
                     });
 
                     //update 
-                    this.mainGraph = this.mainGraph;
-                    this.ragnebarGraph = this.ragnebarGraph;
+                    // this.mainGraph = this.mainGraph;
+                    // this.ragnebarGraph = this.ragnebarGraph;
                     this.currentCollection = choosedCollection;
-                    this.currentView = this.currentView;
+                    // this.currentView = this.currentView;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
                     if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
                         this.start = this.xBoundary[0];
@@ -907,6 +974,7 @@ export class GraphOperator {
                             dateWindow: [this.start, this.end]
                         });
                     }
+                    console.log("2: before upate the collection is ", this.currentCollection, this.currentView);
                     this.update();
                     this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
                     if (interactionCallback) {
@@ -916,6 +984,64 @@ export class GraphOperator {
                 }
             });
         };
+
+
+        if (view.graphConfig.hideHeader && view.graphConfig.hideHeader === true) {
+            this.header.style.display = 'none';
+        } else {
+            let viewDrops = this.header.getElementsByClassName('fgp-views-dropdown');
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.views === true) {
+                // hide views
+
+                // only have one
+                if (viewDrops && viewDrops[0]) {
+                    (<HTMLSelectElement>viewDrops[0]).style.display = "none";
+                }
+            } else {
+                if (viewDrops && viewDrops[0]) {
+                    (<HTMLSelectElement>viewDrops[0]).style.display = "";
+                }
+            }
+
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.toolbar === true) {
+                // hide views
+                let toolbar = this.header.getElementsByClassName('fgp-filter-buttons');
+                // only have one
+                if (toolbar && toolbar[0]) {
+                    (<HTMLElement>toolbar[0]).style.display = "none";
+                }
+            }
+            let intervalDrops = this.header.getElementsByClassName('fgp-intervals-dropdown');
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.intervals === true) {
+                // hide views
+
+                // only have one
+                if (intervalDrops && intervalDrops[0]) {
+                    (<HTMLElement>intervalDrops[0]).style.display = "none";
+                }
+            } else {
+                if (intervalDrops && intervalDrops[0]) {
+                    (<HTMLElement>intervalDrops[0]).style.display = "";
+                }
+            }
+
+            //
+            let seriesDrops = this.header.getElementsByClassName('fgp-series-dropdown');
+            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.series === true) {
+                // hide views
+
+                // only have one
+                if (seriesDrops && seriesDrops[0]) {
+                    (<HTMLElement>seriesDrops[0]).style.display = "none";
+                }
+            } else {
+                if (seriesDrops && seriesDrops[0]) {
+                    (<HTMLElement>seriesDrops[0]).style.display = "";
+                }
+            }
+
+
+        }
 
         // get fields
         let fieldsForCollection: any[] = [];
@@ -984,7 +1110,7 @@ export class GraphOperator {
                 }
             });
 
-            // get choosed collection by width....
+            // get choose collection by width....
             if (!choosedCollection && firstRanges) {
                 // cal with width
                 const width: number = this.graphContainer.offsetWidth;
@@ -1071,6 +1197,7 @@ export class GraphOperator {
             if (choosedCollection) {
                 // set currentCollection to choosedCollection
                 this.currentCollection = choosedCollection;
+                console.log("update collection to ", this.currentCollection);
             }
 
             let currentDatewindowOnMouseDown: any[] = [];
@@ -1157,13 +1284,14 @@ export class GraphOperator {
                     this.currentCollection = collection;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
 
+                    console.log("3: before upate the collection is ", this.currentCollection, this.currentView);
                     this.update(undefined, undefined, true);
                     if (!this.lockedInterval) {
                         this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
                     }
 
                 }
-            }
+            };
 
             let callbackFuncForInteractions = (e: MouseEvent, yAxisRange: Array<Array<number>>, refreshData: any) => {
                 if (refreshData) {
@@ -1214,21 +1342,40 @@ export class GraphOperator {
                 fullVisibility.push(true);
             });
 
-            let interactionModelConfig:any = {
+            let interactionModelConfig: any = {
                 'mousedown': interactionModel.mouseDown,
                 'mouseup': interactionModel.mouseUp,
                 'mouseenter': interactionModel.mouseEnter,
             };
 
+            if (this.currentView.graphConfig.features.rangeLocked) {
+                // remove all event listener. can't zooming, scrolling and panning
+            } else {
+                // disable scrolling. scrolling will change datetime window
+                if (this.currentView.graphConfig.features.scroll) {
+                    interactionModelConfig["mousewheel"] = interactionModel.mouseScroll;
+                    interactionModelConfig["DOMMouseScroll"] = interactionModel.mouseScroll;
+                    interactionModelConfig["wheel"] = interactionModel.mouseScroll;
+                }
+            }
 
-            if(this.currentView.graphConfig.features.zoom){
+            if (this.currentView.graphConfig.features.zoom) {
                 interactionModelConfig["mousemove"] = interactionModel.mouseMove;
             }
-            if(this.currentView.graphConfig.features.scroll){
-                interactionModelConfig["mousewheel"] = interactionModel.mouseScroll;
-                interactionModelConfig["DOMMouseScroll"] = interactionModel.mouseScroll;
-                interactionModelConfig["wheel"] = interactionModel.mouseScroll;
+
+            // check if we need to put a markline on map
+            if (choosedCollection && choosedCollection.markLines) {
+                choosedCollection.markLines.forEach(markLine => {
+                    mainGraphLabels.push(markLine.label);
+                    if (initVisibility.length > 0) {
+                        initVisibility.push(true);
+                    }
+                    initialData.forEach(initData => {
+                        initData.push(null);
+                    });
+                });
             }
+
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -1268,8 +1415,14 @@ export class GraphOperator {
                     const xAxisRange: Array<number> = g.xAxisRange();
                     currentDatewindow = [xAxisRange[0], xAxisRange[1]];
                     if (this.currentView.graphConfig.features.rangeBar && this.currentView.graphConfig.rangeCollection) {
-                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        if (typeof (this.currentView.graphConfig.features.rangeBar) === "boolean") {
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        } else if (this.currentView.graphConfig.features.rangeBar.format) {
+                            const format: string = this.currentView.graphConfig.features.rangeBar.format;
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                        }
                     }
                     if (this.spinner && this.spinner.isLoading) {
                         // remove spinner from container
@@ -1475,35 +1628,43 @@ export class GraphOperator {
             let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
 
             // add buttons 
-            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in'}];
-            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'}];
-            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'}];
+            let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in fgp-btn-v'
+            }];
+            let xAxisZoomOutBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out fgp-btn-v'
+            }];
+            let xAxisPanLeftBtnAttrs: Array<DomAttrs> = [{
+                key: 'class',
+                value: 'fgp-graph-xaxis-btn fgp-btn-pan-left fgp-btn-v'
+            }];
             let xAxisPanRightBtnAttrs: Array<DomAttrs> = [{
                 key: 'class',
-                value: 'fgp-graph-xaxis-btn fgp-btn-pan-right'
+                value: 'fgp-graph-xaxis-btn fgp-btn-pan-right fgp-btn-v'
             }];
 
             //
-            let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
-            xAxisZoomInBtn.setAttribute("fgp-ctrl", "x-zoom-in");
-            let xAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomOutBtnAttrs);
-            xAxisZoomOutBtn.setAttribute("fgp-ctrl", "x-zoom-out");
-            let xAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanLeftBtnAttrs);
-            xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
-            let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
-            xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
-
-
-            xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            xAxisPanRightBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
-            // add buttons into container
-            xAxisBtnArea.appendChild(xAxisPanLeftBtn);
-            xAxisBtnArea.appendChild(xAxisZoomInBtn);
-            xAxisBtnArea.appendChild(xAxisZoomOutBtn);
-            xAxisBtnArea.appendChild(xAxisPanRightBtn);
-
+            if (!this.currentView.graphConfig.features.rangeLocked) {
+                let xAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomInBtnAttrs);
+                xAxisZoomInBtn.setAttribute("fgp-ctrl", "x-zoom-in");
+                let xAxisZoomOutBtn: HTMLElement = DomElementOperator.createElement('button', xAxisZoomOutBtnAttrs);
+                xAxisZoomOutBtn.setAttribute("fgp-ctrl", "x-zoom-out");
+                let xAxisPanLeftBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanLeftBtnAttrs);
+                xAxisPanLeftBtn.setAttribute("fgp-ctrl", "x-pan-left");
+                let xAxisPanRightBtn: HTMLElement = DomElementOperator.createElement('button', xAxisPanRightBtnAttrs);
+                xAxisPanRightBtn.setAttribute("fgp-ctrl", "x-pan-right");
+                xAxisZoomInBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisZoomOutBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisPanLeftBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                xAxisPanRightBtn.addEventListener('mousedown', ctrlBtnsEventListener, false);
+                // add buttons into container
+                xAxisBtnArea.appendChild(xAxisPanLeftBtn);
+                xAxisBtnArea.appendChild(xAxisZoomInBtn);
+                xAxisBtnArea.appendChild(xAxisZoomOutBtn);
+                xAxisBtnArea.appendChild(xAxisPanRightBtn);
+            }
             // add buttons for y and y2 ctrl
             const ctrlVBtnsEventListener: EventListener = (e) => {
 
@@ -1607,19 +1768,19 @@ export class GraphOperator {
                 // add buttons 
                 let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in'
+                    value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in fgp-btn-v'
                 }];
                 let yAxisZoomOutBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'
+                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out fgp-btn-v'
                 }];
                 let yAxisPanLeftBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'
+                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left fgp-btn-v'
                 }];
                 let yAxisPanRightBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-yaxis-btn fgp-btn-pan-right'
+                    value: 'fgp-graph-yaxis-btn fgp-btn-pan-right fgp-btn-v'
                 }];
                 //
                 let yAxisZoomInBtn: HTMLElement = DomElementOperator.createElement('button', yAxisZoomInBtnAttrs);
@@ -1648,19 +1809,19 @@ export class GraphOperator {
                 // add buttons 
                 let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in'
+                    value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in fgp-btn-v'
                 }];
                 let y2AxisZoomOutBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out'
+                    value: 'fgp-graph-xaxis-btn fgp-btn-zoom-out fgp-btn-v'
                 }];
                 let y2AxisPanLeftBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left'
+                    value: 'fgp-graph-xaxis-btn fgp-btn-pan-left fgp-btn-v'
                 }];
                 let y2AxisPanRightBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
-                    value: 'fgp-graph-y2axis-btn fgp-btn-pan-right'
+                    value: 'fgp-graph-y2axis-btn fgp-btn-pan-right fgp-btn-v'
                 }];
 
                 //
@@ -1770,15 +1931,21 @@ export class GraphOperator {
                     legend: 'never',
                     drawCallback: (dygraph, isInitial) => {
                         const xAxisRange: Array<number> = dygraph.xAxisRange();
-                        startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
-                        endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        if (typeof (this.currentView.graphConfig.features.rangeBar) === "boolean") {
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format('lll z');
+                        } else if (this.currentView.graphConfig.features.rangeBar.format) {
+                            const format: string = this.currentView.graphConfig.features.rangeBar.format;
+                            startLabelLeft.innerHTML = moment.tz(xAxisRange[0], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                            endLabelRight.innerHTML = moment.tz(xAxisRange[1], this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).format(format);
+                        }
                         // only run first draw
                         if (isInitial) {
                             // find zoomhandle
-                            const handles = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                            const handles: HTMLCollectionOf<Element> = this.graphContainer.getElementsByClassName("dygraph-rangesel-zoomhandle");
                             // left handle  just in case the right handle overlap the left one
                             if (handles[0] instanceof HTMLElement) {
-                                handles[0].style.zIndex = "11";
+                                (<HTMLElement>handles[0]).style.zIndex = "11";
                             }
                         }
 
@@ -1805,14 +1972,22 @@ export class GraphOperator {
                             interactionCallback();
                         }
                     }, {once: true});
-                }
+                };
 
                 for (let i = 0; i < rangeBarHandles.length; i++) {
                     const element: any = rangeBarHandles[i];
-                    let style: any = element.getAttribute("style");
-                    style.replace("z-index: 10;", "z-index: " + (10 + i) + ";");
-                    element.setAttribute("style", style);
+                    // left one on the top
+                    if (i === 0) {
+                        element.style.zIndex = (10 + 1);
+                    } else {
+                        element.style.zIndex = (10);
+                    }
                     element.addEventListener('mousedown', rangebarMousedownFunc);
+                    if (this.currentView.graphConfig.features.rangeLocked) {
+                        // change cursor
+                        element.style.cursor = 'default';
+                        element.style.pointerEvents = 'none';
+                    }
                 }
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
@@ -1825,6 +2000,8 @@ export class GraphOperator {
             this.start = timewindowStart;
             this.end = timewindowEnd;
 
+            //
+            console.log("4: before upate the collection is ", this.currentCollection, this.currentView);
             this.update(first.timestamp, last.timestamp);
             // send "ready" after update 
             readyCallback(this.mainGraph);
@@ -1862,10 +2039,6 @@ export class GraphOperator {
             datewindow[1] = xAxisRange[1];
         }
 
-        // get correct collection then call update
-        // if (datewindow[0] == this.start && datewindow[1] == this.end && !this.lockedInterval) {
-        //     // console.debug("no change!");
-        // } else {
         this.start = datewindow[0];
         this.end = datewindow[1];
 
@@ -1908,18 +2081,16 @@ export class GraphOperator {
 
         let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
         Object.assign(collection, this.currentCollection);
+        console.log("5: efore upate the collection is ", this.currentCollection, this.currentView);
         // check initScale
         this.update(undefined, undefined, true);
         if (!this.lockedInterval) {
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
         }
-        // }
+    };
 
 
-    }
-
-
-    update = (first?: number, last?: number, refersh?: boolean) => {
+    update = (first?: number, last?: number, refersh?: boolean, range?: [number, number]) => {
 
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.ragnebarGraph;
@@ -1927,6 +2098,22 @@ export class GraphOperator {
         let rangeCollection = this.rangeCollection;
         let start = this.start;
         let end = this.end;
+
+        // check if currentCollection doesnt exist in currentView then ignore it
+        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
+                return collection.name === this.currentCollection?.name;
+        });
+
+        // wrong collection and ignore it
+        if(!existCollection){
+            return false;
+        }
+
+        if (range && range.length === 2) {
+            // rest start and end
+            start = this.start = range[0];
+            end = this.end = range[1];
+        }
 
         let view = this.currentView;
 
@@ -1953,6 +2140,11 @@ export class GraphOperator {
         let mainLabels: Array<string> = [];
         let isY2: boolean = false;
         if (graphCollection) {
+
+            const num = graphCollection.series.length;
+            const half = Math.ceil(num / 2);
+            const sat = 1.0;
+            const val = 0.5;
             graphCollection.series.forEach((series, _index) => {
                 let _tempFields: string[] | null = (series.exp).match(GraphOperator.FIELD_PATTERN);
                 // replace all "data."" with ""
@@ -1963,6 +2155,12 @@ export class GraphOperator {
                 // put fields together
                 if (view.graphConfig.entities.length == 1 && series.color) {
                     colors.push(series.color);
+                } else if (view.graphConfig.entities.length == 1) {
+                    let half = Math.ceil(num / 2);
+                    let idx = _index % 2 ? (half + (_index + 1) / 2) : Math.ceil((_index + 1) / 2);
+                    let hue = (1.0 * idx / (1 + num));
+                    let colorStr = hsvToRGB(hue, sat, val);
+                    colors.push(colorStr);
                 }
 
                 if (series.yIndex && series.yIndex == 'right') {
@@ -1984,11 +2182,93 @@ export class GraphOperator {
                     mainGraphSeries[series.label]["drawPoints"] = true;
                 } else if (series.type == 'step') {
                     mainGraphSeries[series.label]["stepPlot"] = true;
+                } else if (series.type === 'bar') {
+                    mainGraphSeries[series.label]["plotter"] = (e: any) => {
+                        if (graphCollection) {
+                            let allSeries = graphCollection.series;
+                            const currentVs: Array<boolean> = this.mainGraph.getOption("visibility");
+                            const sets = e.allSeriesPoints;
+                            // find all bar series and get the real index
+                            let bars: Array<any> = [];
+                            let barIndex: Array<number> = [];
+                            allSeries.forEach((series, _index) => {
+                                if (series.type === 'bar') {
+                                    // check visibility here
+                                    bars.push(series);
+                                    barIndex.push(_index);
+                                }
+                            });
+
+                            //
+                            const g: any = e.dygraph;
+                            //
+                            const ctx: any = e.drawingContext;
+                            // y bottom
+                            const y_bottom = g.toDomYCoord(0);
+                            // Find the minimum separation between x-values.
+                            // This determines the bar width.
+                            let min_sep = Infinity;
+                            for (let j = 0; j < sets.length; j++) {
+                                let points = sets[j];
+                                for (let i = 1; i < points.length; i++) {
+                                    let sep = points[i].canvasx - points[i - 1].canvasx;
+                                    if (sep < min_sep) min_sep = sep;
+                                }
+                            }
+
+                            const barWidth = Math.floor(2.0 / 3 * min_sep);
+                            const fillColors: Array<string> = [];
+                            const strokeColors = g.getColors();
+
+                            strokeColors.forEach((c: string, _i: number) => {
+                                fillColors.push(new FgpColor(strokeColors[_i]).toRgbWithAlpha(.6));
+                            });
+
+
+                            // check current label visibility
+                            let finalBars: number = bars.length;
+
+
+                            currentVs.forEach((vs, _in) => {
+                                if (!vs && barIndex.includes(_in)) {
+                                    finalBars -= 1;
+                                }
+                            });
+
+                            for (let j = 0; j < finalBars; j++) {
+                                // find how many series disabled before this one
+                                let dsCount = 0;
+                                currentVs.forEach((vs, _in) => {
+                                    if (!vs && barIndex[j] > _in) {
+                                        dsCount++;
+                                    }
+                                });
+                                ctx.fillStyle = fillColors[barIndex[j] - dsCount];
+                                ctx.strokeStyle = strokeColors[barIndex[j] - dsCount];
+                                for (let i = 0; i < sets[barIndex[j] - dsCount].length; i++) {
+                                    let p = sets[barIndex[j] - dsCount][i];
+                                    let center_x = p.canvasx;
+                                    let x_left = -1;
+                                    // only one bar
+                                    if (finalBars === 1) {
+                                        x_left = center_x - (barWidth / 2);
+                                    } else {
+                                        x_left = center_x - (barWidth / 2) * (1 - j / (finalBars - 1));
+                                    }
+                                    ctx.fillRect(x_left, p.canvasy,
+                                        barWidth / finalBars, y_bottom - p.canvasy);
+                                    ctx.strokeRect(x_left, p.canvasy,
+                                        barWidth / finalBars, y_bottom - p.canvasy);
+                                }
+                            }
+                        }
+                    }
                 } else {
                     // disable step and show 
                     mainGraphSeries[series.label]["stepPlot"] = false;
                     mainGraphSeries[series.label]["strokeWidth"] = 1;
                     mainGraphSeries[series.label]["drawPoints"] = false;
+                    mainGraphSeries[series.label]["plotter"] = Dygraph.Plotters.linePlotter;
                 }
 
                 if (series.yIndex != 'left') {
@@ -2164,11 +2444,12 @@ export class GraphOperator {
                 });
             }
             return {data: finalData, axis: {y: yAxis, y2: yAxis2}};
-        }
+        };
 
         if (graphCollection) {
             this.spinner.show();
-            // get data for 
+            // get data for
+            console.log("going to get data for graph ", this.graphId, mainEntities, mainDeviceType, graphCollection);
             view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, {
                 start: start,
                 end: end
@@ -2243,22 +2524,85 @@ export class GraphOperator {
                 }
                 // clear old graph
                 mainGraph.hidden_ctx_.clearRect(0, 0, mainGraph.hidden_.width, mainGraph.hidden_.height);
-                console.debug("Graph is clean now!~");
+                // console.debug("Graph is clean now!~");
+
+
+                // check if we need to put marks line there
+                if (graphCollection && graphCollection.markLines) {
+                    graphCollection.markLines.forEach(markLine => {
+                        mainLabels.push(markLine.label + '_markline');
+                        if (colors.length > 0 && markLine.color) {
+                            // add color
+                            colors.push(markLine.color);
+                        }
+                    });
+                }
+
+
                 if (graphData.data) {
                     this.currentGraphData = [];
+
                     graphData.data.forEach(_data => {
-                        _data[0] = new Date(_data[0])
+                        // convert timestamp to date
+                        _data[0] = new Date(_data[0]);
+                        if (graphCollection && graphCollection.markLines) {
+                            graphCollection.markLines.forEach(markLine => {
+                                _data.push(markLine.value);
+                            });
+                        }
                         this.currentGraphData.push(_data);
                     });
                 }
                 if (view.graphConfig.entities.length > 1) {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
+                    colors = [];
+                } else if (graphCollection && graphCollection.markLines) {
+                    graphCollection.markLines.forEach(markLine => {
+                        mainGraphSeries[markLine.label + '_markline'] = {
+                            strokeWidth: 2,
+                            drawPoints: false,
+                            highlightCircleSize: 0,
+                            axis: 'y',
+                            color: markLine.color,
+                            strokePattern: Dygraph.DOT_DASH_LINE
+                        };
+                    });
                 }
+
+                console.log(this.currentGraphData, mainGraphSeries, mainLabels);
+
+                const latestVisibility: Array<boolean> = [];
+
+                const orgVisibility: Array<boolean> = mainGraph.getOption('visibility');
+
+                if (orgVisibility.length != mainLabels.length && graphCollection) {
+                    let initVisibility: boolean[] = [];
+                    let seriesNames: Array<string> = [];
+                    graphCollection.series.forEach((series, _index) => {
+                        if (series.visibility == undefined || series.visibility == true) {
+                            initVisibility[_index] = true;
+                        } else if (series.visibility == false) {
+                            initVisibility[_index] = false;
+                        }
+                        seriesNames.push(series.label);
+                    });
+
+                    // set visibility, need to think about init visibility
+                    mainLabels.forEach((label, _index) => {
+                        latestVisibility[_index] = initVisibility[_index] != undefined ? initVisibility[_index] : true;
+                    });
+
+                    // update dropdown list
+                    this.updateSeriesDropdown(this.header, seriesNames, this.mainGraph, initVisibility);
+                }
+                //
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    visibility: latestVisibility.length > 0 ? latestVisibility : orgVisibility,
                     colors: colors.length == 0 ? undefined : colors,
                     labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
@@ -2282,12 +2626,29 @@ export class GraphOperator {
                     }
                 });
 
+                mainGraph.ready(() => {
+                    // do we need to update annotations
+                    if (graphCollection && graphCollection.markLines) {
+                        const annos: Array<dygraphs.Annotation> = [];
+                        graphCollection.markLines.forEach((line, _index) => {
+                            annos.push({
+                                series: line.label + '_markline',
+                                x: this.currentGraphData[this.currentGraphData.length - 2][0].getTime(),
+                                shortText: line.label,
+                                width: 100,
+                                height: 23,
+                                tickHeight: 1,
+                            });
+                        });
+                        console.log(annos);
+                        mainGraph.setAnnotations(annos);
+                    }
+                });
+
             });
         }
-
-
         if (view.graphConfig.features.rangeBar) {
-            // get fields for range-bar 
+            // get fields for range-bar
             const rangeEntities: Array<string> = [view.graphConfig.rangeEntity.id];
             const rangeDeviceType: string = view.graphConfig.rangeEntity.type;
             // get fields for main graph
@@ -2332,7 +2693,7 @@ export class GraphOperator {
 
                 let rangeSeries: any = {};
                 let labels = [];
-                // check if ther is a y2
+                // check if there is a y2
                 rangeCollection.series.forEach((series, _index) => {
                     labels.push(series.label);
                     rangeSeries[series.label] = {
@@ -2365,7 +2726,5 @@ export class GraphOperator {
                 });
             });
         }
-
     }
-
 }

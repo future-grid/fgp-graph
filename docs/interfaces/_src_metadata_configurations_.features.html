@@ -71,14 +71,27 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>enable or disable graph features</p>
-					</div>
 					<dl class="tsd-comment-tags">
-						<dt>export</dt>
-						<dd></dd>
-						<dt>interface</dt>
-						<dd><p>Features</p>
+						<dt>zoom</dt>
+						<dd><p>enable or disable zooming</p>
+						</dd>
+						<dt>scroll</dt>
+						<dd><p>enable or disable scrolling</p>
+						</dd>
+						<dt>rangebar</dt>
+						<dd><p>show or hide rangeBar</p>
+						</dd>
+						<dt>connectpoints</dt>
+						<dd><p>connect points when series interval are different.</p>
+						</dd>
+						<dt>legend</dt>
+						<dd><p>type of legend (single or multiple)</p>
+						</dd>
+						<dt>ctrlbuttons</dt>
+						<dd><p>show or hide control buttons</p>
+						</dd>
+						<dt>rangelocked</dt>
+						<dd><p>lock range bar</p>
 						</dd>
 					</dl>
 				</div>
@@ -99,9 +112,11 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#connectpoints" class="tsd-kind-icon">connect<wbr>Points</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#ctrlbuttons" class="tsd-kind-icon">ctrl<wbr>Buttons</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#exports" class="tsd-kind-icon">exports</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#legend" class="tsd-kind-icon">legend</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#rangebar" class="tsd-kind-icon">range<wbr>Bar</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#rangelocked" class="tsd-kind-icon">range<wbr>Locked</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#scroll" class="tsd-kind-icon">scroll</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_metadata_configurations_.features.html#zoom" class="tsd-kind-icon">zoom</a></li>
 							</ul>
@@ -117,7 +132,17 @@
 					<div class="tsd-signature tsd-kind-icon">connect<wbr>Points<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L25">src/metadata/configurations.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L27">src/metadata/configurations.ts:27</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="ctrlbuttons" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ctrl<wbr>Buttons</h3>
+					<div class="tsd-signature tsd-kind-icon">ctrl<wbr>Buttons<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L30">src/metadata/configurations.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -127,7 +152,7 @@
 					<div class="tsd-signature tsd-kind-icon">exports<span class="tsd-signature-symbol">:</span> <a href="../enums/_src_metadata_configurations_.graphexports.html" class="tsd-signature-type">GraphExports</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L27">src/metadata/configurations.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L29">src/metadata/configurations.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -137,7 +162,7 @@
 					<div class="tsd-signature tsd-kind-icon">legend<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L26">src/metadata/configurations.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L28">src/metadata/configurations.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -147,7 +172,17 @@
 					<div class="tsd-signature tsd-kind-icon">range<wbr>Bar<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L24">src/metadata/configurations.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L26">src/metadata/configurations.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="rangelocked" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> range<wbr>Locked</h3>
+					<div class="tsd-signature tsd-kind-icon">range<wbr>Locked<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L31">src/metadata/configurations.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -157,7 +192,7 @@
 					<div class="tsd-signature tsd-kind-icon">scroll<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L23">src/metadata/configurations.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L25">src/metadata/configurations.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,7 +202,7 @@
 					<div class="tsd-signature tsd-kind-icon">zoom<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/11b4588/src/metadata/configurations.ts#L22">src/metadata/configurations.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/1b2c5e0/src/metadata/configurations.ts#L24">src/metadata/configurations.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -214,6 +249,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_src_metadata_configurations_.filtertype.html" class="tsd-kind-icon">Filter<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
 						<a href="../enums/_src_metadata_configurations_.graphconstant.html" class="tsd-kind-icon">Graph<wbr>Constant</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
@@ -237,6 +275,9 @@
 								<a href="_src_metadata_configurations_.features.html#connectpoints" class="tsd-kind-icon">connect<wbr>Points</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_src_metadata_configurations_.features.html#ctrlbuttons" class="tsd-kind-icon">ctrl<wbr>Buttons</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.features.html#exports" class="tsd-kind-icon">exports</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -244,6 +285,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.features.html#rangebar" class="tsd-kind-icon">range<wbr>Bar</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_src_metadata_configurations_.features.html#rangelocked" class="tsd-kind-icon">range<wbr>Locked</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_src_metadata_configurations_.features.html#scroll" class="tsd-kind-icon">scroll</a>
@@ -256,6 +300,9 @@
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_src_metadata_configurations_.filterconfig.html" class="tsd-kind-icon">Filter<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.graphcollection.html" class="tsd-kind-icon">Graph<wbr>Collection</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
@@ -266,6 +313,9 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_src_metadata_configurations_.viewconfig.html" class="tsd-kind-icon">View<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_src_metadata_configurations_.html#filterfunc" class="tsd-kind-icon">filter<wbr>Func</a>
 					</li>
 				</ul>
 			</nav>

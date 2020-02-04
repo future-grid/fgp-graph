@@ -1,6 +1,6 @@
 {
   "name": "@future-grid/fgp-graph",
-  "version": "19.10.0",
+  "version": "20.2.1-RC15",
   "description": "fgp-graph is a chart lib based on Dygraphs",
   "main": "dist/fgp-graph.bundle.js",
   "module": "lib/index.js",
@@ -12,7 +12,14 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
     "start": "webpack-dev-server --color --mode development",
-    "test": "jest"
+    "test": "jest",
+    "version": "auto-changelog -p"
+  },
+  "auto-changelog": {
+    "output": "changelog.md",
+    "template": "keepachangelog",
+    "unreleased": false,
+    "commitLimit": true
   },
   "keywords": [
     "fgp",
@@ -22,6 +29,7 @@
   "license": "Apache-2.0",
   "types": "lib/index.d.ts",
   "homepage": "https://github.com/future-grid/fgp-graph#readme",
+  "repository": "https://github.com/future-grid/fgp-graph.git",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -34,18 +42,21 @@
     "@types/jest": "^24.0.15",
     "@types/moment-timezone": "^0.5.12",
     "@types/node": "^12.6.8",
+    "auto-changelog": "^1.16.2",
     "babel-loader": "^8.0.4",
     "babel-minify-webpack-plugin": "^0.3.1",
+    "copy-webpack-plugin": "^5.1.1",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "typedoc": "^0.15.0",
     "typescript": "^3.5.3",
+    "typescript-logging": "^0.6.4",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8",
-    "webpack-dev-server": "^3.7.2",
-    "typescript-logging": "^0.6.4"
+    "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "@juggle/resize-observer": "^3.0.2",
     "dygraphs": "^2.1.0",
     "html2canvas": "^1.0.0-rc.3",
     "moment": "^2.24.0",

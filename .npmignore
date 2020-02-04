@@ -4,3 +4,9 @@ npm-debug.log
 demo/
 test/
 Dockerfile
+.idea/
+_config.yml
+tsconfig.json
+.babelrc
+webpack.config.js
+docs/
