@@ -157,6 +157,8 @@ export class GraphOperator {
 
     public static FIELD_PATTERN = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
+    private graphId?: string;
+
     defaultGraphRanges: Array<{ name: string, value: number, show?: boolean }> = [
         {name: "3 days", value: (1000 * 60 * 60 * 24 * 3), show: true},
         {name: "7 days", value: 604800000, show: true},
@@ -212,8 +214,9 @@ export class GraphOperator {
 
     private graphInstance: FgpGraph;
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers) {
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
         this.mainGraph = mainGraph;
+        this.graphId = id;
         this.graphInstance = fgpGraph;
         this.ragnebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
@@ -723,6 +726,7 @@ export class GraphOperator {
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
         this.updateExportButtons(view);
+
         // check toolbar buttons and dropdown list
         let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
         if (toolbarArea && toolbarArea[0]) {
@@ -970,6 +974,7 @@ export class GraphOperator {
                             dateWindow: [this.start, this.end]
                         });
                     }
+                    console.log("2: before upate the collection is ", this.currentCollection, this.currentView);
                     this.update();
                     this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
                     if (interactionCallback) {
@@ -1192,6 +1197,7 @@ export class GraphOperator {
             if (choosedCollection) {
                 // set currentCollection to choosedCollection
                 this.currentCollection = choosedCollection;
+                console.log("update collection to ", this.currentCollection);
             }
 
             let currentDatewindowOnMouseDown: any[] = [];
@@ -1278,6 +1284,7 @@ export class GraphOperator {
                     this.currentCollection = collection;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
 
+                    console.log("3: before upate the collection is ", this.currentCollection, this.currentView);
                     this.update(undefined, undefined, true);
                     if (!this.lockedInterval) {
                         this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
@@ -1993,6 +2000,8 @@ export class GraphOperator {
             this.start = timewindowStart;
             this.end = timewindowEnd;
 
+            //
+            console.log("4: before upate the collection is ", this.currentCollection, this.currentView);
             this.update(first.timestamp, last.timestamp);
             // send "ready" after update 
             readyCallback(this.mainGraph);
@@ -2072,6 +2081,7 @@ export class GraphOperator {
 
         let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
         Object.assign(collection, this.currentCollection);
+        console.log("5: efore upate the collection is ", this.currentCollection, this.currentView);
         // check initScale
         this.update(undefined, undefined, true);
         if (!this.lockedInterval) {
@@ -2088,6 +2098,16 @@ export class GraphOperator {
         let rangeCollection = this.rangeCollection;
         let start = this.start;
         let end = this.end;
+
+        // check if currentCollection doesnt exist in currentView then ignore it
+        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
+                return collection.name === this.currentCollection?.name;
+        });
+
+        // wrong collection and ignore it
+        if(!existCollection){
+            return false;
+        }
 
         if (range && range.length === 2) {
             // rest start and end
@@ -2135,7 +2155,7 @@ export class GraphOperator {
                 // put fields together
                 if (view.graphConfig.entities.length == 1 && series.color) {
                     colors.push(series.color);
-                } else if(view.graphConfig.entities.length == 1) {
+                } else if (view.graphConfig.entities.length == 1) {
                     let half = Math.ceil(num / 2);
                     let idx = _index % 2 ? (half + (_index + 1) / 2) : Math.ceil((_index + 1) / 2);
                     let hue = (1.0 * idx / (1 + num));
@@ -2428,7 +2448,8 @@ export class GraphOperator {
 
         if (graphCollection) {
             this.spinner.show();
-            // get data for 
+            // get data for
+            console.log("going to get data for graph ", this.graphId, mainEntities, mainDeviceType, graphCollection);
             view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, {
                 start: start,
                 end: end

@@ -37,7 +37,7 @@ export default class FgpGraph {
 
     private fieldPattern = new RegExp(/data[.]{1}[a-zA-Z0-9]+/g);
 
-    private children: Array<FgpGraph> = [];
+    public children: Array<FgpGraph> = [];
 
     // store locally
     private rangeBarData: any = [];
@@ -227,7 +227,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public initGraph = () => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners, this.id);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
