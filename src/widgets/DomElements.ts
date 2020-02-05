@@ -1955,7 +1955,7 @@ export class GraphOperator {
 
                         this.datewindowCallback(xAxisRange, this.currentView);
                     },
-                    plugins: [RangeHandles]
+                    plugins: this.currentView.graphConfig.features.rangeLocked ? [RangeHandles] : []
                 });
 
 
@@ -1997,7 +1997,7 @@ export class GraphOperator {
                     }
                 }
 
-                if(singleHandle && singleHandle[0]){
+                if (singleHandle && singleHandle[0]) {
                     singleHandle[0].addEventListener('mousedown', rangebarMousedownFunc);
                 }
 
