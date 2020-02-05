@@ -17,6 +17,9 @@ import {Formatters} from '../extras/formatters';
 import {FgpColor, hsvToRGB} from '../services/colorService';
 import FgpGraph from "../index";
 import {EventHandlers} from "../metadata/graphoptions";
+import RangeSelector from '../extras/RangeHandles';
+import Toolbar from "../extras/Toolbar";
+import RangeHandles from "../extras/RangeHandles";
 
 
 export class DropdownButton {
@@ -1430,7 +1433,8 @@ export class GraphOperator {
                     }
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
-                }
+                },
+                // plugins: [new Toolbar({collections: this.currentView.graphConfig.collections})]
             });
             // add dbl event
             if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback) {
@@ -1950,15 +1954,18 @@ export class GraphOperator {
                         }
 
                         this.datewindowCallback(xAxisRange, this.currentView);
-                    }
+                    },
+                    plugins: [RangeHandles]
                 });
 
-                // check 
+
+                // check
                 let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
                 sync.synchronize();
                 // readyCallback(this.mainGraph);
                 let rangeBarCanvas: any = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
                 let rangeBarHandles: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
+                let singleHandle: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle-single");
                 const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
                     const datewindow = this.ragnebarGraph.xAxisRange();
@@ -1989,6 +1996,11 @@ export class GraphOperator {
                         element.style.pointerEvents = 'none';
                     }
                 }
+
+                if(singleHandle && singleHandle[0]){
+                    singleHandle[0].addEventListener('mousedown', rangebarMousedownFunc);
+                }
+
                 // add mouse listener 
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
             }
@@ -2101,11 +2113,11 @@ export class GraphOperator {
 
         // check if currentCollection doesnt exist in currentView then ignore it
         const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
-                return collection.name === this.currentCollection?.name;
+            return collection.name === this.currentCollection?.name;
         });
 
         // wrong collection and ignore it
-        if(!existCollection){
+        if (!existCollection) {
             return false;
         }
 
@@ -2631,14 +2643,18 @@ export class GraphOperator {
                     if (graphCollection && graphCollection.markLines) {
                         const annos: Array<dygraphs.Annotation> = [];
                         graphCollection.markLines.forEach((line, _index) => {
-                            annos.push({
-                                series: line.label + '_markline',
-                                x: this.currentGraphData[this.currentGraphData.length - 2][0].getTime(),
-                                shortText: line.label,
-                                width: 100,
-                                height: 23,
-                                tickHeight: 1,
-                            });
+
+                            if (this.currentGraphData && this.currentGraphData.length > 0) {
+                                annos.push({
+                                    series: line.label + '_markline',
+                                    x: this.currentGraphData[this.currentGraphData.length - 1][0].getTime(),
+                                    shortText: line.label,
+                                    width: 100,
+                                    height: 23,
+                                    tickHeight: 1,
+                                });
+                            }
+
                         });
                         console.log(annos);
                         mainGraph.setAnnotations(annos);

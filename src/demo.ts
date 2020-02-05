@@ -250,8 +250,8 @@ let vdConfig: ViewConfig = {
                 interval: 86400000,
                 // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
-                    {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'bar', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
+                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
@@ -414,8 +414,8 @@ let vdConfig2: ViewConfig = {
                 interval: 86400000,
                 // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
-                    {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'bar', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
+                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
