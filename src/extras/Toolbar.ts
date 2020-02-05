@@ -75,6 +75,9 @@ export default class Toolbar {
             let badge: HTMLSpanElement = document.createElement('span');
             badge.textContent = coll.label;
             badge.setAttribute("class", "badge badge-pill badge-secondary badge-interval");
+            badge.setAttribute("data-interval-locked", "false");
+            badge.setAttribute("data-interval-name", coll.label);
+            badge.setAttribute("data-interval-value", coll.interval + '');
             badgesContainer.appendChild(badge);
             this.collectionLabels.push(badge);
         });

@@ -169,7 +169,7 @@ export default class FgpGraph {
         this.children.forEach(graph => {
             // call updateDatewinow
             if (graph.id != this.id) {
-                graph.updateDatewinow(dateWindow);
+                graph.updateDatewinowInside(dateWindow);
             }
         });
 
@@ -273,12 +273,25 @@ export default class FgpGraph {
         // update graph 
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
-            // if datewindow same then ignorn that
+            // if datewindow same then ignore that
             if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
                 this.graph.updateOptions({
                     dateWindow: datewindow
                 });
                 this.operator.update(undefined, undefined, true, datewindow);
+            }
+        }
+    };
+
+    private updateDatewinowInside = (datewindow: [number, number]) => {
+        // update graph
+        if (this.graph) {
+            const range: Array<number> = this.graph.xAxisRange();
+            // if datewindow same then ignore that
+            if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
+                this.graph.updateOptions({
+                    dateWindow: datewindow
+                });
             }
         }
     };

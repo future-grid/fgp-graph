@@ -119,13 +119,13 @@ export default class DygraphInteraction {
 
             for (i = 0; i < g.axes_.length; i++) {
                 axis = g.axes_[i];
-                var yExtremes = axis.extremeRange;
+                let yExtremes = axis.extremeRange;
 
-                var boundedTopY = g.toDomYCoord(yExtremes[0], i) + maxYPixelsToDraw;
-                var boundedBottomY = g.toDomYCoord(yExtremes[1], i) - maxYPixelsToDraw;
+                let boundedTopY = g.toDomYCoord(yExtremes[0], i) + maxYPixelsToDraw;
+                let boundedBottomY = g.toDomYCoord(yExtremes[1], i) - maxYPixelsToDraw;
 
-                var boundedTopValue = g.toDataYCoord(boundedTopY, i);
-                var boundedBottomValue = g.toDataYCoord(boundedBottomY, i);
+                let boundedTopValue = g.toDataYCoord(boundedTopY, i);
+                let boundedBottomValue = g.toDataYCoord(boundedBottomY, i);
 
                 boundedValues[i] = [boundedTopValue, boundedBottomValue];
             }
