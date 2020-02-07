@@ -200,7 +200,7 @@ let vdConfig: ViewConfig = {
             rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
             legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
-            rangeLocked: false   // lock or unlock range bar
+            rangeLocked: true   // lock or unlock range bar
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},
@@ -851,15 +851,24 @@ let vsConfig3: ViewConfig = {
 let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
     console.log("view changed!", view.name);
 
-    g.children.forEach(child => {
+    // g.children.forEach(child => {
+    //
+    //     child.viewConfigs.forEach(_view => {
+    //         if(_view.name === view.name){
+    //             child.changeView(view.name);
+    //         }
+    //     });
+    //
+    // });
 
-        child.viewConfigs.forEach(_view => {
-            if(_view.name === view.name){
-                child.changeView(view.name);
-            }
-        });
+    // crete new graph
 
-    });
+
+    // let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+    // graph2.initGraph();
+    // graph1.setChildren([graph2]);
+
+
 
 };
 
@@ -884,6 +893,10 @@ graph1.setChildren([graph1_1]);
 //     graph1.changeView('scatter view');
 // }, 5000);
 
+
+setTimeout(()=>{
+    graph1.updateDatewinow([moment("2019-12-2").valueOf(), moment('2020-01-3').valueOf()]);
+}, 5000);
 
 
 // testing resize graph without resizing window
