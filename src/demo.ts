@@ -864,9 +864,9 @@ let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
     // crete new graph
 
 
-    // let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
-    // graph2.initGraph();
-    // graph1.setChildren([graph2]);
+    let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+    graph2.initGraph();
+    graph1.setChildren([graph2]);
 
 
 
@@ -894,9 +894,9 @@ graph1.setChildren([graph1_1]);
 // }, 5000);
 
 
-setTimeout(()=>{
-    graph1.updateDatewinow([moment("2019-12-2").valueOf(), moment('2020-01-3').valueOf()]);
-}, 5000);
+// setTimeout(()=>{
+//     graph1.updateDatewinow([moment("2019-12-2").valueOf(), moment('2020-01-3').valueOf()]);
+// }, 5000);
 
 
 // testing resize graph without resizing window
