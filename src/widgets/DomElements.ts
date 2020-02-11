@@ -1058,7 +1058,8 @@ export class GraphOperator {
             // put fields together
             fieldsForCollection = fieldsForCollection.concat(_tempFields);
         });
-        this.graphContainer.addEventListener("mouseout", (e) => {
+        // tell outside highlight disappeared
+        this.graphContainer.addEventListener("mouseleave", (e) => {
             if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                 this.currentView.interaction.callback.highlightCallback(0, null, []);
             }
@@ -1338,7 +1339,7 @@ export class GraphOperator {
             let dateLabelRightAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-range-bar-date-label-right'}];
             let endLabelRight: HTMLElement = DomElementOperator.createElement('label', dateLabelRightAttrs);
 
-            let currentSelection = "";
+            let currentSelection:any = null;
 
             let fullVisibility: Array<boolean> = [];
             mainGraphLabels.forEach(label => {
@@ -1404,9 +1405,13 @@ export class GraphOperator {
                 highlightSeriesOpts: {strokeWidth: 1},
                 highlightCallback: (e, x, ps, row, seriesName) => {
                     if (currentSelection != seriesName && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                        currentSelection = seriesName;
+                        console.log("current selection is ", currentSelection);
                         this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
-                    currentSelection = seriesName;
+                },
+                unhighlightCallback: (e) => {
+                    currentSelection = null;
                 },
                 clickCallback: (e, x, points) => {
                     if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.clickCallback) {

@@ -239,6 +239,16 @@ export default class FgpGraph {
                 }
                 dropdownOpts.push({id: view.name, label: view.name, selected: view.show});
             });
+
+            // check if showView is undefined
+            if(!showView && this.viewConfigs.length > 0){
+                showView = this.viewConfigs[0];
+            } else if(!showView && this.viewConfigs.length === 0) {
+                console.error("view config not found!");
+                return false;
+            }
+
+
             // add options into view dropdown list
             const viewsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.viewsDropdown, [...dropdownOpts]);
             viewsDropdonwOptions.render();
