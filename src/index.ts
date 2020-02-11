@@ -243,7 +243,7 @@ export default class FgpGraph {
             // check if showView is undefined
             if(!showView && this.viewConfigs.length > 0){
                 showView = this.viewConfigs[0];
-            } else {
+            } else if(!showView && this.viewConfigs.length === 0) {
                 console.error("view config not found!");
                 return false;
             }

@@ -622,8 +622,8 @@ let vsConfig: ViewConfig = {
         },
         entities: [
             {id: "meter1", type: "meter", name: "meter1"},
-            {id: "meter2", type: "meter", name: "meter2"},
-            // {id: "?", type: "meter", name: "?", fragment: true}
+            // {id: "meter2", type: "meter", name: "meter2"},
+            {id: "?", type: "meter", name: "?", fragment: true}
         ],
         rangeEntity: {id: "substation1", type: "substation", name: "substation1"},
         rangeCollection: {
@@ -758,10 +758,10 @@ let vsConfig2: ViewConfig = {
     interaction: {
         callback: {
             highlightCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -884,10 +884,10 @@ let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig], {
 graph1.initGraph();
 
 
-let graph1_1 = new FgpGraph(graphDiv2, [vdConfig2, vsConfig2_2]);
-graph1_1.initGraph();
-
-graph1.setChildren([graph1_1]);
+// let graph1_1 = new FgpGraph(graphDiv2, [vdConfig2, vsConfig2_2]);
+// graph1_1.initGraph();
+//
+// graph1.setChildren([graph1_1]);
 
 // setTimeout(()=> {
 //     graph1.changeView('scatter view');
