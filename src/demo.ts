@@ -84,25 +84,25 @@ class DataService implements DataHandler {
                 if (_ed.id.indexOf('meter') != -1) {
 
                     // if (_ed.id.indexOf('meter2') == -1) {
-                        // get existing data
-                        if (_ed.interval == interval) {
-                            // find data
-                            let recordExist = false;
-                            _ed.data.forEach((_data: any) => {
-                                if (_data.timestamp == tempDate) {
-                                    // found it
-                                    recordExist = true;
-                                }
-                            });
-                            if (!recordExist) {
-                                // add new one
-                                _ed.data.push({
-                                    'timestamp': tempDate,
-                                    'voltage': this.randomNumber(252, 255),
-                                    'amp': this.randomNumber(1, 2),
-                                    'avgVoltage': this.randomNumber(250, 255)
-                                });
+                    // get existing data
+                    if (_ed.interval == interval) {
+                        // find data
+                        let recordExist = false;
+                        _ed.data.forEach((_data: any) => {
+                            if (_data.timestamp == tempDate) {
+                                // found it
+                                recordExist = true;
                             }
+                        });
+                        if (!recordExist) {
+                            // add new one
+                            _ed.data.push({
+                                'timestamp': tempDate,
+                                'voltage': this.randomNumber(252, 255),
+                                'amp': this.randomNumber(1, 2),
+                                'avgVoltage': this.randomNumber(250, 255)
+                            });
+                        }
                         // }
                     }
 
@@ -585,7 +585,7 @@ const changeGraphSize = (graphDiv: HTMLElement, size: number) => {
     graphDiv.style.height = size + "px";
 };
 
-
+let childGraph: FgpGraph;
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -690,6 +690,7 @@ let vsConfig: ViewConfig = {
         callback: {
             highlightCallback: (datetime, series, points) => {
                 console.debug("selected series: ", series);    // too many messages in console
+                childGraph.highlightSeries([series], 0);
             },
             clickCallback: (series) => {
                 console.debug("choose series: ", series);
@@ -699,6 +700,11 @@ let vsConfig: ViewConfig = {
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
+
+
+
+
+
 let vsConfig2: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -865,9 +871,9 @@ let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
 
 
     let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+    childGraph = graph2;
     graph2.initGraph();
     graph1.setChildren([graph2]);
-
 
 
 };
