@@ -169,7 +169,7 @@ export default class FgpGraph {
         this.children.forEach(graph => {
             // call updateDatewinow
             if (graph.id != this.id) {
-                graph.updateDatewinow(dateWindow);
+                graph.updateDatewinowInside(dateWindow);
             }
         });
 
@@ -226,7 +226,7 @@ export default class FgpGraph {
      * @private
      * @memberof FgpGraph
      */
-    public initGraph = () => {
+    public initGraph = (ready?: (g: FgpGraph) => void) => {
         this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners, this.id);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
@@ -239,6 +239,16 @@ export default class FgpGraph {
                 }
                 dropdownOpts.push({id: view.name, label: view.name, selected: view.show});
             });
+
+            // check if showView is undefined
+            if (!showView && this.viewConfigs.length > 0) {
+                showView = this.viewConfigs[0];
+            } else if (!showView && this.viewConfigs.length === 0) {
+                console.error("view config not found!");
+                return false;
+            }
+
+
             // add options into view dropdown list
             const viewsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.viewsDropdown, [...dropdownOpts]);
             viewsDropdonwOptions.render();
@@ -250,6 +260,9 @@ export default class FgpGraph {
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
+                    if(ready){
+                        ready(this);
+                    }
                 }, () => {
                     this.children.forEach(graph => {
                         // call updateDatewinow
@@ -273,11 +286,31 @@ export default class FgpGraph {
         // update graph 
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
-            // if datewindow same then ignorn that
+            // if datewindow same then ignore that
             if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
                 this.graph.updateOptions({
                     dateWindow: datewindow
                 });
+                // reload data for current graph
+                this.operator.update(undefined, undefined, true, datewindow);
+                // get all children graphs then run update
+                this.children.forEach(child => {
+                    child.updateDatewinowInside(datewindow, true);
+                });
+            }
+        }
+    };
+
+    private updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
+        // update graph
+        if (this.graph) {
+            const range: Array<number> = this.graph.xAxisRange();
+            if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
+                this.graph.updateOptions({
+                    dateWindow: datewindow
+                });
+            }
+            if (forceReload) {
                 this.operator.update(undefined, undefined, true, datewindow);
             }
         }

@@ -84,25 +84,25 @@ class DataService implements DataHandler {
                 if (_ed.id.indexOf('meter') != -1) {
 
                     // if (_ed.id.indexOf('meter2') == -1) {
-                        // get existing data
-                        if (_ed.interval == interval) {
-                            // find data
-                            let recordExist = false;
-                            _ed.data.forEach((_data: any) => {
-                                if (_data.timestamp == tempDate) {
-                                    // found it
-                                    recordExist = true;
-                                }
-                            });
-                            if (!recordExist) {
-                                // add new one
-                                _ed.data.push({
-                                    'timestamp': tempDate,
-                                    'voltage': this.randomNumber(252, 255),
-                                    'amp': this.randomNumber(1, 2),
-                                    'avgVoltage': this.randomNumber(250, 255)
-                                });
+                    // get existing data
+                    if (_ed.interval == interval) {
+                        // find data
+                        let recordExist = false;
+                        _ed.data.forEach((_data: any) => {
+                            if (_data.timestamp == tempDate) {
+                                // found it
+                                recordExist = true;
                             }
+                        });
+                        if (!recordExist) {
+                            // add new one
+                            _ed.data.push({
+                                'timestamp': tempDate,
+                                'voltage': this.randomNumber(252, 255),
+                                'amp': this.randomNumber(1, 2),
+                                'avgVoltage': this.randomNumber(250, 255)
+                            });
+                        }
                         // }
                     }
 
@@ -200,7 +200,7 @@ let vdConfig: ViewConfig = {
             rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
             legend: formatters.legendForAllSeries,
             exports: [GraphExports.Data, GraphExports.Image],
-            rangeLocked: false   // lock or unlock range bar
+            rangeLocked: true   // lock or unlock range bar
         },
         entities: [
             {id: "substation1", type: "substation", name: "substation1"},
@@ -250,8 +250,8 @@ let vdConfig: ViewConfig = {
                 interval: 86400000,
                 // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
-                    {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'bar', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
+                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
@@ -414,8 +414,8 @@ let vdConfig2: ViewConfig = {
                 interval: 86400000,
                 // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
                 series: [
-                    {label: "Avg", type: 'bar', exp: "data.avgConsumptionVah", yIndex: 'left'},
-                    {label: "Max", type: 'bar', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
+                    {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                    {label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#ff0000'},
                     // {
                     //     label: "Min",
                     //     type: 'dots',
@@ -585,7 +585,7 @@ const changeGraphSize = (graphDiv: HTMLElement, size: number) => {
     graphDiv.style.height = size + "px";
 };
 
-
+let childGraph: FgpGraph;
 let vsConfig: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -622,8 +622,8 @@ let vsConfig: ViewConfig = {
         },
         entities: [
             {id: "meter1", type: "meter", name: "meter1"},
-            {id: "meter2", type: "meter", name: "meter2"},
-            // {id: "?", type: "meter", name: "?", fragment: true}
+            // {id: "meter2", type: "meter", name: "meter2"},
+            {id: "?", type: "meter", name: "?", fragment: true}
         ],
         rangeEntity: {id: "substation1", type: "substation", name: "substation1"},
         rangeCollection: {
@@ -690,6 +690,7 @@ let vsConfig: ViewConfig = {
         callback: {
             highlightCallback: (datetime, series, points) => {
                 console.debug("selected series: ", series);    // too many messages in console
+                childGraph.highlightSeries([series], 0);
             },
             clickCallback: (series) => {
                 console.debug("choose series: ", series);
@@ -699,6 +700,11 @@ let vsConfig: ViewConfig = {
     timezone: 'Australia/Melbourne'
     // timezone: 'Pacific/Auckland'
 };
+
+
+
+
+
 let vsConfig2: ViewConfig = {
     name: "scatter view",
     graphConfig: {
@@ -758,10 +764,10 @@ let vsConfig2: ViewConfig = {
     interaction: {
         callback: {
             highlightCallback: (datetime, series, points) => {
-                console.debug("selected series: ", series);
+                // console.debug("selected series: ", series);
             },
             clickCallback: (series) => {
-                console.debug("choosed series: ", series);
+                // console.debug("choosed series: ", series);
             }
         }
     },
@@ -851,15 +857,26 @@ let vsConfig3: ViewConfig = {
 let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
     console.log("view changed!", view.name);
 
-    g.children.forEach(child => {
+    // g.children.forEach(child => {
+    //
+    //     child.viewConfigs.forEach(_view => {
+    //         if(_view.name === view.name){
+    //             child.changeView(view.name);
+    //         }
+    //     });
+    //
+    // });
 
-        child.viewConfigs.forEach(_view => {
-            if(_view.name === view.name){
-                child.changeView(view.name);
-            }
-        });
+    // crete new graph
 
+
+    let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
+    childGraph = graph2;
+    graph2.initGraph((g)=>{
+        graph1.setChildren([graph2]);
     });
+
+
 
 };
 
@@ -875,15 +892,19 @@ let graph1 = new FgpGraph(graphDiv, [vdConfig, vsConfig], {
 graph1.initGraph();
 
 
-let graph1_1 = new FgpGraph(graphDiv2, [vdConfig2, vsConfig2_2]);
-graph1_1.initGraph();
-
-graph1.setChildren([graph1_1]);
+// let graph1_1 = new FgpGraph(graphDiv2, [vdConfig2, vsConfig2_2]);
+// graph1_1.initGraph();
+//
+// graph1.setChildren([graph1_1]);
 
 // setTimeout(()=> {
 //     graph1.changeView('scatter view');
 // }, 5000);
 
+
+// setTimeout(()=>{
+//     graph1.updateDatewinow([moment("2019-12-2").valueOf(), moment('2020-01-3').valueOf()]);
+// }, 5000);
 
 
 // testing resize graph without resizing window

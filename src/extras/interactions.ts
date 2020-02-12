@@ -1,4 +1,5 @@
 import Dygraph from "dygraphs";
+import utils from './utils';
 import moment from 'moment-timezone';
 
 export class GraphInteractions {
@@ -39,33 +40,19 @@ export class GraphInteractions {
 
     private pageX = (e: MouseEvent) => {
         return !e.pageX || e.pageX < 0 ? 0 : e.pageX;
-    }
+    };
 
     private pageY = (e: MouseEvent) => {
         return !e.pageY || e.pageY < 0 ? 0 : e.pageY;
-    }
+    };
 
     private dragGetX_ = (e: MouseEvent, context: any) => {
         return this.pageX(e) - context.px;
-    }
+    };
 
     private dragGetY_ = (e: MouseEvent, context: any) => {
         return this.pageY(e) - context.py;
-    }
-
-    private cancelEvent = (e: any) => {
-        e = e ? e : window.event;
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        e.cancelBubble = true;
-        e.cancel = true;
-        e.returnValue = false;
-        return false;
-    }
+    };
 
     private endPan = (event: MouseEvent, g: any, context: any) => {
         context.dragEndX = this.dragGetX_(event, context);
@@ -80,7 +67,7 @@ export class GraphInteractions {
 
         context.regionWidth = regionWidth;
         context.regionHeight = regionHeight;
-    }
+    };
 
     private startPan = (event: MouseEvent, g: any, context: any) => {
         var i, axis;
@@ -152,7 +139,7 @@ export class GraphInteractions {
             // While calculating axes, set 2dpan.
             if (axis.valueRange) context.is2DPan = true;
         }
-    }
+    };
 
 
     private treatMouseOpAsClick = (g: any, event: MouseEvent, context: any) => {
@@ -244,7 +231,7 @@ export class GraphInteractions {
         // The (1-) part below changes it from "% distance down from the top"
         // to "% distance up from the bottom".
         return [xPct, (1 - yPct)];
-    }
+    };
 
     private pan = (event: MouseEvent, g: any, context: any, side: string) => {
         context.dragEndX = this.dragGetX_(event, context);
@@ -313,14 +300,14 @@ export class GraphInteractions {
             }
         }
         
-    }
+    };
 
     private adjustAxis = (axis: any, zoomInPercentage: number, bias: any) => {
         var delta = axis[1] - axis[0];
         var increment = delta * zoomInPercentage;
         var foo = [increment * bias, increment * (1 - bias)];
         return [axis[0] + foo[0], axis[1] - foo[1]];
-    }
+    };
 
     private zoom = (g: any, zoomInPercentage: number, xBias: any, yBias: any, direction: string, side: string, e?: Event) => {
 
@@ -377,7 +364,7 @@ export class GraphInteractions {
                 });
             }
         }
-    }
+    };
 
 
 
@@ -402,7 +389,7 @@ export class GraphInteractions {
             this.callback(e, g.yAxisRanges(), false);
             this.panEnable = false;
         }
-    }
+    };
 
     public mouseDown = (e: MouseEvent, g: any, context: any) => {
         this.preDatewindow = g.dateWindow_;
@@ -415,7 +402,7 @@ export class GraphInteractions {
         context.initializeMouseDown(event, g, context);
         this.startPan(e, g, context);
         // console.debug("mouse down", context);
-    }
+    };
 
     public mouseMove = (e: MouseEvent, g: any, context: any) => {
         if (this.panEnable && context.isPanning) {
@@ -432,7 +419,7 @@ export class GraphInteractions {
                 this.pan(e, g, context, 'h');
             }
         }
-    }
+    };
 
     public mouseOut = (e: MouseEvent, g: any, context: any) => {
         // console.debug("mouse out");
@@ -441,7 +428,7 @@ export class GraphInteractions {
         }
         this.scrollEnable = false;
 
-    }
+    };
 
     public mouseScroll = (e: any, g: any, context: any) => {
         if (this.scrollEnable) {
@@ -476,9 +463,9 @@ export class GraphInteractions {
                 // middle zoom
                 this.zoom(g, percentage, xPct, yPct, 'h', 'm');
             }
-            this.cancelEvent(e);
+            utils.cancelEvent(e);
         }
-    }
+    };
 
     public mouseEnter = (e: MouseEvent, g: any, context: any) => {
 
