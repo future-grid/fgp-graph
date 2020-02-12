@@ -872,8 +872,10 @@ let viewChangeListener = (g: FgpGraph, view: ViewConfig) => {
 
     let graph2 = new FgpGraph(graphDiv2, [vsConfig2]);
     childGraph = graph2;
-    graph2.initGraph();
-    graph1.setChildren([graph2]);
+    graph2.initGraph((g)=>{
+        graph1.setChildren([graph2]);
+    });
+
 
 
 };

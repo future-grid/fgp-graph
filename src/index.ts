@@ -226,7 +226,7 @@ export default class FgpGraph {
      * @private
      * @memberof FgpGraph
      */
-    public initGraph = () => {
+    public initGraph = (ready?: (g: FgpGraph) => void) => {
         this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners, this.id);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
@@ -241,9 +241,9 @@ export default class FgpGraph {
             });
 
             // check if showView is undefined
-            if(!showView && this.viewConfigs.length > 0){
+            if (!showView && this.viewConfigs.length > 0) {
                 showView = this.viewConfigs[0];
-            } else if(!showView && this.viewConfigs.length === 0) {
+            } else if (!showView && this.viewConfigs.length === 0) {
                 console.error("view config not found!");
                 return false;
             }
@@ -260,6 +260,9 @@ export default class FgpGraph {
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
+                    if(ready){
+                        ready(this);
+                    }
                 }, () => {
                     this.children.forEach(graph => {
                         // call updateDatewinow
@@ -292,7 +295,7 @@ export default class FgpGraph {
                 this.operator.update(undefined, undefined, true, datewindow);
                 // get all children graphs then run update
                 this.children.forEach(child => {
-                   child.updateDatewinowInside(datewindow, true);
+                    child.updateDatewinowInside(datewindow, true);
                 });
             }
         }
@@ -307,7 +310,7 @@ export default class FgpGraph {
                     dateWindow: datewindow
                 });
             }
-            if(forceReload){
+            if (forceReload) {
                 this.operator.update(undefined, undefined, true, datewindow);
             }
         }

@@ -1380,6 +1380,11 @@ export class GraphOperator {
                 });
             }
 
+            if(this.mainGraph){
+                // clear old graph
+                // (<any>this.mainGraph).hidden_ctx_.clearRect(0, 0, (<any>this.mainGraph).hidden_.width, (<any>this.mainGraph).hidden_.height);
+                this.mainGraph.destroy();
+            }
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -2024,6 +2029,7 @@ export class GraphOperator {
             readyCallback(this.mainGraph);
             this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
             const seriesName: string[] = [];
+
             if (this.currentView.graphConfig.entities.length > 1) {
                 this.currentView.graphConfig.entities.forEach(entity => {
                     if (!entity.fragment) {
@@ -2037,9 +2043,7 @@ export class GraphOperator {
                         seriesName.push(series.label);
                     });
                 }
-
             }
-
             this.updateSeriesDropdown(this.header, seriesName, this.mainGraph, initVisibility);
 
         });
@@ -2047,63 +2051,74 @@ export class GraphOperator {
 
 
     refresh = () => {
-        const xAxisRange: Array<number> = this.mainGraph.xAxisRange();
 
-        let datewindow: number[] = [];
 
-        if (xAxisRange) {
-            datewindow[0] = xAxisRange[0];
-            datewindow[1] = xAxisRange[1];
-        }
+        if(this.mainGraph){
+            const xAxisRange: Array<number> = this.mainGraph.xAxisRange();
 
-        this.start = datewindow[0];
-        this.end = datewindow[1];
+            let datewindow: number[] = [];
 
-        this.currentView.graphConfig.collections.sort((a, b) => {
-            return a.interval > b.interval ? 1 : -1;
-        });
-
-        if (!this.lockedInterval) {
-            this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
-                return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
-            });
-        } else if (this.currentCollection) {
-            // check if the datewindow acceptable
-            let gAreaW = this.mainGraph.getArea().w;
-
-            let currentInterval = this.currentCollection.interval;
-
-            let maxShowP = 0;
-            if (gAreaW) {
-                // call start and end
-                maxShowP = gAreaW * currentInterval;
+            if (xAxisRange) {
+                datewindow[0] = xAxisRange[0];
+                datewindow[1] = xAxisRange[1];
             }
-            // get current datewindow
-            if (this.start > (this.end - maxShowP)) {
-                // go ahead
-            } else {
-                this.start = this.end - (maxShowP * 1.5);
-                // update datewindow
-                if (this.ragnebarGraph) {
-                    this.ragnebarGraph.updateOptions({
-                        dateWindow: [this.start, this.end]
-                    });
+
+            this.start = datewindow[0];
+            this.end = datewindow[1];
+
+            this.currentView.graphConfig.collections.sort((a, b) => {
+                return a.interval > b.interval ? 1 : -1;
+            });
+
+
+
+            if (!this.lockedInterval) {
+                this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
+                    return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
+                });
+            } else if (this.currentCollection) {
+                // check if the datewindow acceptable
+                let gAreaW = this.mainGraph.getArea().w;
+
+                let currentInterval = this.currentCollection.interval;
+
+                let maxShowP = 0;
+                if (gAreaW) {
+                    // call start and end
+                    maxShowP = gAreaW * currentInterval;
+                }
+                // get current datewindow
+                if (this.start > (this.end - maxShowP)) {
+                    // go ahead
                 } else {
-                    this.mainGraph.updateOptions({
-                        dateWindow: [this.start, this.end]
-                    });
+                    this.start = this.end - (maxShowP * 1.5);
+                    // update datewindow
+                    if (this.ragnebarGraph) {
+                        this.ragnebarGraph.updateOptions({
+                            dateWindow: [this.start, this.end]
+                        });
+                    } else {
+                        this.mainGraph.updateOptions({
+                            dateWindow: [this.start, this.end]
+                        });
+                    }
                 }
             }
+
+            let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
+            Object.assign(collection, this.currentCollection);
+            console.log("5: efore upate the collection is ", this.currentCollection, this.currentView);
+
+            // check initScale
+            this.update(undefined, undefined, true);
+            if (!this.lockedInterval) {
+
+
+                this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
+            }
         }
 
-        let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
-        Object.assign(collection, this.currentCollection);
-        console.log("5: efore upate the collection is ", this.currentCollection, this.currentView);
-        // check initScale
-        this.update(undefined, undefined, true);
-        if (!this.lockedInterval) {
-            this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
-        }
+
     };
 
 
@@ -2613,8 +2628,8 @@ export class GraphOperator {
                     // update dropdown list
                     this.updateSeriesDropdown(this.header, seriesNames, this.mainGraph, initVisibility);
                 }
-                //
-
+                // clear draw area
+                (mainGraph).hidden_ctx_.clearRect(0, 0, (mainGraph).hidden_.width, (mainGraph).hidden_.height);
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
