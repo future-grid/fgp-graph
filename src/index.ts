@@ -283,7 +283,8 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public updateDatewinow = (datewindow: [number, number]) => {
-        // update graph 
+
+        // update graph
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
             // if datewindow same then ignore that

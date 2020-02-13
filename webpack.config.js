@@ -4,23 +4,13 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
     plugins: [
         new CopyPlugin([
-            { from: 'src/style/graph.css', to: '../lib/css/graph.css'},
-            { from: 'src/style/graph.css', to: '../demo/css/graph.css'}
+            { from: 'src/style/graph.css', to: '../lib/css/graph.css'}
         ])
     ],
     entry: {
-        'fgp-graph-demo': './src/demo.ts',
         'fgp-graph': './src/index.ts'
     },
     devtool: 'source-map',
-    devServer: {
-        contentBase: [path.join(__dirname, 'demo')],
-        compress: true,
-        clientLogLevel: 'debug',
-        open: true,
-        filename: '[name].bundle.js',
-        // noInfo: true
-    },
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js'
