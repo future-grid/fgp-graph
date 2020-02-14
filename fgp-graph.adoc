@@ -5,22 +5,38 @@ fgp-graph bases on dygraphs and uses typescript as development
 langulage. It allows future-grid customer to explore their timeseries
 aggregations data sets. Here’s how the fgp-graphs works:
 
-image:docs/assets/images/fgp-graph.png[fgp-graph] 1. *Typescript*
-`javascript       let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;       let fgpGraph = new FgpGraph(graphDiv, [vsConfig]);       fgpGraph.initGraph();`
-2. *React*
-`javascript       let fgpGraph = new FgpGraph(document.getElementById('graphArea'), [             vdConfig,             vsConfig       ]);       fgpGraph.initGraph();`
-3. *Angular2* `coming soon~`
+image:docs/assets/images/fgp-graph.png[fgp-graph]
 
+1. *Typescript*
++
+```javascript
+let graphDiv: HTMLDivElement = document.getElementById("graphArea") as HTMLDivElement;
+let fgpGraph = new FgpGraph(graphDiv, [vsConfig]);
+fgpGraph.initGraph();
+```
+2. *React*
++
+```javascript
+let fgpGraph = new FgpGraph(document.getElementById('graphArea'), [vdConfig,vsConfig]);
+fgpGraph.initGraph();
+```
+3. *Angular2*
++
+```
+coming soon~
+```
++
 This graph is interactive as same as dygraphs, but some changes are made
 to meet the needs of futuregrid customer requirements. You can scroll up
 and down on both left and right axis to scale the y-ranges. You can also
 zoom-in & zoom-out on graph in the same way. Panning on those area has
 same effect.
 
++
 This graph is highly configurable. You can put mulitple
-``VIEW''(datasource) to this graph and swap them with the ``dropdown''
+'VIEW'(datasource) to this graph and swap them with the 'dropdown'
 easily. You can download data and save current graph as a image. There
-are ``callbacks'' can be used to monitoring the date window and
+are 'callbacks' can be used to monitoring the date window and
 highlighting(selection) events.
 
 Geeting Started
