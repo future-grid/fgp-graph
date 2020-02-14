@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@future-grid/fgp-graph</title>
+	<title>@future-grid/fgp-graph - v20.2.3-RC4</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">@future-grid/fgp-graph</a>
+					<a href="index.html" class="title">@future-grid/fgp-graph - v20.2.3-RC4</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> @future-grid/fgp-graph</h1>
+			<h1> @future-grid/fgp-graph - v20.2.3-RC4</h1>
 		</div>
 	</div>
 </header>
@@ -90,7 +90,7 @@
 				</a>
 				<p>Once you`ve got ready to put it in your project, please check the demos or check out our github wiki.</p>
 				<p>If you&#39;re using npm and a bundler like webpack, browserify or rollup, you can install fgp-graph via:</p>
-				<pre><code><span class="hljs-selector-tag">npm</span> <span class="hljs-selector-tag">install</span> <span class="hljs-selector-tag">--save</span> @<span class="hljs-keyword">future</span>-<span class="hljs-keyword">grid</span>/<span class="hljs-keyword">fgp</span>-<span class="hljs-keyword">graph</span></code></pre><p>and use it via:</p>
+				<pre><code><span class="hljs-built_in">npm</span> install --save @future-grid/fgp-graph</code></pre><p>and use it via:</p>
 				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> FgpGraph <span class="hljs-keyword">from</span> <span class="hljs-string">'@future-grid/fgp-graph'</span>;
     <span class="hljs-comment">//...... your code ......//</span>
 
@@ -109,83 +109,184 @@
 				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 					<h3>Usage</h3>
 				</a>
-				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> vdConfig: ViewConfig = {
-    <span class="hljs-attr">name</span>: <span class="hljs-string">"device view"</span>,
-    <span class="hljs-attr">graphConfig</span>: {
-        <span class="hljs-attr">features</span>: {
-            <span class="hljs-attr">zoom</span>: <span class="hljs-literal">true</span>,
-            <span class="hljs-attr">scroll</span>: <span class="hljs-literal">true</span>,
-            <span class="hljs-attr">rangeBar</span>: <span class="hljs-literal">true</span>,
-            <span class="hljs-attr">legend</span>: formatters.legendForAllSeries,
-            <span class="hljs-attr">exports</span>: [GraphExports.Data, GraphExports.Image]
-        },
-        <span class="hljs-attr">entities</span>: [
-            { <span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"**F**substation"</span> },
-        ],
-        <span class="hljs-attr">rangeEntity</span>: { <span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"**F**substation"</span> },
-        <span class="hljs-attr">rangeCollection</span>: {
-            <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
-            <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
-            <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
-            <span class="hljs-attr">series</span>: [
-                { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span> }
-            ]
-        },
-        <span class="hljs-attr">collections</span>: [
-            {
-                <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_raw'</span>,
-                <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval'</span>,
-                <span class="hljs-attr">interval</span>: <span class="hljs-number">3600000</span>,
-                <span class="hljs-attr">series</span>: [
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#058902'</span> },
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#d80808'</span> },
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.minConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#210aa8'</span> }
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> vdConfig: ViewConfig = {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"device view"</span>,
+            <span class="hljs-attr">connectSeparatedPoints</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">graphConfig</span>: {
+                <span class="hljs-attr">hideHeader</span>: {<span class="hljs-attr">views</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">intervals</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">toolbar</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">series</span>: <span class="hljs-literal">false</span>},
+                <span class="hljs-comment">// hideHeader: false,</span>
+                <span class="hljs-attr">features</span>: {
+                    <span class="hljs-attr">zoom</span>: <span class="hljs-literal">true</span>,
+                    <span class="hljs-attr">scroll</span>: <span class="hljs-literal">true</span>,
+                    <span class="hljs-attr">rangeBar</span>: {<span class="hljs-attr">show</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">format</span>: <span class="hljs-string">'DD MMM YYYY h:mm a'</span>},
+                    <span class="hljs-attr">legend</span>: <span class="hljs-keyword">this</span>.formatters.legendForAllSeries,
+                    <span class="hljs-attr">exports</span>: [GraphExports.Data, GraphExports.Image],
+                    <span class="hljs-attr">rangeLocked</span>: <span class="hljs-literal">true</span>   <span class="hljs-comment">// lock or unlock range bar</span>
+                },
+                <span class="hljs-attr">entities</span>: [
+                    {<span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"substation1"</span>},
                 ],
-                <span class="hljs-attr">threshold</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>) },    <span class="hljs-comment">//  0 ~ 10 days</span>
-                yLabel: <span class="hljs-string">'voltage'</span>,
-                <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
-                <span class="hljs-attr">initScales</span>: { <span class="hljs-attr">left</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">245</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span> } },
-                <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
-            }, {
-                <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
-                <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
-                <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
-                <span class="hljs-attr">series</span>: [
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> },
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> },
-                    { <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.minConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span> }
+                <span class="hljs-attr">rangeEntity</span>: {<span class="hljs-attr">id</span>: <span class="hljs-string">"substation1"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">"substation"</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"substation1"</span>},
+                <span class="hljs-attr">rangeCollection</span>: {
+                    <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
+                    <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
+                    <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
+                    <span class="hljs-attr">series</span>: [
+                        {<span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>}
+                    ]
+                },
+                <span class="hljs-attr">collections</span>: [
+                    {
+                        <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_raw'</span>,
+                        <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval'</span>,
+                        <span class="hljs-attr">interval</span>: <span class="hljs-number">3600000</span>,
+                        <span class="hljs-attr">markLines</span>: [{<span class="hljs-attr">value</span>: <span class="hljs-number">256</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">'256'</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">'#FF0000'</span>}, {
+                            <span class="hljs-attr">value</span>: <span class="hljs-number">248</span>,
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">'248'</span>,
+                            <span class="hljs-attr">color</span>: <span class="hljs-string">'#FF0000'</span>
+                        }],
+                        <span class="hljs-attr">series</span>: [
+                            {
+                                <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>,
+                                <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>,
+                                <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>,
+                                <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>,
+                                <span class="hljs-attr">color</span>: <span class="hljs-string">'#058902'</span>,
+                                <span class="hljs-attr">visibility</span>: <span class="hljs-literal">false</span>
+                            },
+                            {
+                                <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>,
+                                <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>,
+                                <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>,
+                                <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>,
+                                <span class="hljs-attr">color</span>: <span class="hljs-string">'#d80808'</span>
+                            },
+                            {
+                                <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>,
+                                <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>,
+                                <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.minConsumptionVah"</span>,
+                                <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>,
+                                <span class="hljs-attr">color</span>: <span class="hljs-string">'#210aa8'</span>,
+                                <span class="hljs-attr">extraConfig</span>: {<span class="hljs-attr">name</span>: <span class="hljs-string">"helloword"</span>}
+                            }
+                        ],
+                        <span class="hljs-attr">threshold</span>: {<span class="hljs-attr">min</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>)},    <span class="hljs-comment">//  0 ~ 10 days</span>
+                        <span class="hljs-attr">yLabel</span>: <span class="hljs-string">'voltage'</span>,
+                        <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
+                        <span class="hljs-attr">initScales</span>: {<span class="hljs-attr">left</span>: {<span class="hljs-attr">min</span>: <span class="hljs-number">245</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span>}},
+                        <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
+                    }, {
+                        <span class="hljs-attr">label</span>: <span class="hljs-string">'substation_day'</span>,
+                        <span class="hljs-attr">name</span>: <span class="hljs-string">'substation_interval_day'</span>,
+                        <span class="hljs-attr">interval</span>: <span class="hljs-number">86400000</span>,
+                        <span class="hljs-comment">// markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],</span>
+                        <span class="hljs-attr">series</span>: [
+                            {<span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>, <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.avgConsumptionVah"</span>, <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>},
+                            {
+                                <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>,
+                                <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>,
+                                <span class="hljs-attr">exp</span>: <span class="hljs-string">"data.maxConsumptionVah"</span>,
+                                <span class="hljs-attr">yIndex</span>: <span class="hljs-string">'left'</span>,
+                                <span class="hljs-attr">color</span>: <span class="hljs-string">'#ff0000'</span>
+                            },
+                            <span class="hljs-comment">// {</span>
+                            <span class="hljs-comment">//     label: "Min",</span>
+                            <span class="hljs-comment">//     type: 'dots',</span>
+                            <span class="hljs-comment">//     exp: "data.minConsumptionVah",</span>
+                            <span class="hljs-comment">//     yIndex: 'left',</span>
+                            <span class="hljs-comment">//     extraConfig: {any: "anything"}</span>
+                            <span class="hljs-comment">// }</span>
+                        ],
+                        <span class="hljs-attr">threshold</span>: {<span class="hljs-attr">min</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>), <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">7</span> * <span class="hljs-number">52</span> * <span class="hljs-number">10</span>)},    <span class="hljs-comment">// 7 days ~ 3 weeks</span>
+                        <span class="hljs-attr">yLabel</span>: <span class="hljs-string">'voltage'</span>,
+                        <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
+                        <span class="hljs-attr">initScales</span>: {<span class="hljs-attr">left</span>: {<span class="hljs-attr">min</span>: <span class="hljs-number">230</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span>}},
+                        <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
+                    }
                 ],
-                <span class="hljs-attr">threshold</span>: { <span class="hljs-attr">min</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">10</span>), <span class="hljs-attr">max</span>: (<span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span> * <span class="hljs-number">7</span> * <span class="hljs-number">52</span> * <span class="hljs-number">10</span>) },    <span class="hljs-comment">// 7 days ~ 3 weeks</span>
-                yLabel: <span class="hljs-string">'voltage'</span>,
-                <span class="hljs-attr">y2Label</span>: <span class="hljs-string">'voltage'</span>,
-                <span class="hljs-attr">initScales</span>: { <span class="hljs-attr">left</span>: { <span class="hljs-attr">min</span>: <span class="hljs-number">230</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">260</span> } },
-                <span class="hljs-attr">fill</span>: <span class="hljs-literal">false</span>
-            }
-        ]
+                <span class="hljs-attr">filters</span>: {
+                    <span class="hljs-string">"buttons"</span>: [
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"All"</span>
+                            , <span class="hljs-attr">func</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                                <span class="hljs-keyword">return</span> [<span class="hljs-string">"Min"</span>, <span class="hljs-string">"Max"</span>, <span class="hljs-string">"Avg"</span>];
+                            }
+                        },
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"Min"</span>
+                            , <span class="hljs-attr">func</span>: (): <span class="hljs-built_in">Array</span>&lt;string&gt; =&gt; {
+                                <span class="hljs-keyword">return</span> [<span class="hljs-string">"Min"</span>];
+                            }
+                        },
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"Max"</span>
+                            , <span class="hljs-attr">func</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                                <span class="hljs-keyword">return</span> [<span class="hljs-string">"Max"</span>];
+                            }
+                        },
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"Avg"</span>
+                            , <span class="hljs-attr">func</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                                <span class="hljs-keyword">return</span> [<span class="hljs-string">"Avg"</span>];
+                            }
+                        },
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"Colors"</span>,
+                            <span class="hljs-attr">type</span>: FilterType.COLORS,
+                            <span class="hljs-attr">func</span>: <span class="hljs-function">(<span class="hljs-params">labels?: <span class="hljs-built_in">Array</span>&lt;string&gt;</span>) =&gt;</span> {
+                                <span class="hljs-keyword">let</span> colors: <span class="hljs-built_in">Array</span>&lt;string&gt; = [];
+                                <span class="hljs-comment">// generate colors</span>
+                                <span class="hljs-keyword">if</span> (labels) {
+                                    labels.forEach(<span class="hljs-function"><span class="hljs-params">element</span> =&gt;</span> {
+                                        colors.push(<span class="hljs-string">"#FF0000"</span>);
+                                    });
 
-    },
-    <span class="hljs-attr">dataService</span>: dataService,
-    <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">ranges</span>: [
-        { <span class="hljs-attr">name</span>: <span class="hljs-string">"7 days"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">604800000</span>, <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span> },
-        { <span class="hljs-attr">name</span>: <span class="hljs-string">"1 month"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">2592000000</span> }
-    ],
-    <span class="hljs-attr">initRange</span>: {
-        <span class="hljs-attr">start</span>: moment().subtract(<span class="hljs-number">10</span>, <span class="hljs-string">'days'</span>).startOf(<span class="hljs-string">'day'</span>).valueOf(),
-        <span class="hljs-attr">end</span>: moment().add(<span class="hljs-number">1</span>, <span class="hljs-string">'days'</span>).valueOf()
-    },
-    <span class="hljs-attr">interaction</span>: {
-        <span class="hljs-attr">callback</span>: {
-            <span class="hljs-attr">highlighCallback</span>: <span class="hljs-function">(<span class="hljs-params">datetime, series, points</span>) =&gt;</span> {
-                <span class="hljs-comment">// console.debug("selected series: ", series);</span>
+                                }
+                                <span class="hljs-keyword">return</span> colors;
+                            }
+                        },
+                        {
+                            <span class="hljs-attr">label</span>: <span class="hljs-string">"reset Colors"</span>,
+                            <span class="hljs-attr">type</span>: FilterType.COLORS,
+                            <span class="hljs-attr">func</span>: <span class="hljs-function">(<span class="hljs-params">labels?: <span class="hljs-built_in">Array</span>&lt;string&gt;</span>) =&gt;</span> {
+                                <span class="hljs-keyword">return</span> [];
+                            }
+                        }
+                    ]
+                }
             },
-            <span class="hljs-attr">syncDateWindow</span>: <span class="hljs-function">(<span class="hljs-params">dateWindow</span>) =&gt;</span> {
-                <span class="hljs-built_in">console</span>.debug(moment(dateWindow[<span class="hljs-number">0</span>]), moment(dateWindow[<span class="hljs-number">1</span>]));
-            }
-        }
-    },
-    <span class="hljs-attr">timezone</span>: <span class="hljs-string">'Australia/Melbourne'</span>
-};
+            <span class="hljs-attr">dataService</span>: <span class="hljs-keyword">this</span>.dataService,
+            <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">ranges</span>: [
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"10 mins"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">10</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"half an hour"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">30</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"1 hours"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"2 hours"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">2</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"1 day"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"7 days"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">604800000</span>, <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span>},
+                {<span class="hljs-attr">name</span>: <span class="hljs-string">"1 month"</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">2592000000</span>}
+            ],
+            <span class="hljs-attr">initRange</span>: {
+                <span class="hljs-attr">start</span>: moment(<span class="hljs-string">"2019-11-01"</span>).add(<span class="hljs-number">0</span>, <span class="hljs-string">'days'</span>).startOf(<span class="hljs-string">'day'</span>).valueOf(),
+                <span class="hljs-attr">end</span>: moment(<span class="hljs-string">"2019-12-01"</span>).subtract(<span class="hljs-number">0</span>, <span class="hljs-string">'days'</span>).endOf(<span class="hljs-string">'day'</span>).valueOf()
+            },
+            <span class="hljs-attr">interaction</span>: {
+                <span class="hljs-attr">callback</span>: {
+                    <span class="hljs-attr">highlightCallback</span>: <span class="hljs-function">(<span class="hljs-params">datetime, series, points</span>) =&gt;</span> {
+                        <span class="hljs-comment">// console.debug("selected series: ", series);</span>
+                    },
+                    <span class="hljs-attr">syncDateWindow</span>: <span class="hljs-function">(<span class="hljs-params">dateWindow</span>) =&gt;</span> {
+                        <span class="hljs-comment">// console.debug(moment(dateWindow[0]), moment(dateWindow[1]));</span>
+                    },
+                    <span class="hljs-attr">dbClickCallback</span>: <span class="hljs-function">(<span class="hljs-params">series</span>) =&gt;</span> {
+                        <span class="hljs-comment">// console.debug("dbl callback");</span>
+                    }
+                }
+            },
+            <span class="hljs-attr">timezone</span>: <span class="hljs-string">'Australia/Perth'</span>,
+            <span class="hljs-attr">highlightSeriesBackgroundAlpha</span>: <span class="hljs-number">1</span>
+            <span class="hljs-comment">// timezone: 'Pacific/Auckland'</span>
+        };
 
 <span class="hljs-keyword">let</span> fgpGraph = <span class="hljs-keyword">new</span> FgpGraph(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'graphArea'</span>), [
           vdConfig
@@ -455,14 +556,56 @@
 							<li><strong>clickCallback</strong><pre><code class="language-js">(series) =&gt; {
   <span class="hljs-comment">// console.debug("choosed series: ", series);</span>
 }</code></pre>
-								<ul>
-									<li><strong>series</strong>
-									series name</li>
-								</ul>
+							</li>
+							<li><strong>dbClickCallback</strong><br>same as clickCallback, just in case sometimes we need 2 different event to highlight on map and pop window for another page<pre><code class="language-js">(series) =&gt; {
+      <span class="hljs-comment">// console.debug("choosed series: ", series);</span>
+    }</code></pre>
 							</li>
 						</ul>
 					</li>
 				</ul>
+				<a href="#event-listeners" id="event-listeners" style="color: inherit; text-decoration: none;">
+					<h4>Event Listeners</h4>
+				</a>
+				<p>There are 2 listeners let you know when &quot;ViewConfig&quot; &amp; &quot;Interval&quot; changed. Such as you can use &quot;viewChangeListener&quot; to create a child graph.</p>
+				<ul>
+					<li><strong>viewChangeListener</strong><pre><code class="language-js">  onViewChange = (g: FgpGraph, <span class="hljs-attr">view</span>: ViewConfig): <span class="hljs-function"><span class="hljs-params">void</span> =&gt;</span> {
+          <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"view changed!"</span>, view.name);
+          <span class="hljs-keyword">const</span> mainGraph = g;
+          <span class="hljs-keyword">if</span>(<span class="hljs-string">"device view"</span> === view.name){
+              <span class="hljs-comment">// add new child graph</span>
+              <span class="hljs-keyword">this</span>.setState({
+                  <span class="hljs-attr">childrenGraph</span>: []
+              });
+          } <span class="hljs-keyword">else</span> {
+              <span class="hljs-comment">// add new child graph</span>
+              <span class="hljs-keyword">this</span>.setState({
+                  <span class="hljs-attr">childrenGraph</span>: [{
+                      <span class="hljs-attr">id</span>: <span class="hljs-string">''</span> + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">1000</span>,
+                      <span class="hljs-attr">viewConfigs</span>: <span class="hljs-keyword">this</span>.childViewConfigs,
+                      <span class="hljs-attr">onReady</span>: <span class="hljs-function">(<span class="hljs-params">div: HTMLDivElement, g: FgpGraph</span>) =&gt;</span> {
+                          mainGraph.setChildren([g]);
+                      }
+                  }]
+              });
+          }
+
+
+</code></pre>
+					</li>
+				</ul>
+				<pre><code>    };
+```  
+Graph<span class="hljs-built_in"> instance </span><span class="hljs-keyword">and</span> viewConfig object will send back as parameters. </code></pre><ul>
+					<li><strong>intervalChangeListener</strong><pre><code class="language-js">  onIntervalChange = (g: FgpGraph, <span class="hljs-attr">interval</span>: { <span class="hljs-attr">name</span>: string; value: number; show?: boolean }): <span class="hljs-function"><span class="hljs-params">void</span> =&gt;</span> {
+          <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'interval changed!'</span>, interval);
+      };</code></pre>
+					</li>
+				</ul>
+				<a href="#api" id="api" style="color: inherit; text-decoration: none;">
+					<h2>API</h2>
+				</a>
+				<p>Please goto &quot;docs&quot; folder for more details.</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -472,34 +615,46 @@
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_demo_.html">"src/demo"</a>
+						<a href="modules/_extras_dygraphinteraction_.html">&quot;extras/<wbr>Dygraph<wbr>Interaction&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_extras_formatters_.html">"src/extras/formatters"</a>
+						<a href="modules/_extras_iframetarp_.html">&quot;extras/IFrame<wbr>Tarp&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_extras_interactions_.html">"src/extras/interactions"</a>
+						<a href="modules/_extras_rangehandles_.html">&quot;extras/<wbr>Range<wbr>Handles&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_extras_synchronizer_.html">"src/extras/synchronizer"</a>
+						<a href="modules/_extras_toolbar_.html">&quot;extras/<wbr>Toolbar&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_index_.html">"src/index"</a>
+						<a href="modules/_extras_formatters_.html">&quot;extras/formatters&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_metadata_configurations_.html">"src/metadata/configurations"</a>
+						<a href="modules/_extras_interactions_.html">&quot;extras/interactions&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_services_dataservice_.html">"src/services/data<wbr>Service"</a>
+						<a href="modules/_extras_synchronizer_.html">&quot;extras/synchronizer&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_widgets_domelements_.html">"src/widgets/<wbr>Dom<wbr>Elements"</a>
+						<a href="modules/_extras_utils_.html">&quot;extras/utils&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_test_services_test_.html">"test/services.test"</a>
+						<a href="modules/_index_.html">&quot;index&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_test_widgets_test_.html">"test/widgets.test"</a>
+						<a href="modules/_metadata_configurations_.html">&quot;metadata/configurations&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_metadata_graphoptions_.html">&quot;metadata/graphoptions&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_services_colorservice_.html">&quot;services/color<wbr>Service&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_services_dataservice_.html">&quot;services/data<wbr>Service&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_widgets_domelements_.html">&quot;widgets/<wbr>Dom<wbr>Elements&quot;</a>
 					</li>
 				</ul>
 			</nav>
