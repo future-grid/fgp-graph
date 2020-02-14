@@ -488,5 +488,54 @@ Every time you change the datetime range or highlighting series on graph, the gr
       // console.debug("choosed series: ", series);
     }
     ```
-  + **series**
-    series name
+  + **dbClickCallback**  
+    same as clickCallback, just in case sometimes we need 2 different event to highlight on map and pop window for another page
+    ```js
+    (series) => {
+          // console.debug("choosed series: ", series);
+        }
+    ```
+
+
+#### Event Listeners
+There are 2 listeners let you know when "ViewConfig" & "Interval" changed. Such as you can use "viewChangeListener" to create a child graph.
++ **viewChangeListener**
+    ```js
+    onViewChange = (g: FgpGraph, view: ViewConfig): void => {
+            console.log("view changed!", view.name);
+            const mainGraph = g;
+            if("device view" === view.name){
+                // add new child graph
+                this.setState({
+                    childrenGraph: []
+                });
+            } else {
+                // add new child graph
+                this.setState({
+                    childrenGraph: [{
+                        id: '' + Math.random() * 1000,
+                        viewConfigs: this.childViewConfigs,
+                        onReady: (div: HTMLDivElement, g: FgpGraph) => {
+                            mainGraph.setChildren([g]);
+                        }
+                    }]
+                });
+            }
+    
+    
+    
+        };
+    ```  
+    Graph instance and viewConfig object will send back as parameters. 
+
++ **intervalChangeListener**
+    ```js
+    onIntervalChange = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }): void => {
+            console.log('interval changed!', interval);
+        };
+    ```` 
+
+
+
+## API
+Please goto "docs" folder for more details.
