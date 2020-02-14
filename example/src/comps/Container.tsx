@@ -109,7 +109,7 @@ export default class Container extends Component<Props, States> {
                         threshold: {min: 0, max: (1000 * 60 * 60 * 24 * 10)},    //  0 ~ 10 days
                         yLabel: 'voltage',
                         y2Label: 'voltage',
-                        initScales: {left: {min: 245, max: 260}},
+                        // initScales: {left: {min: 245, max: 260}},
                         fill: false
                     }, {
                         label: 'substation_day',
@@ -136,7 +136,7 @@ export default class Container extends Component<Props, States> {
                         threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
                         yLabel: 'voltage',
                         y2Label: 'voltage',
-                        initScales: {left: {min: 230, max: 260}},
+                        // initScales: {left: {min: 230, max: 260}},
                         fill: false
                     }
                 ],
@@ -203,10 +203,10 @@ export default class Container extends Component<Props, States> {
                 {name: "7 days", value: 604800000, show: true},
                 {name: "1 month", value: 2592000000}
             ],
-            initRange: {
-                start: moment("2019-11-01").add(0, 'days').startOf('day').valueOf(),
-                end: moment("2019-12-01").subtract(0, 'days').endOf('day').valueOf()
-            },
+            // initRange: {
+            //     start: moment("2019-11-01").add(0, 'days').startOf('day').valueOf(),
+            //     end: moment("2019-12-01").subtract(0, 'days').endOf('day').valueOf()
+            // },
             interaction: {
                 callback: {
                     highlightCallback: (datetime, series, points) => {
@@ -216,7 +216,10 @@ export default class Container extends Component<Props, States> {
                         // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
                     },
                     dbClickCallback: (series) => {
-                        // console.debug("dbl callback");
+                        // console.debug("dbl callback, ", series);
+                    },
+                    clickCallback: (series) => {
+                        console.debug("click callback, ", series);
                     }
                 }
             },
@@ -342,8 +345,11 @@ export default class Container extends Component<Props, States> {
                         console.debug("selected series: ", series);    // too many messages in console
                         // childGraph.highlightSeries([series], 0);
                     },
+                    dbClickCallback: (series) => {
+                        // console.debug("dbl callback, ", series);
+                    },
                     clickCallback: (series) => {
-                        console.debug("choose series: ", series);
+                        console.debug("click callback, ", series);
                     }
                 }
             },
@@ -509,16 +515,24 @@ export default class Container extends Component<Props, States> {
     onViewChange = (g: FgpGraph, view: ViewConfig): void => {
         console.log("view changed!", view.name);
         const mainGraph = g;
-        // add new child graph
-        this.setState({
-            childrenGraph: [{
-                id: '' + Math.random() * 1000,
-                viewConfigs: this.childViewConfigs,
-                onReady: (div: HTMLDivElement, g: FgpGraph) => {
-                    mainGraph.setChildren([g]);
-                }
-            }]
-        });
+        if("device view" === view.name){
+            // add new child graph
+            this.setState({
+                childrenGraph: []
+            });
+        } else {
+            // add new child graph
+            this.setState({
+                childrenGraph: [{
+                    id: '' + Math.random() * 1000,
+                    viewConfigs: this.childViewConfigs,
+                    onReady: (div: HTMLDivElement, g: FgpGraph) => {
+                        mainGraph.setChildren([g]);
+                    }
+                }]
+            });
+        }
+
 
 
     };
@@ -549,8 +563,6 @@ export default class Container extends Component<Props, States> {
                         );
                     })
                 }
-
-
             </div>
         )
     }

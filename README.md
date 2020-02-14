@@ -53,83 +53,184 @@ Check out the [React demo](https://github.com/flexdeviser/fgp-graph-react) for m
 If you are a dygrpahs user, please don't put dygraphs options in fgp-graph. fgp-graph has its own options and different formats.
 ### Usage
 ```javascript
-let vdConfig: ViewConfig = {
-    name: "device view",
-    graphConfig: {
-        features: {
-            zoom: true,
-            scroll: true,
-            rangeBar: true,
-            legend: formatters.legendForAllSeries,
-            exports: [GraphExports.Data, GraphExports.Image]
-        },
-        entities: [
-            { id: "substation1", type: "substation", name: "**F**substation" },
-        ],
-        rangeEntity: { id: "substation1", type: "substation", name: "**F**substation" },
-        rangeCollection: {
-            label: 'substation_day',
-            name: 'substation_interval_day',
-            interval: 86400000,
-            series: [
-                { label: "Avg", type: 'line', exp: "data.avgConsumptionVah" }
-            ]
-        },
-        collections: [
-            {
-                label: 'substation_raw',
-                name: 'substation_interval',
-                interval: 3600000,
-                series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left', color: '#058902' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left', color: '#d80808' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left', color: '#210aa8' }
+const vdConfig: ViewConfig = {
+            name: "device view",
+            connectSeparatedPoints: true,
+            graphConfig: {
+                hideHeader: {views: false, intervals: false, toolbar: false, series: false},
+                // hideHeader: false,
+                features: {
+                    zoom: true,
+                    scroll: true,
+                    rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
+                    legend: this.formatters.legendForAllSeries,
+                    exports: [GraphExports.Data, GraphExports.Image],
+                    rangeLocked: true   // lock or unlock range bar
+                },
+                entities: [
+                    {id: "substation1", type: "substation", name: "substation1"},
                 ],
-                threshold: { min: 0, max: (1000 * 60 * 60 * 24 * 10) },    //  0 ~ 10 days
-                yLabel: 'voltage',
-                y2Label: 'voltage',
-                initScales: { left: { min: 245, max: 260 } },
-                fill: false
-            }, {
-                label: 'substation_day',
-                name: 'substation_interval_day',
-                interval: 86400000,
-                series: [
-                    { label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left' },
-                    { label: "Max", type: 'line', exp: "data.maxConsumptionVah", yIndex: 'left' },
-                    { label: "Min", type: 'line', exp: "data.minConsumptionVah", yIndex: 'left' }
+                rangeEntity: {id: "substation1", type: "substation", name: "substation1"},
+                rangeCollection: {
+                    label: 'substation_day',
+                    name: 'substation_interval_day',
+                    interval: 86400000,
+                    series: [
+                        {label: "Avg", type: 'line', exp: "data.avgConsumptionVah"}
+                    ]
+                },
+                collections: [
+                    {
+                        label: 'substation_raw',
+                        name: 'substation_interval',
+                        interval: 3600000,
+                        markLines: [{value: 256, label: '256', color: '#FF0000'}, {
+                            value: 248,
+                            label: '248',
+                            color: '#FF0000'
+                        }],
+                        series: [
+                            {
+                                label: "Avg",
+                                type: 'line',
+                                exp: "data.avgConsumptionVah",
+                                yIndex: 'left',
+                                color: '#058902',
+                                visibility: false
+                            },
+                            {
+                                label: "Max",
+                                type: 'line',
+                                exp: "data.maxConsumptionVah",
+                                yIndex: 'left',
+                                color: '#d80808'
+                            },
+                            {
+                                label: "Min",
+                                type: 'line',
+                                exp: "data.minConsumptionVah",
+                                yIndex: 'left',
+                                color: '#210aa8',
+                                extraConfig: {name: "helloword"}
+                            }
+                        ],
+                        threshold: {min: 0, max: (1000 * 60 * 60 * 24 * 10)},    //  0 ~ 10 days
+                        yLabel: 'voltage',
+                        y2Label: 'voltage',
+                        initScales: {left: {min: 245, max: 260}},
+                        fill: false
+                    }, {
+                        label: 'substation_day',
+                        name: 'substation_interval_day',
+                        interval: 86400000,
+                        // markLines: [{value: 255, label: '255', color: '#FF0000'}, {value: 235, label: '235', color: '#FF0000'}],
+                        series: [
+                            {label: "Avg", type: 'line', exp: "data.avgConsumptionVah", yIndex: 'left'},
+                            {
+                                label: "Max",
+                                type: 'line',
+                                exp: "data.maxConsumptionVah",
+                                yIndex: 'left',
+                                color: '#ff0000'
+                            },
+                            // {
+                            //     label: "Min",
+                            //     type: 'dots',
+                            //     exp: "data.minConsumptionVah",
+                            //     yIndex: 'left',
+                            //     extraConfig: {any: "anything"}
+                            // }
+                        ],
+                        threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
+                        yLabel: 'voltage',
+                        y2Label: 'voltage',
+                        initScales: {left: {min: 230, max: 260}},
+                        fill: false
+                    }
                 ],
-                threshold: { min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10) },    // 7 days ~ 3 weeks
-                yLabel: 'voltage',
-                y2Label: 'voltage',
-                initScales: { left: { min: 230, max: 260 } },
-                fill: false
-            }
-        ]
+                filters: {
+                    "buttons": [
+                        {
+                            label: "All"
+                            , func: () => {
+                                return ["Min", "Max", "Avg"];
+                            }
+                        },
+                        {
+                            label: "Min"
+                            , func: (): Array<string> => {
+                                return ["Min"];
+                            }
+                        },
+                        {
+                            label: "Max"
+                            , func: () => {
+                                return ["Max"];
+                            }
+                        },
+                        {
+                            label: "Avg"
+                            , func: () => {
+                                return ["Avg"];
+                            }
+                        },
+                        {
+                            label: "Colors",
+                            type: FilterType.COLORS,
+                            func: (labels?: Array<string>) => {
+                                let colors: Array<string> = [];
+                                // generate colors
+                                if (labels) {
+                                    labels.forEach(element => {
+                                        colors.push("#FF0000");
+                                    });
 
-    },
-    dataService: dataService,
-    show: true,
-    ranges: [
-        { name: "7 days", value: 604800000, show: true },
-        { name: "1 month", value: 2592000000 }
-    ],
-    initRange: {
-        start: moment().subtract(10, 'days').startOf('day').valueOf(),
-        end: moment().add(1, 'days').valueOf()
-    },
-    interaction: {
-        callback: {
-            highlighCallback: (datetime, series, points) => {
-                // console.debug("selected series: ", series);
+                                }
+                                return colors;
+                            }
+                        },
+                        {
+                            label: "reset Colors",
+                            type: FilterType.COLORS,
+                            func: (labels?: Array<string>) => {
+                                return [];
+                            }
+                        }
+                    ]
+                }
             },
-            syncDateWindow: (dateWindow) => {
-                console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
-            }
-        }
-    },
-    timezone: 'Australia/Melbourne'
-};
+            dataService: this.dataService,
+            show: true,
+            ranges: [
+                {name: "10 mins", value: 1000 * 60 * 10},
+                {name: "half an hour", value: 1000 * 60 * 30},
+                {name: "1 hours", value: 1000 * 60 * 60},
+                {name: "2 hours", value: 1000 * 60 * 60 * 2},
+                {name: "1 day", value: 1000 * 60 * 60 * 24},
+                {name: "7 days", value: 604800000, show: true},
+                {name: "1 month", value: 2592000000}
+            ],
+            initRange: {
+                start: moment("2019-11-01").add(0, 'days').startOf('day').valueOf(),
+                end: moment("2019-12-01").subtract(0, 'days').endOf('day').valueOf()
+            },
+            interaction: {
+                callback: {
+                    highlightCallback: (datetime, series, points) => {
+                        // console.debug("selected series: ", series);
+                    },
+                    syncDateWindow: (dateWindow) => {
+                        // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                    },
+                    dbClickCallback: (series) => {
+                        // console.debug("dbl callback");
+                    }
+                }
+            },
+            timezone: 'Australia/Perth',
+            highlightSeriesBackgroundAlpha: 1
+            // timezone: 'Pacific/Auckland'
+        };
 
 let fgpGraph = new FgpGraph(document.getElementById('graphArea'), [
           vdConfig
@@ -387,5 +488,5 @@ Every time you change the datetime range or highlighting series on graph, the gr
       // console.debug("choosed series: ", series);
     }
     ```
-    + **series**
-      series name
+  + **series**
+    series name
