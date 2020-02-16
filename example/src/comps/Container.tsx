@@ -7,13 +7,15 @@ import moment from "moment-timezone";
 import FgpGraph from "@future-grid/fgp-graph";
 import GenericGraph from "./GenericGraph";
 
+import {Container, Badge} from 'react-bootstrap';
+
 type Props = {}
 
 type States = {
     childrenGraph: Array<{ id: string, viewConfigs: Array<ViewConfig>, onReady(div: HTMLDivElement, g: FgpGraph): void }>
 }
 
-export default class Container extends Component<Props, States> {
+export default class GraphContainer extends Component<Props, States> {
 
     private graphDiv?: HTMLDivElement;
 
@@ -515,7 +517,7 @@ export default class Container extends Component<Props, States> {
     onViewChange = (g: FgpGraph, view: ViewConfig): void => {
         console.log("view changed!", view.name);
         const mainGraph = g;
-        if("device view" === view.name){
+        if ("device view" === view.name) {
             // add new child graph
             this.setState({
                 childrenGraph: []
@@ -534,7 +536,6 @@ export default class Container extends Component<Props, States> {
         }
 
 
-
     };
 
     onIntervalChange = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }): void => {
@@ -549,13 +550,16 @@ export default class Container extends Component<Props, States> {
 
     render() {
         return (
-            <div>
+            <Container fluid={true}>
+                {/*main graph*/}
+                <Badge variant="info">@future-grid/fgp-graph</Badge>
                 <GenericGraph viewConfigs={this.mainViewConfigs} onReady={this.readyCallback}
                               viewChangeListener={this.onViewChange}
                               intervalChangeListener={this.onIntervalChange}/>
 
+                {/*children graphs*/}
                 {
-                    this.state.childrenGraph?.map((_config) => {
+                    this.state.childrenGraph.map((_config) => {
                         return (
                             <div key={_config.id}>
                                 <GenericGraph viewConfigs={_config.viewConfigs} onReady={_config.onReady}/>
@@ -563,7 +567,7 @@ export default class Container extends Component<Props, States> {
                         );
                     })
                 }
-            </div>
+            </Container>
         )
     }
 }

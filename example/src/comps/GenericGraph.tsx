@@ -3,6 +3,7 @@ import {ViewConfig} from "@future-grid/fgp-graph/lib/metadata/configurations";
 import FgpGraph from "@future-grid/fgp-graph";
 
 
+
 type GraphProps = {
     viewConfigs: Array<ViewConfig>,
     onReady?(div: HTMLDivElement, g: FgpGraph): void,
@@ -56,7 +57,7 @@ export default class GenericGraph extends Component<GraphProps, GraphStates> {
         };
         return (
             <div>
-                <div className="container-fluid" fgp-graph-id={'Graph' + this.state.id} ref={this.mainGraph} style={divStyle}/>
+                <div fgp-graph-id={'Graph' + this.state.id} ref={this.mainGraph} style={divStyle}/>
             </div>
         )
     }
