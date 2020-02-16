@@ -32,6 +32,10 @@
   "types": "lib/index.d.ts",
   "homepage": "https://github.com/future-grid/fgp-graph#readme",
   "repository": "https://github.com/future-grid/fgp-graph.git",
+  "peerDependencies": {
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26"
+  },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -46,6 +50,8 @@
     "@types/moment-timezone": "^0.5.12",
     "@types/node": "^12.6.8",
     "auto-changelog": "^1.16.2",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26",
     "babel-loader": "^8.0.4",
     "babel-minify-webpack-plugin": "^0.3.1",
     "copy-webpack-plugin": "^5.1.1",
@@ -61,9 +67,7 @@
   "dependencies": {
     "@juggle/resize-observer": "^3.0.2",
     "dygraphs": "^2.1.0",
-    "html2canvas": "^1.0.0-rc.3",
-    "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26"
+    "html2canvas": "^1.0.0-rc.3"
   },
   "bugs": {
     "url": "https://github.com/future-grid/fgp-graph/issues"

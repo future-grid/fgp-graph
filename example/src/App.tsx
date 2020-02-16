@@ -5,17 +5,16 @@ import React from 'react';
  */
 import '@future-grid/fgp-graph/lib/css/graph.css';
 
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import Container from "./comps/Container";
+import GraphContainer from "./comps/Container";
+
 
 
 const App = () => {
-
-
     return (
-        <div className="App">
-            <Container/>
+        <div>
+            <GraphContainer/>
         </div>
     );
 };
