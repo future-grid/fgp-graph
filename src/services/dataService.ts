@@ -38,7 +38,7 @@ export class LoadingSpinner {
 
     public show(): void {
         // add into parent
-        this.container.append(this.spinner);
+        this.container.appendChild(this.spinner);
         this.isLoading = true;
     }
 

@@ -507,6 +507,18 @@ export default class GraphContainer extends Component<Props, States> {
 
     readyCallback = (div: HTMLDivElement, g: FgpGraph) => {
         this.graphDiv = div;
+        const mainGraph = g;
+        this.setState({
+            childrenGraph: [{
+                id: '' + Math.random() * 1000,
+                viewConfigs: this.childViewConfigs,
+                onReady: (div: HTMLDivElement, g: FgpGraph) => {
+                    mainGraph.setChildren([g]);
+                }
+            }]
+        });
+
+
     };
 
     changeGraphSize = (graphDiv: HTMLElement, size: number) => {
@@ -515,7 +527,7 @@ export default class GraphContainer extends Component<Props, States> {
 
 
     onViewChange = (g: FgpGraph, view: ViewConfig): void => {
-        console.log("view changed!", view.name);
+        console.log(`view changed! current view is [${view.name}]`);
         const mainGraph = g;
         if ("device view" === view.name) {
             // add new child graph

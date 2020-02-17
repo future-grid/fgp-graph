@@ -58,7 +58,7 @@ export class DropdownButton {
 export class DropdownMenu {
     private dropdown: HTMLElement; // div
     private opts: Array<{ checked: boolean, name: string, label: string }>;
-    private callback: any;
+    private readonly callback: any;
 
     constructor(dropdownArea: HTMLElement, opts: Array<{ checked: boolean, name: string, label: string }>, callback: any) {
         this.dropdown = dropdownArea;
@@ -100,7 +100,7 @@ export class DropdownMenu {
                 this.callback(series, checked);
             });
             li.appendChild(checkbox);
-            li.append(' ' + opt.label);
+            li.textContent = ' ' + opt.label;
             content.appendChild(li);
         });
         //
@@ -129,7 +129,8 @@ export class SelectWithCheckbox {
             let checkbox: HTMLInputElement = document.createElement('input');
             checkbox.setAttribute("type", "checkbox");
             optElement.appendChild(checkbox);
-            optElement.append(opt.label);
+            optElement.textContent = opt.label;
+            optElement.value = opt.name;
             this.select.add(optElement);
         });
     }
@@ -459,13 +460,16 @@ export class GraphOperator {
                         label.className = "badge badge-pill badge-success badge-interval";
                         // reset
                         this.lockedInterval = undefined;
-                        let datewindow = this.mainGraph.xAxisRange();
+                        let dateWindow = this.mainGraph.xAxisRange();
                         // find best collection 
-                        this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
-                            return collection.threshold && (datewindow[1] - (datewindow[0] - collection.interval)) <= (collection.threshold.max);
+                        this.currentCollection = this.currentView.graphConfig.collections.find((value: GraphCollection, index: number, obj: GraphCollection[]) => {
+                            if (value.threshold) {
+                                return (dateWindow[1] - (dateWindow[0] - value.interval)) <= (value.threshold.max);
+                            } else {
+                                return false;
+                            }
                         });
                         this.refresh();
-                        // this.update(undefined, undefined, true);
                     }
                 }
             });
@@ -883,10 +887,8 @@ export class GraphOperator {
         const ranges: Array<{ name: string, value: number, show?: boolean }> | undefined = this.currentView.ranges;
         if (ranges && ranges.length > 0) {
             // get first "show" == true
-            const selected = ranges.find((value, index, arr) => {
-                if (value.show) {
-                    return value;
-                }
+            const selected = ranges.find((value: { name: string; value: number; show?: boolean }, index: number, arr: { name: string; value: number; show?: boolean }[]) => {
+                return !!value.show;
             });
             // not found then use first one
             if (!selected) {
@@ -945,8 +947,12 @@ export class GraphOperator {
                     let halfConfigRequire = config.value / 2;
 
                     // find the correct collection and update graph
-                    choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
-                        return collection.threshold && (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
+                    choosedCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection, index: number, obj: GraphCollection[]) => {
+                        if (collection.threshold) {
+                            return (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
+                        } else {
+                            return false;
+                        }
                     });
 
                     //update 
@@ -1096,7 +1102,14 @@ export class GraphOperator {
             });
 
             // init empty graph with start and end  no other data
-            let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
+            // let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
+
+
+            let firstRanges: any = graphRangesConfig.find((range: { name: string; value: number; show?: boolean }, index: number, object: ({ name: string; value: number; show?: boolean })[]) => {
+                return range ? range.show : false;
+            });
+
+
             if (!firstRanges) {
                 // throw errors;
                 console.warn("non default range for range-bar, use default 7 days");
@@ -1145,7 +1158,7 @@ export class GraphOperator {
                 // upate choosed collection
                 const gap = this.currentView.initRange.end - this.currentView.initRange.start;
 
-                choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
+                choosedCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection) => {
                     return collection.threshold && (gap) <= (collection.threshold.max - collection.threshold.min);
                 });
             }
@@ -1380,11 +1393,6 @@ export class GraphOperator {
                 });
             }
 
-            if (this.mainGraph) {
-                // clear old graph
-                // (<any>this.mainGraph).hidden_ctx_.clearRect(0, 0, (<any>this.mainGraph).hidden_.width, (<any>this.mainGraph).hidden_.height);
-                this.mainGraph.destroy();
-            }
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -1971,16 +1979,19 @@ export class GraphOperator {
 
 
                 // check
-                let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
-                sync.synchronize();
+                if(this.ragnebarGraph && this.mainGraph){
+                    let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
+                    sync.synchronize();
+                }
+
                 // readyCallback(this.mainGraph);
                 let rangeBarCanvas: any = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
                 let rangeBarHandles: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
                 let singleHandle: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle-single");
                 const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
-                    const datewindow = this.ragnebarGraph.xAxisRange();
-                    currentDatewindowOnMouseDown = datewindow;
+                    const dateWindow = this.ragnebarGraph.xAxisRange();
+                    currentDatewindowOnMouseDown = dateWindow;
 
                     window.addEventListener("mouseup", (e) => {
                         datewindowChangeFunc(e, []);
@@ -2073,7 +2084,7 @@ export class GraphOperator {
 
 
             if (!this.lockedInterval) {
-                this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
+                this.currentCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection) => {
                     return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
                 });
             } else if (this.currentCollection) {
@@ -2132,9 +2143,7 @@ export class GraphOperator {
         let end = this.end;
 
         // check if currentCollection doesnt exist in currentView then ignore it
-        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
-            return collection.name === this.currentCollection?.name;
-        });
+        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => collection.name === this.currentCollection?.name);
 
         // wrong collection and ignore it
         if (!existCollection) {

@@ -18,52 +18,52 @@ export class Synchronizer {
             throw 'Invalid invocation of Dygraph.synchronize(). Need >= 1 argument.';
         }
 
-        var OPTIONS = ['selection', 'zoom', 'range'];
-        var opts: any = {
+        let OPTIONS = ['selection', 'zoom', 'range'];
+        let opts: any = {
             selection: true,
             zoom: true,
             range: false
         };
-        var dygraphs: any[] = [];
-        var prevCallbacks: any[] = [];
+        let dygraphs: any[] = [];
+        let prevCallbacks: any[] = [];
 
-        var parseOpts = function (obj: any) {
+        let parseOpts = function (obj: any) {
             if (!(obj instanceof Object)) {
                 throw 'Last argument must be either Dygraph or Object.';
             } else {
-                for (var i = 0; i < OPTIONS.length; i++) {
-                    var optName = OPTIONS[i];
+                for (let i = 0; i < OPTIONS.length; i++) {
+                    let optName = OPTIONS[i];
                     if (obj.hasOwnProperty(optName)) opts[optName] = obj[optName];
                 }
             }
         };
 
-        var arraysAreEqual = (a: any, b: any) => {
+        let arraysAreEqual = (a: any, b: any) => {
             if (!Array.isArray(a) || !Array.isArray(b)) return false;
-            var i = a.length;
+            let i = a.length;
             if (i !== b.length) return false;
             while (i--) {
                 if (a[i] !== b[i]) return false;
             }
             return true;
-        }
+        };
 
-        var attachZoomHandlers = (gs: Dygraph[], syncOpts: any, prevCallbacks: any) => {
-            var block = false;
-            for (var i = 0; i < gs.length; i++) {
-                var g = gs[i];
+        let attachZoomHandlers = (gs: Dygraph[], syncOpts: any, prevCallbacks: any) => {
+            let block = false;
+            for (let i = 0; i < gs.length; i++) {
+                let g = gs[i];
                 g.updateOptions({
                     drawCallback: function (me: Dygraph, initial: boolean) {
                         if (block || initial) return;
                         block = true;
-                        var opts: { dateWindow: any, valueRange?: any } = {
+                        let opts: { dateWindow: any, valueRange?: any } = {
                             dateWindow: me.xAxisRange()
                         };
                         if (syncOpts.range) { 
                             opts.valueRange = me.yAxisRange();
                         };
 
-                        for (var j = 0; j < gs.length; j++) {
+                        for (let j = 0; j < gs.length; j++) {
                             if (gs[j] == me) {
                                 if (prevCallbacks[j] && prevCallbacks[j].drawCallback) {
                                     prevCallbacks[j].drawCallback.apply(this, arguments);
@@ -85,24 +85,24 @@ export class Synchronizer {
             }
         }
 
-        var attachSelectionHandlers = (gs: any[], prevCallbacks: any) => {
-            var block = false;
-            for (var i = 0; i < gs.length; i++) {
-                var g = gs[i];
+        let attachSelectionHandlers = (gs: any[], prevCallbacks: any) => {
+            let block = false;
+            for (let i = 0; i < gs.length; i++) {
+                let g = gs[i];
 
                 g.updateOptions({
                     highlightCallback: function (event: Event, x: any, points: any[], row: any, seriesName: any) {
                         if (block) return;
                         block = true;
-                        var me: any = this;
-                        for (var i = 0; i < gs.length; i++) {
+                        let me: any = this;
+                        for (let i = 0; i < gs.length; i++) {
                             if (me == gs[i]) {
                                 if (prevCallbacks[i] && prevCallbacks[i].highlightCallback) {
                                     prevCallbacks[i].highlightCallback.apply(this, arguments);
                                 }
                                 continue;
                             }
-                            var idx = gs[i].getRowForX(x);
+                            let idx = gs[i].getRowForX(x);
                             if (idx !== null) {
                                 gs[i].setSelection(idx, seriesName);
                             }
@@ -112,8 +112,8 @@ export class Synchronizer {
                     unhighlightCallback: function (e: Event) {
                         if (block) return;
                         block = true;
-                        var me = this;
-                        for (var i = 0; i < gs.length; i++) {
+                        let me = this;
+                        for (let i = 0; i < gs.length; i++) {
                             if (me == gs[i]) {
                                 if (prevCallbacks[i] && prevCallbacks[i].unhighlightCallback) {
                                     prevCallbacks[i].unhighlightCallback.apply(this, arguments);
@@ -126,12 +126,13 @@ export class Synchronizer {
                     }
                 }, true /* no need to redraw */);
             }
-        }
+        };
 
 
         if (this.args[0] instanceof Dygraph) {
             // Arguments are Dygraph objects.
-            for (var i = 0; i < this.args.length; i++) {
+            let i;
+            for (i = 0; i < this.args.length; i++) {
                 if (this.args[i] instanceof Dygraph) {
                     dygraphs.push(this.args[i]);
                 } else {
@@ -146,7 +147,7 @@ export class Synchronizer {
             }
         } else if (this.args[0].length) {
             // Invoked w/ list of dygraphs, options
-            for (var i = 0; i < this.args[0].length; i++) {
+            for (let i = 0; i < this.args[0].length; i++) {
                 dygraphs.push(this.args[0][i]);
             }
             if (this.args.length == 2) {
@@ -165,18 +166,18 @@ export class Synchronizer {
             'Need two or more dygraphs to synchronize.';
         }
 
-        var readycount = dygraphs.length;
-        for (var i = 0; i < dygraphs.length; i++) {
-            var g = dygraphs[i];
+        let readycount = dygraphs.length;
+        for (let i = 0; i < dygraphs.length; i++) {
+            let g = dygraphs[i];
             g.ready(function () {
                 if (--readycount == 0) {
                     // store original callbacks
-                    var callBackTypes = ['drawCallback', 'highlightCallback', 'unhighlightCallback'];
-                    for (var j = 0; j < dygraphs.length; j++) {
+                    let callBackTypes = ['drawCallback', 'highlightCallback', 'unhighlightCallback'];
+                    for (let j = 0; j < dygraphs.length; j++) {
                         if (!prevCallbacks[j]) {
                             prevCallbacks[j] = {};
                         }
-                        for (var k = callBackTypes.length - 1; k >= 0; k--) {
+                        for (let k = callBackTypes.length - 1; k >= 0; k--) {
                             prevCallbacks[j][callBackTypes[k]] = dygraphs[j].getFunctionOption(callBackTypes[k]);
                         }
                     }
@@ -195,8 +196,8 @@ export class Synchronizer {
 
         return {
             detach: function () {
-                for (var i = 0; i < dygraphs.length; i++) {
-                    var g = dygraphs[i];
+                for (let i = 0; i < dygraphs.length; i++) {
+                    let g = dygraphs[i];
                     if (opts.zoom) {
                         g.updateOptions({ drawCallback: prevCallbacks[i].drawCallback });
                     }
