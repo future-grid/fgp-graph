@@ -5,13 +5,15 @@ pipeline{
   }
   post {
     failure {
-      slackSend color: 'bad', message: "Jenkins build for fgp-graph has failed - ${env.VERSION}"
+      slackSend color: 'bad', message: "fgp-graph: build has failed - ${env.VERSION}"
     }
     success {
-      if(['origin/master'].contains(env.GIT_BRANCH) ){
-        slackSend color: 'good', message: "Build and publish for fgp-graph has succeeded - ${env.VERSION}"
-      }else{
-        slackSend color: 'good', message: "Build for fgp-graph has succeeded - ${env.VERSION} (you still need to merge to master)"
+      script {
+        if(['origin/master'].contains(env.GIT_BRANCH) ){
+          slackSend color: 'good', message: "fgp-graph: build+publish has succeeded - ${env.VERSION}"
+        }else{
+          slackSend color: 'good', message: "fgp-graph: build has succeeded - ${env.VERSION} (you still need to merge to master)"
+        }
       }
     }
   }
