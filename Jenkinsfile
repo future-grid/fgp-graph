@@ -35,7 +35,7 @@ pipeline{
           ).trim()
           echo "VERSION=${env.VERSION}"
           echo "GIT_TAG=${env.GIT_TAG}"
-
+          sh 'printenv'
           container("docker"){
             env.CURRENT_VERSION = sh (
               script: 'docker run --rm --entrypoint sh node:10-alpine -c "npm view @future-grid/fgp-graph version"',
