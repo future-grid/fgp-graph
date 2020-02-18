@@ -21,7 +21,7 @@ pipeline{
     stage ('prep'){
       steps {
         script {
-          package_json = readJSON(file: 'apps/ui/package.json')
+          package_json = readJSON(file: 'package.json')
           env.VERSION = package_json.version
           env.GIT_TAG = sh (
             script: 'git rev-parse --short HEAD',
