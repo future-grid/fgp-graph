@@ -5,14 +5,14 @@ pipeline{
   }
   post {
     failure {
-      slackSend color: 'bad', message: "*fgp-graph* build has failed - ${env.VERSION}"
+      slackSend color: 'bad', message: "*fgp-graph* build has failed - ${env.VERSION} - ${env.GIT_BRANCH}"
     }
     success {
       script {
         if(['origin/master'].contains(env.GIT_BRANCH) ){
-          slackSend color: 'good', message: "*fgp-graph* build+publish has succeeded - ${env.VERSION}"
+          slackSend color: 'good', message: "*fgp-graph* build+publish has succeeded - ${env.VERSION} - ${env.GIT_BRANCH}"
         }else{
-          slackSend color: 'good', message: "*fgp-graph* build has succeeded - ${env.VERSION} (you still need to merge to master)"
+          slackSend color: 'good', message: "*fgp-graph* build has succeeded - ${env.VERSION} - ${env.GIT_BRANCH} - (you still need to merge to master)"
         }
       }
     }
@@ -44,8 +44,8 @@ pipeline{
           }
           echo "CURRENT_VERSION=${env.CURRENT_VERSION}"
           if(env.CURRENT_VERSION == env.VERSION){
-            slackSend color: 'bad', message: "*fgp-graph* version ${env.VERSION} already exists - you need to increment the version in your package.json"
-            error("fgp-graph: ${env.VERSION} already exists - please increment the version in your package.json")
+            slackSend color: 'bad', message: "*fgp-graph* version ${env.VERSION} already exists - you need to increment the version in your package.json - ${env.GIT_BRANCH}"
+            error("fgp-graph: ${env.VERSION} already exists - please increment the version in your package.json - ${env.GIT_BRANCH}")
           }
         }
       }
