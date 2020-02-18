@@ -26,7 +26,6 @@ pipeline{
   stages{
     stage ('prep'){
       steps {
-        echo "ref is ${ref}"
         script {
           package_json = readJSON(file: 'package.json')
           env.VERSION = package_json.version
