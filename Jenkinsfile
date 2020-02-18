@@ -18,26 +18,6 @@ pipeline{
     }
   }
 
-  // triggers {
-  //   GenericTrigger(
-  //    genericVariables: [
-  //     [key: 'ref', value: '$.ref']
-  //    ],
-
-  //    causeString: "Triggered on $ref",
-
-  //   //  token: 'abc123',
-
-  //    printContributedVariables: true,
-  //    printPostContent: true,
-
-  //    silentResponse: false,
-
-  //    regexpFilterText: "$ref"
-  //   //  regexpFilterExpression: 'refs/heads/' + BRANCH_NAME
-  //   )
-  // }
-
   environment{
     DOCKERHUB = credentials('dockerhub-credentials')
     DEPLOYMENTS_REPO = "future-grid.git.beanstalkapp.com/futuregrid-deploy.git"
