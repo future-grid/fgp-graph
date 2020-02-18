@@ -66,7 +66,7 @@ pipeline{
       steps {
         container("docker"){
           ansiColor('xterm') {
-            sh "docker run --rm -e NPM_TOKEN=${env.NPM_TOKEN} --workdir /opt/app npm run-script publish"            
+            sh "docker run --rm -e NPM_TOKEN=${env.NPM_TOKEN} --entrypoint sh --workdir /opt/app fgp-graph -c 'npm run-script publish'"            
           }
         }
       }
