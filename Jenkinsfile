@@ -49,8 +49,10 @@ pipeline{
       //   expression { ['master'].contains(env.gitlabBranch) || ['origin/master'].contains(env.GIT_BRANCH) }
       // }
       steps {
-        container("docker"){
-          sh "docker build -t fgp-graph -f Dockerfile.build ."
+        ansiColor('xterm'){
+          container("docker"){
+            sh "docker build -t fgp-graph -f Dockerfile.build ."
+          }
         }
       }
     }
