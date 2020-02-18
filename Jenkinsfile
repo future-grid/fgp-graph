@@ -9,7 +9,7 @@ pipeline{
     }
     success {
       script {
-        if(['origin/master'].contains(env.GIT_BRANCH) ){
+        if(['master'].contains(env.GIT_BRANCH) ){
           slackSend color: 'good', message: "*fgp-graph* build+publish has succeeded - ${env.VERSION} - ${env.GIT_BRANCH}"
         }else{
           slackSend color: 'good', message: "*fgp-graph* build has succeeded - ${env.VERSION} - ${env.GIT_BRANCH} - (you still need to merge to master)"
@@ -51,9 +51,6 @@ pipeline{
       }
     }
     stage ('build'){
-      // when {
-      //   expression { ['master'].contains(env.gitlabBranch) || ['origin/master'].contains(env.GIT_BRANCH) }
-      // }
       steps {
         ansiColor('xterm'){
           container("docker"){
@@ -64,7 +61,7 @@ pipeline{
     }
     stage ('publish'){
       when {
-        expression { ['origin/master'].contains(env.GIT_BRANCH) }
+        expression { ['master'].contains(env.GIT_BRANCH) }
       }
       steps {
         container("docker"){
