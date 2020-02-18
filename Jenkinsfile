@@ -18,25 +18,25 @@ pipeline{
     }
   }
 
-  triggers {
-    GenericTrigger(
-     genericVariables: [
-      [key: 'ref', value: '$.ref']
-     ],
+  // triggers {
+  //   GenericTrigger(
+  //    genericVariables: [
+  //     [key: 'ref', value: '$.ref']
+  //    ],
 
-     causeString: 'Triggered on $ref',
+  //    causeString: "Triggered on $ref",
 
-    //  token: 'abc123',
+  //   //  token: 'abc123',
 
-     printContributedVariables: true,
-     printPostContent: true,
+  //    printContributedVariables: true,
+  //    printPostContent: true,
 
-     silentResponse: false,
+  //    silentResponse: false,
 
-     regexpFilterText: '$ref'
-    //  regexpFilterExpression: 'refs/heads/' + BRANCH_NAME
-    )
-  }
+  //    regexpFilterText: "$ref"
+  //   //  regexpFilterExpression: 'refs/heads/' + BRANCH_NAME
+  //   )
+  // }
 
   environment{
     DOCKERHUB = credentials('dockerhub-credentials')
@@ -46,7 +46,7 @@ pipeline{
   stages{
     stage ('prep'){
       steps {
-        echo "ref is $ref"
+        echo "ref is ${ref}"
         script {
           package_json = readJSON(file: 'package.json')
           env.VERSION = package_json.version
