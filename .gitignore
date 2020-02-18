@@ -3,3 +3,4 @@ dist/
 node_modules/
 etc/
 .idea/
+package-lock.json
