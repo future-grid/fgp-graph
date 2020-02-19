@@ -166,7 +166,6 @@ export default class DataService implements DataHandler {
                                 _records.push(_d);
                             }
                         });
-                        console.info(_id);
                         sampleData.push({id: _id, data: _records});
                     }
                 });

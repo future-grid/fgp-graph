@@ -12,7 +12,7 @@ export default class IFrameTarp {
 
 
     cover = () => {
-        let iframes: NodeListOf<HTMLIFrameElement> = document.getElementsByTagName('iframe');
+        let iframes: HTMLCollectionOf<HTMLIFrameElement> = document.getElementsByTagName('iframe');
 
         for (let i = 0; i < iframes.length; i++) {
             const iframe = iframes[i];

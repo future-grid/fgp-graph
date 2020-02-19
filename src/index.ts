@@ -11,8 +11,6 @@ export default class FgpGraph {
 
     graphContainer: HTMLElement;
 
-    header: HTMLElement;
-
     body: HTMLElement;
 
     private bottom!: HTMLElement;
@@ -25,13 +23,8 @@ export default class FgpGraph {
 
     private parentDom: HTMLElement;
 
-    viewsDropdown: HTMLElement;
-
-    intervalsDropdown: HTMLElement;
 
     intervalLabelsArea: HTMLElement;
-
-    seriesDropdown: HTMLElement;
 
     private exportButtons!: HTMLElement[];
 
@@ -46,7 +39,7 @@ export default class FgpGraph {
 
     id: string;
 
-    private operator!: GraphOperator;
+    public operator!: GraphOperator;
 
     private callbackDelayTimer: any = 0;
 
@@ -82,18 +75,10 @@ export default class FgpGraph {
             this.id = <string>this.parentDom.getAttribute("fgp-graph-id");
         }
 
-        let viewsDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-views-dropdown"}];
-        this.viewsDropdown = DomElementOperator.createElement('select', viewsDropdownAttrs);
 
-        let intervalsDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-intervals-dropdown"}];
-        this.intervalsDropdown = DomElementOperator.createElement('select', intervalsDropdownAttrs);
 
         let intervalsLabelsAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-interval-labels"}];
         this.intervalLabelsArea = DomElementOperator.createElement('div', intervalsLabelsAttrs);
-
-        let seriesDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-series-dropdown"}];
-        this.seriesDropdown = DomElementOperator.createElement('div', seriesDropdownAttrs);
-
 
         let buttonsAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-buttons"}];
         const buttonsArea = DomElementOperator.createElement('div', buttonsAttrs);
@@ -105,20 +90,11 @@ export default class FgpGraph {
         const toolbarArea = DomElementOperator.createElement('div', toolbarAreaAttrs);
 
 
-        let headerAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-header'}];
-        this.header = DomElementOperator.createElement('div', headerAttrs);
-        this.header.appendChild(buttonsArea);
-        this.header.appendChild(filterArea);
-        this.header.appendChild(toolbarArea);
-        this.header.appendChild(this.viewsDropdown);
-        this.header.appendChild(this.intervalsDropdown);
-        this.header.appendChild(this.seriesDropdown);
-        this.header.appendChild(this.intervalLabelsArea);
+
         // create doms
         let containerAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-container noselect'}];
         this.graphContainer = DomElementOperator.createElement('div', containerAttrs);
 
-        this.graphContainer.appendChild(this.header);
 
         let bodyAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-body'}];
         this.body = DomElementOperator.createElement('div', bodyAttrs);
@@ -133,7 +109,10 @@ export default class FgpGraph {
                     if (isNaN(domObserverEntry.contentRect.width) || isNaN(domObserverEntry.contentRect.height)) {
                     } else {
                         // resize graph manually, because dygraph resizing base on window object.
-                        this.graph.resize(NaN, NaN);
+                        console.log(`new size is: ${domObserverEntry.contentRect.width} ${domObserverEntry.contentRect.height}`);
+                        let evt = window.document.createEvent('UIEvents');
+                        evt.initEvent('resize', true, false);
+                        window.dispatchEvent(evt);
                     }
                 } else {
                     console.log("resizing not support for: ", domObserverEntry.target.className);
@@ -183,11 +162,12 @@ export default class FgpGraph {
         // change view
         // find view
         this.viewConfigs.forEach(config => {
+            config.show = false;
             if (config.name === view) {
-
+                // update show attribute
+                config.show = true;
                 this.operator.init(config, (graph: Dygraph) => {
                     this.graph = graph;
-
                     this.children.forEach(graph => {
                         // call updateDatewinow
                         if (graph.id != this.id) {
@@ -195,7 +175,6 @@ export default class FgpGraph {
                             graph.operator.refresh();
                         }
                     });
-
                 }, () => {
                     this.children.forEach(graph => {
                         // call updateDatewinow
@@ -211,11 +190,6 @@ export default class FgpGraph {
                     //f call
                     this.eventListeners.onViewChange(this, config);
                 }
-
-                // update dropdownlist
-                if (view && this.viewsDropdown) {
-                    (<HTMLSelectElement>this.viewsDropdown).value = view;
-                }
             }
         });
     };
@@ -227,7 +201,7 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public initGraph = (ready?: (g: FgpGraph) => void) => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.intervalsDropdown, this.header, this.dateWindowHandler, this, this.eventListeners, this.id);
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.dateWindowHandler, this, this.eventListeners, this.id);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
@@ -248,15 +222,6 @@ export default class FgpGraph {
                 return false;
             }
 
-
-            // add options into view dropdown list
-            const viewsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.viewsDropdown, [...dropdownOpts]);
-            viewsDropdonwOptions.render();
-            // add callback handler
-            this.viewsDropdown.onchange = (e) => {
-                const choosedView = (<HTMLSelectElement>e.target).value;
-                this.changeView(choosedView);
-            };
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;

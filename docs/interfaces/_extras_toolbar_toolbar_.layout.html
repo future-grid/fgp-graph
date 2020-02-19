@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Callbacks | @future-grid/fgp-graph - v20.2.3-RC4</title>
+	<title>Layout | @future-grid/fgp-graph - v20.2.3-RC4</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,48 +56,24 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_metadata_configurations_.html">&quot;metadata/configurations&quot;</a>
+					<a href="../modules/_extras_toolbar_toolbar_.html">&quot;extras/toolbar/Toolbar&quot;</a>
 				</li>
 				<li>
-					<a href="_metadata_configurations_.callbacks.html">Callbacks</a>
+					<a href="_extras_toolbar_toolbar_.layout.html">Layout</a>
 				</li>
 			</ul>
-			<h1>Interface Callbacks</h1>
+			<h1>Interface Layout</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>graph callback configuration</p>
-					</div>
-					<dl class="tsd-comment-tags">
-						<dt>datacallback</dt>
-						<dd><p>any time the datewindow changed, call this method to send data back to outside</p>
-						</dd>
-						<dt>highlightcallback</dt>
-						<dd><p>send one series back to outside on hover the graph</p>
-						</dd>
-						<dt>clickcallback</dt>
-						<dd><p>send one series back on click the graph</p>
-						</dd>
-						<dt>dbclickcallback</dt>
-						<dd><p>send one series back on dblclick the graph</p>
-						</dd>
-						<dt>syncdatewindow</dt>
-						<dd><p>send [start, end] back to outside</p>
-						</dd>
-					</dl>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Callbacks</span>
+						<span class="target">Layout</span>
 					</li>
 				</ul>
 			</section>
@@ -106,138 +82,145 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#chart_div" class="tsd-kind-icon">chart_<wbr>div</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_metadata_configurations_.callbacks.html#clickcallback" class="tsd-kind-icon">click<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_metadata_configurations_.callbacks.html#datacallback" class="tsd-kind-icon">data<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_metadata_configurations_.callbacks.html#dbclickcallback" class="tsd-kind-icon">db<wbr>Click<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_metadata_configurations_.callbacks.html#highlightcallback" class="tsd-kind-icon">highlight<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_metadata_configurations_.callbacks.html#syncdatewindow" class="tsd-kind-icon">sync<wbr>Date<wbr>Window</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#chartrect" class="tsd-kind-icon">chart<wbr>Rect</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#reservespacebottom" class="tsd-kind-icon">reserve<wbr>Space<wbr>Bottom</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#reservespaceleft" class="tsd-kind-icon">reserve<wbr>Space<wbr>Left</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#reservespaceright" class="tsd-kind-icon">reserve<wbr>Space<wbr>Right</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_extras_toolbar_toolbar_.layout.html#reservespacetop" class="tsd-kind-icon">reserve<wbr>Space<wbr>Top</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="chart_div" class="tsd-anchor"></a>
+					<h3>chart_<wbr>div</h3>
+					<div class="tsd-signature tsd-kind-icon">chart_<wbr>div<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLDivElement</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L16">extras/toolbar/Toolbar.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="clickcallback" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> click<wbr>Callback</h3>
+					<a name="chartrect" class="tsd-anchor"></a>
+					<h3>chart<wbr>Rect</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">click<wbr>Callback<span class="tsd-signature-symbol">(</span>series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">chart<wbr>Rect<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/metadata/configurations.ts#L193">metadata/configurations.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L26">extras/toolbar/Toolbar.ts:26</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>series: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="datacallback" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> data<wbr>Callback</h3>
+					<a name="reservespacebottom" class="tsd-anchor"></a>
+					<h3>reserve<wbr>Space<wbr>Bottom</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">data<wbr>Callback<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">reserve<wbr>Space<wbr>Bottom<span class="tsd-signature-symbol">(</span>px<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/metadata/configurations.ts#L189">metadata/configurations.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L24">extras/toolbar/Toolbar.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>data: <span class="tsd-signature-type">any</span></h5>
+									<h5>px: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="dbclickcallback" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> db<wbr>Click<wbr>Callback</h3>
+					<a name="reservespaceleft" class="tsd-anchor"></a>
+					<h3>reserve<wbr>Space<wbr>Left</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">db<wbr>Click<wbr>Callback<span class="tsd-signature-symbol">(</span>series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">reserve<wbr>Space<wbr>Left<span class="tsd-signature-symbol">(</span>px<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/metadata/configurations.ts#L195">metadata/configurations.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L18">extras/toolbar/Toolbar.ts:18</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>series: <span class="tsd-signature-type">string</span></h5>
+									<h5>px: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="highlightcallback" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> highlight<wbr>Callback</h3>
+					<a name="reservespaceright" class="tsd-anchor"></a>
+					<h3>reserve<wbr>Space<wbr>Right</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">highlight<wbr>Callback<span class="tsd-signature-symbol">(</span>datetime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, series<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">reserve<wbr>Space<wbr>Right<span class="tsd-signature-symbol">(</span>px<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/metadata/configurations.ts#L191">metadata/configurations.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L20">extras/toolbar/Toolbar.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>datetime: <span class="tsd-signature-type">any</span></h5>
-								</li>
-								<li>
-									<h5>series: <span class="tsd-signature-type">any</span></h5>
-								</li>
-								<li>
-									<h5>points: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>px: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="syncdatewindow" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> sync<wbr>Date<wbr>Window</h3>
+					<a name="reservespacetop" class="tsd-anchor"></a>
+					<h3>reserve<wbr>Space<wbr>Top</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">sync<wbr>Date<wbr>Window<span class="tsd-signature-symbol">(</span>dateWindow<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">reserve<wbr>Space<wbr>Top<span class="tsd-signature-symbol">(</span>px<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/metadata/configurations.ts#L197">metadata/configurations.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/future-grid/fgp-graph/blob/54c2204/src/extras/toolbar/Toolbar.ts#L22">extras/toolbar/Toolbar.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>dateWindow: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>px: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-signature-type">ReserveSpace</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -267,7 +250,7 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_extras_synchronizer_.html">&quot;extras/synchronizer&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
+					<li class="current tsd-kind-external-module">
 						<a href="../modules/_extras_toolbar_toolbar_.html">&quot;extras/toolbar/<wbr>Toolbar&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -285,7 +268,7 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_index_.html">&quot;index&quot;</a>
 					</li>
-					<li class="current tsd-kind-external-module">
+					<li class=" tsd-kind-external-module">
 						<a href="../modules/_metadata_configurations_.html">&quot;metadata/configurations&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -304,77 +287,38 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_metadata_configurations_.filtertype.html" class="tsd-kind-icon">Filter<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_metadata_configurations_.graphconstant.html" class="tsd-kind-icon">Graph<wbr>Constant</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_metadata_configurations_.graphexports.html" class="tsd-kind-icon">Graph<wbr>Exports</a>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+						<a href="../classes/_extras_toolbar_toolbar_.toolbar.html" class="tsd-kind-icon">Toolbar</a>
 					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.callbacks.html" class="tsd-kind-icon">Callbacks</a>
+						<a href="_extras_toolbar_toolbar_.layout.html" class="tsd-kind-icon">Layout</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_metadata_configurations_.callbacks.html#clickcallback" class="tsd-kind-icon">click<wbr>Callback</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_extras_toolbar_toolbar_.layout.html#chart_div" class="tsd-kind-icon">chart_<wbr>div</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_metadata_configurations_.callbacks.html#datacallback" class="tsd-kind-icon">data<wbr>Callback</a>
+								<a href="_extras_toolbar_toolbar_.layout.html#chartrect" class="tsd-kind-icon">chart<wbr>Rect</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_metadata_configurations_.callbacks.html#dbclickcallback" class="tsd-kind-icon">db<wbr>Click<wbr>Callback</a>
+								<a href="_extras_toolbar_toolbar_.layout.html#reservespacebottom" class="tsd-kind-icon">reserve<wbr>Space<wbr>Bottom</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_metadata_configurations_.callbacks.html#highlightcallback" class="tsd-kind-icon">highlight<wbr>Callback</a>
+								<a href="_extras_toolbar_toolbar_.layout.html#reservespaceleft" class="tsd-kind-icon">reserve<wbr>Space<wbr>Left</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_metadata_configurations_.callbacks.html#syncdatewindow" class="tsd-kind-icon">sync<wbr>Date<wbr>Window</a>
+								<a href="_extras_toolbar_toolbar_.layout.html#reservespaceright" class="tsd-kind-icon">reserve<wbr>Space<wbr>Right</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_extras_toolbar_toolbar_.layout.html#reservespacetop" class="tsd-kind-icon">reserve<wbr>Space<wbr>Top</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.domattrs.html" class="tsd-kind-icon">Dom<wbr>Attrs</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.entity.html" class="tsd-kind-icon">Entity</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.features.html" class="tsd-kind-icon">Features</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.filterconfig.html" class="tsd-kind-icon">Filter<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.graphcollection.html" class="tsd-kind-icon">Graph<wbr>Collection</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.graphconfig.html" class="tsd-kind-icon">Graph<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.graphseries.html" class="tsd-kind-icon">Graph<wbr>Series</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.toolbarbtn.html" class="tsd-kind-icon">Toolbar<wbr>Btn</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.toolbarconfig.html" class="tsd-kind-icon">Toolbar<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.toolbardropdown.html" class="tsd-kind-icon">Toolbar<wbr>Dropdown</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.viewconfig.html" class="tsd-kind-icon">View<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_metadata_configurations_.viewoptions.html" class="tsd-kind-icon">View<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_metadata_configurations_.html#filterfunc" class="tsd-kind-icon">filter<wbr>Func</a>
+						<a href="_extras_toolbar_toolbar_.reservespace.html" class="tsd-kind-icon">Reserve<wbr>Space</a>
 					</li>
 				</ul>
 			</nav>

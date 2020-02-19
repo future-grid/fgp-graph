@@ -129,6 +129,8 @@ export interface GraphCollection {
     initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
     fill?: boolean;
     markLines?: Array<{ value: number, label: string, color?: string }>;
+    locked?: boolean,
+    show?: boolean
 }
 
 /**
@@ -164,7 +166,7 @@ export interface FilterConfig {
  * @filters button or dropdown list config
  */
 export interface GraphConfig {
-    hideHeader?: boolean | { views: boolean, intervals: boolean, toolbar: boolean, series: boolean };
+    hideHeader?: boolean | { views: boolean, intervals: boolean, toolbar: boolean, series: boolean};
     features: Features;
     entities: Array<Entity>;
     rangeEntity: Entity;

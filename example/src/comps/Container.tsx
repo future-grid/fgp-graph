@@ -7,7 +7,8 @@ import moment from "moment-timezone";
 import FgpGraph from "@future-grid/fgp-graph";
 import GenericGraph from "./GenericGraph";
 
-import {Container, Badge} from 'react-bootstrap';
+import {Container, Badge, Card, Row} from 'react-bootstrap';
+import ReactJson from "react-json-view";
 
 type Props = {}
 
@@ -35,7 +36,7 @@ export default class GraphContainer extends Component<Props, States> {
             childrenGraph: []
         };
 
-        this.formatters = new Formatters("Australia/Perth");
+        this.formatters = new Formatters("Australia/Melbourne");
         this.formatters.setFormat('DD MMM YYYY h:mm a');
 
         this.dataService = new DataService();
@@ -51,8 +52,8 @@ export default class GraphContainer extends Component<Props, States> {
             name: "device view",
             connectSeparatedPoints: true,
             graphConfig: {
-                hideHeader: {views: false, intervals: false, toolbar: false, series: false},
-                // hideHeader: false,
+                hideHeader: {views: false, intervals: false, toolbar: true, series: false},
+                // hideHeader: true,
                 features: {
                     zoom: true,
                     scroll: true,
@@ -428,76 +429,76 @@ export default class GraphContainer extends Component<Props, States> {
             timezone: 'Australia/Melbourne'
             // timezone: 'Pacific/Auckland'
         };
-        const vsConfig3: ViewConfig = {
-            name: "scatter view",
-            graphConfig: {
-                features: {
-                    zoom: true,
-                    scroll: false,
-                    rangeBar: false,
-                    legend: this.formatters.legendForSingleSeries
-
-                },
-                entities: [
-                    {id: "meter1", type: "meter", name: "meter1"},
-                    {id: "meter2", type: "meter", name: "meter2"}
-                ],
-                rangeEntity: {id: "substation1", type: "substation", name: "**F**substation"},
-                rangeCollection: {
-                    label: 'substation_day',
-                    name: 'substation_interval_day',
-                    interval: 86400000,
-                    series: [
-                        {label: "Avg", type: 'line', exp: "data.avgConsumptionVah"}
-                    ]
-                },
-                collections: [
-                    {
-                        label: 'meter_raw',
-                        name: 'meter_read',
-                        interval: 3600000,
-                        series: [
-                            {label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left'}
-                        ],
-                        threshold: {min: 0, max: (1000 * 60 * 60 * 24 * 10)},    //  0 ~ 10 days
-                        initScales: {left: {min: 245, max: 260}},
-                        yLabel: 'voltage'
-                    }, {
-                        label: 'meter_day',
-                        name: 'meter_read_day',
-                        interval: 86400000,
-                        series: [
-                            {label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left'}
-                        ],
-                        threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
-                        initScales: {left: {min: 245, max: 260}},
-                        yLabel: 'voltage'
-                    }
-                ]
-            },
-            dataService: this.dataService,
-            show: true,
-            ranges: [
-                {name: "7 days", value: 604800000, show: true},
-                {name: "1 month", value: 2592000000}
-            ],
-            initRange: {
-                start: moment().subtract(10, 'days').startOf('day').valueOf(),
-                end: moment().add(1, 'days').valueOf()
-            },
-            interaction: {
-                callback: {
-                    highlightCallback: (datetime, series, points) => {
-                        console.debug("selected series: ", series);
-                    },
-                    clickCallback: (series) => {
-                        console.debug("choosed series: ", series);
-                    }
-                }
-            },
-            timezone: 'Australia/Melbourne'
-            // timezone: 'Pacific/Auckland'
-        };
+        // const vsConfig3: ViewConfig = {
+        //     name: "scatter view",
+        //     graphConfig: {
+        //         features: {
+        //             zoom: true,
+        //             scroll: false,
+        //             rangeBar: false,
+        //             legend: this.formatters.legendForSingleSeries
+        //
+        //         },
+        //         entities: [
+        //             {id: "meter1", type: "meter", name: "meter1"},
+        //             {id: "meter2", type: "meter", name: "meter2"}
+        //         ],
+        //         rangeEntity: {id: "substation1", type: "substation", name: "**F**substation"},
+        //         rangeCollection: {
+        //             label: 'substation_day',
+        //             name: 'substation_interval_day',
+        //             interval: 86400000,
+        //             series: [
+        //                 {label: "Avg", type: 'line', exp: "data.avgConsumptionVah"}
+        //             ]
+        //         },
+        //         collections: [
+        //             {
+        //                 label: 'meter_raw',
+        //                 name: 'meter_read',
+        //                 interval: 3600000,
+        //                 series: [
+        //                     {label: "Voltage", type: 'line', exp: "data.voltage", yIndex: 'left'}
+        //                 ],
+        //                 threshold: {min: 0, max: (1000 * 60 * 60 * 24 * 10)},    //  0 ~ 10 days
+        //                 initScales: {left: {min: 245, max: 260}},
+        //                 yLabel: 'voltage'
+        //             }, {
+        //                 label: 'meter_day',
+        //                 name: 'meter_read_day',
+        //                 interval: 86400000,
+        //                 series: [
+        //                     {label: "Avg Voltage", type: 'line', exp: "data.avgVoltage", yIndex: 'left'}
+        //                 ],
+        //                 threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
+        //                 initScales: {left: {min: 245, max: 260}},
+        //                 yLabel: 'voltage'
+        //             }
+        //         ]
+        //     },
+        //     dataService: this.dataService,
+        //     show: true,
+        //     ranges: [
+        //         {name: "7 days", value: 604800000, show: true},
+        //         {name: "1 month", value: 2592000000}
+        //     ],
+        //     initRange: {
+        //         start: moment().subtract(10, 'days').startOf('day').valueOf(),
+        //         end: moment().add(1, 'days').valueOf()
+        //     },
+        //     interaction: {
+        //         callback: {
+        //             highlightCallback: (datetime, series, points) => {
+        //                 console.log(`select series: [${series}]`);
+        //             },
+        //             clickCallback: (series) => {
+        //                 console.log(`click series: [${series}]`);
+        //             }
+        //         }
+        //     },
+        //     timezone: 'Australia/Melbourne'
+        //     // timezone: 'Pacific/Auckland'
+        // };
 
         this.mainViewConfigs = this.mainViewConfigs.concat(vdConfig, vsConfig);
         this.childViewConfigs = this.childViewConfigs.concat(vsConfig2);
@@ -508,15 +509,25 @@ export default class GraphContainer extends Component<Props, States> {
     readyCallback = (div: HTMLDivElement, g: FgpGraph) => {
         this.graphDiv = div;
         const mainGraph = g;
-        this.setState({
-            childrenGraph: [{
-                id: '' + Math.random() * 1000,
-                viewConfigs: this.childViewConfigs,
-                onReady: (div: HTMLDivElement, g: FgpGraph) => {
-                    mainGraph.setChildren([g]);
-                }
-            }]
-        });
+
+
+
+        // setTimeout(()=>{
+        //     mainGraph.changeView("scatter view");
+        // }, 5000);
+
+
+
+
+        // this.setState({
+        //     childrenGraph: [{
+        //         id: '' + Math.random() * 1000,
+        //         viewConfigs: this.childViewConfigs,
+        //         onReady: (div: HTMLDivElement, g: FgpGraph) => {
+        //             mainGraph.setChildren([g]);
+        //         }
+        //     }]
+        // });
 
 
     };
@@ -527,7 +538,7 @@ export default class GraphContainer extends Component<Props, States> {
 
 
     onViewChange = (g: FgpGraph, view: ViewConfig): void => {
-        console.log(`view changed! current view is [${view.name}]`);
+        console.log(`view changed to [${view.name}]`);
         const mainGraph = g;
         if ("device view" === view.name) {
             // add new child graph
@@ -551,31 +562,69 @@ export default class GraphContainer extends Component<Props, States> {
     };
 
     onIntervalChange = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }): void => {
-        console.log('interval changed!', interval);
+        console.log(`interval changed to [${interval}]`);
     };
 
 
     componentDidMount(): void {
 
+
+
+
     }
 
 
     render() {
+
+
+
+
+
         return (
             <Container fluid={true}>
                 {/*main graph*/}
-                <Badge variant="info">@future-grid/fgp-graph</Badge>
-                <GenericGraph viewConfigs={this.mainViewConfigs} onReady={this.readyCallback}
-                              viewChangeListener={this.onViewChange}
-                              intervalChangeListener={this.onIntervalChange}/>
+                <Row className="justify-content-md-center">
+                    <h4>
+                        <Badge variant="info">@future-grid/fgp-graph / Main Graph</Badge>
+                    </h4>
+                </Row>
+                <Card>
+                    <GenericGraph viewConfigs={this.mainViewConfigs} onReady={this.readyCallback}
+                                  viewChangeListener={this.onViewChange}
+                                  intervalChangeListener={this.onIntervalChange}/>
+
+                </Card>
+                <Card>
+                    <ReactJson src={this.mainViewConfigs} name={'viewConfigs'} collapsed={true} iconStyle={"circle"}/>
+                </Card>
+
+
+                <br/>
 
                 {/*children graphs*/}
+
                 {
-                    this.state.childrenGraph.map((_config) => {
+                    this.state.childrenGraph.length > 0 ? <Row className="justify-content-md-center">
+                        <h4>
+                            <Badge variant="warning">@future-grid/fgp-graph / Children Graphs</Badge>
+                        </h4>
+                    </Row> : null
+                }
+
+
+
+                {
+                    this.state.childrenGraph.map((_config: { id: string; viewConfigs: Array<ViewConfig>; onReady(div: HTMLDivElement, g: FgpGraph): void }) => {
                         return (
                             <div key={_config.id}>
-                                <GenericGraph viewConfigs={_config.viewConfigs} onReady={_config.onReady}/>
+                                <Card>
+                                    <GenericGraph viewConfigs={_config.viewConfigs} onReady={_config.onReady}/>
+                                </Card>
+                                <Card>
+                                    <ReactJson src={_config.viewConfigs} name={'viewConfigs'} collapsed={true} iconStyle={"circle"}/>
+                                </Card>
                             </div>
+
                         );
                     })
                 }
