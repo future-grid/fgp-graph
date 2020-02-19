@@ -18,7 +18,7 @@
 
 .fgp-graph-body {
     position: absolute;
-    top: 31px;
+    top: 0;
     bottom: 50px;
     left: 10px;
     right: 10px;
@@ -45,47 +45,70 @@
     float: right;
 }
 
+.fgp-views-dropdown select{
+
+}
+
 .fgp-intervals-dropdown {
     float: right;
     margin-right: 5px;
+}
+
+.fgp-intervals-dropdown select{
+    width: 100%;
+
 }
 
 .fgp-series-dropdown {
     float: right;
     margin-right: 5px;
     position: relative;
-    top: -1px;
 }
 
 .fgp-buttons {
     float: right;
     line-height: 1.3;
+    margin-top: 1px;
+}
+
+
+.fgp-filter-container{
+    float: right;
+    margin-left: 5px;
 }
 
 .fgp-filter-buttons {
     float: right;
     line-height: 1.3;
     margin-left: 5px;
+    margin-top: 1px;
+}
+
+.fgp-extra-buttons {
+    float: right;
+    line-height: 1.3;
+    margin-left: 5px;
+    margin-top: 1px;
 }
 
 
 .fgp-filter-dropdown {
-    float: right;
-    line-height: 1.3;
     margin-left: 5px;
-    margin-left: 5px;
+
 }
 
 .fgp-toolbar-dropdown{
     float: right;
     line-height: 1.3;
     margin-left: 5px;
+    margin-top: 1px;
+
 }
 
 .fgp-toolbar-area {
     float: right;
-    line-height: 1.3;
     margin-left: 5px;
+    line-height: 1.3;
 }
 
 .fgp-btn-v {
@@ -206,7 +229,6 @@
 .fgp-interval-labels {
     float: right;
     position: relative;
-    top: -2px;
     margin-right: 5px;
     cursor: default;
 }
@@ -230,6 +252,7 @@
     padding-left: 0.6em;
     border-radius: 10rem;
     cursor: pointer;
+
 }
 
 .fgp-interval-labels .badge-success {
@@ -428,6 +451,45 @@
     stroke-dasharray: 12, 36;
     stroke-dashoffset: 48;
     animation: dash 1s linear infinite;
+}
+
+
+.graph-series-multi-select{
+    min-width: 60px;
+}
+
+.graph-series-multi-select .select-box{
+    position: relative;
+}
+
+.graph-series-multi-select .select-box select {
+    width: 100%;
+
+}
+
+.graph-series-multi-select .select-box .over-select {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+.graph-series-checkboxes {
+    display: none;
+    border: 1px #dadada solid;
+    background-color: white;
+    padding: 2px;
+}
+
+
+.graph-series-checkboxes > label {
+    display: block;
+}
+
+.graph-series-checkboxes > label:hover {
+    background-color: rgba(158, 148, 147, 0.51);
 }
 
 @-moz-keyframes dash {
