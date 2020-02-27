@@ -53,8 +53,7 @@ export default class Toolbar {
 
     private readonly views: Array<ViewConfig>;
 
-
-    constructor(view: ViewConfig, views: Array<ViewConfig>, public collectionSelectionListener: (collections: Array<GraphCollection>) => void, public intervalSelectionListener: (collection: GraphCollection, dateWindow: [number, number]) => void, public viewChangeListener: (view: ViewConfig) => void) {
+    constructor(view: ViewConfig, views: Array<ViewConfig>, public collectionSelectionListener: (collections: Array<GraphCollection>) => void, public intervalSelectionListener: (collection: GraphCollection, dateWindow: [number, number]) => void, public viewChangeListener: (view: ViewConfig) => void, public reactSelectionListener?: (active: boolean) => void) {
         this.collectionOpts = view.graphConfig.collections;
         this.views = views;
         this.viewConfig = view;
@@ -83,22 +82,20 @@ export default class Toolbar {
                 this.graphHeader = div;
 
 
-
-                if(this.viewConfig.graphConfig.features.exports){
+                if (this.viewConfig.graphConfig.features.exports) {
                     this.createExportBtns(this.viewConfig.graphConfig.features.exports);
                 }
 
 
-
-                if(!hideHeader.toolbar && this.viewConfig.graphConfig.features.toolbar){
+                if (!hideHeader.toolbar && this.viewConfig.graphConfig.features.toolbar) {
                     this.createExtraToolbar();
                 }
 
-                if(this.viewConfig.graphConfig.filters){
+                if (this.viewConfig.graphConfig.filters) {
                     this.createFilter();
                 }
 
-                if(!hideHeader.views){
+                if (!hideHeader.views) {
                     this.createView();
                 }
 
@@ -107,8 +104,7 @@ export default class Toolbar {
                 }
 
 
-
-                if(!hideHeader.series){
+                if (!hideHeader.series) {
                     this.createSeries();
                 }
 
@@ -150,7 +146,7 @@ export default class Toolbar {
 
     private createExportBtns = (config?: GraphExports[]) => {
         if (this.graphHeader && config) {
-            this.exports = new Exports(this.graphHeader, config, this.graphDiv);
+            this.exports = new Exports(this.graphHeader, config, this.graphDiv, this.reactSelectionListener);
         }
     };
 
@@ -213,4 +209,6 @@ export default class Toolbar {
         this.series?.setData(collection);
         this.filter?.setData(collection);
     };
+
+
 }

@@ -13,7 +13,9 @@ export default class Exports {
 
     private labels?: string[];
 
-    constructor(public parentElement: Element, public config?: GraphExports[], public graphDiv?: Element) {
+    private rectSelectStatus = false;
+
+    constructor(public parentElement: Element, public config?: GraphExports[], public graphDiv?: Element, public reactSelectionListener?: (active: boolean) => void) {
         this.initDom();
     }
 
@@ -89,6 +91,23 @@ export default class Exports {
             }
         });
 
+        // add rect selection
+        if (this.reactSelectionListener) {
+            let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-draw"}];
+            let btnDraw = DomElementOperator.createElement('button', btnAttrs);
+            btnDraw.addEventListener("click", (event) => {
+                this.rectSelectStatus = !this.rectSelectStatus;
+
+                if(this.rectSelectStatus){
+                    btnDraw.style.backgroundColor = "yellow";
+                } else {
+                    btnDraw.style.backgroundColor = "";
+                }
+
+                this.reactSelectionListener ? this.reactSelectionListener(this.rectSelectStatus) : null;
+            });
+            buttonsContainer.appendChild(btnDraw);
+        }
 
         this.parentElement.appendChild(buttonsContainer);
     };
