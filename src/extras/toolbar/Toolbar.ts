@@ -191,7 +191,6 @@ export default class Toolbar {
             this.badges = new Badges(this.graphHeader, collections, this.collectionSelectionListener);
         }
     };
-
     /**
      * call this function to update all toolbar widgets
      * @param dateWindow
