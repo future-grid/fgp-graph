@@ -19,40 +19,7 @@ import FgpGraph from "../index";
 import {EventHandlers} from "../metadata/graphoptions";
 import Toolbar from "../extras/toolbar/Toolbar";
 import RangeHandles from "../extras/RangeHandles";
-
-
-export class DropdownButton {
-
-    private select: HTMLSelectElement;
-
-    private btns: Array<{ id: string, label: string, selected?: boolean }>;
-
-    constructor(select: HTMLSelectElement, buttons: Array<{ id: string, label: string, selected?: boolean, formatter?: any }>) {
-        this.select = select;
-        this.btns = buttons;
-    }
-
-    /**
-     * generate option
-     *
-     * @memberof DropdownButton
-     */
-    render = () => {
-        // remove all first
-        this.select.innerHTML = '';
-        this.btns.forEach(element => {
-            let opt: HTMLOptionElement = document.createElement('option');
-            opt.text = element.label;
-            opt.value = element.id;
-            if (element.selected) {
-                opt.selected = true;
-            }
-            // add it into select
-            this.select.add(opt);
-        });
-    }
-}
-
+import RectSelection from "../extras/toolbar/RectSelection";
 
 export class DomElementOperator {
 
@@ -97,7 +64,7 @@ export class GraphOperator {
 
     private mainGraph: Dygraph;
 
-    private ragnebarGraph: Dygraph;
+    private rangebarGraph: Dygraph;
 
     private currentView!: ViewConfig;
 
@@ -113,32 +80,35 @@ export class GraphOperator {
 
     private currentGraphData: any[];
 
-    private graphContainer: HTMLElement;
+    private readonly graphContainer: HTMLElement;
 
-    private graphBody: HTMLElement;
+    private readonly graphBody: HTMLElement;
 
 
-    private spinner: LoadingSpinner;
+    private readonly spinner: LoadingSpinner;
 
     private xBoundary: [number, number];
 
-    private yAxisBtnArea: HTMLElement;
+    private readonly yAxisBtnArea: HTMLElement;
 
-    private y2AxisBtnArea: HTMLElement;
+    private readonly y2AxisBtnArea: HTMLElement;
 
     private lockedInterval: { name: string, interval: number } | undefined;
 
     private eventListeners?: EventHandlers;
 
-    private graphInstance: FgpGraph;
+    private readonly graphInstance: FgpGraph;
 
     private toolbar?: Toolbar;
+
+    private rectSelection?: RectSelection;
+
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
         this.mainGraph = mainGraph;
         this.graphId = id;
         this.graphInstance = fgpGraph;
-        this.ragnebarGraph = rangeGraph;
+        this.rangebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
@@ -306,132 +276,6 @@ export class GraphOperator {
         }
     };
 
-
-    private setColors = (colors: Array<string>) => {
-        // check if length match or not
-        let graphLabels: Array<string> = this.mainGraph.getLabels();
-        let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
-        let sat = 1.0;
-        let val = 0.5;
-        // get current y and y2 axis scaling max and min
-        let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-        if (graphLabels.length - 1 === colors.length) {
-            this.mainGraph.updateOptions({
-                colors: colors,
-                axes: {
-                    x: {
-                        axisLabelFormatter: formatters.axisLabel
-                    },
-                    y: {
-                        valueRange: ranges[0],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    },
-                    y2: ranges.length > 1 ? {
-                        valueRange: ranges[1],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    } : undefined
-                }
-            });
-        } else {
-            if (this.currentView.graphConfig.entities.length > 1) {
-                this.mainGraph.updateOptions({
-                    colors: undefined,
-                    axes: {
-                        x: {
-                            axisLabelFormatter: formatters.axisLabel
-                        },
-                        y: {
-                            valueRange: ranges[0],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        },
-                        y2: ranges.length > 1 ? {
-                            valueRange: ranges[1],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        } : undefined
-                    }
-                });
-            } else {
-                if (this.currentCollection) {
-                    let defaultColors: Array<string> = [];
-                    const num = this.currentCollection.series.length;
-                    this.currentCollection.series.forEach((series, i) => {
-                        let half = Math.ceil(num / 2);
-                        let idx = i % 2 ? (half + (i + 1) / 2) : Math.ceil((i + 1) / 2);
-                        let hue = (1.0 * idx / (1 + num));
-                        let colorStr = hsvToRGB(hue, sat, val);
-                        defaultColors.push(series.color ? series.color : colorStr);
-                    });
-
-                    this.mainGraph.updateOptions({
-                        colors: defaultColors,
-                        axes: {
-                            x: {
-                                axisLabelFormatter: formatters.axisLabel
-                            },
-                            y: {
-                                valueRange: ranges[0],
-                                axisLabelWidth: 80,
-                                labelsKMB: true
-                            },
-                            y2: ranges.length > 1 ? {
-                                valueRange: ranges[1],
-                                axisLabelWidth: 80,
-                                labelsKMB: true
-                            } : undefined
-                        }
-                    });
-                }
-            }
-        }
-    };
-
-    private setVisibility = (series: Array<string>) => {
-        // set visibility
-        let graphLabels: Array<string> = this.mainGraph.getOption('labels');
-        let visibility: Array<boolean> = [];
-        let labels = graphLabels.filter((element, index, array) => {
-            if (index != 0) {
-                visibility.push(true);
-                return true;
-            }
-            return false;
-        });
-
-        let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
-        // get current y and y2 axis scaling max and min
-        let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-
-
-        labels.map((value, index, array) => {
-            // never hide mark lines
-            visibility[index] = series.includes(value) || value.indexOf("_markline") != -1;
-        });
-
-        // set visibility
-        this.mainGraph.updateOptions({
-            visibility: visibility,
-            axes: {
-                x: {
-                    axisLabelFormatter: formatters.axisLabel
-                },
-                y: {
-                    valueRange: ranges[0],
-                    axisLabelWidth: 80,
-                    labelsKMB: true
-                },
-                y2: ranges.length > 1 ? {
-                    valueRange: ranges[1],
-                    axisLabelWidth: 80,
-                    labelsKMB: true
-                } : undefined
-            }
-        });
-    };
-
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
 
@@ -446,6 +290,18 @@ export class GraphOperator {
                 entities.push(entity.id);
             }
         });
+
+        // bind rect selection
+        this.rectSelection = new RectSelection();
+
+        if (this.rectSelection && this.currentView.interaction?.callback?.multiSelectionCallback) {
+            this.rectSelection.setCallback((series: Array<string>) => {
+                if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.multiSelectionCallback) {
+                    this.currentView.interaction.callback.multiSelectionCallback(series);
+                }
+            });
+        }
+
 
         // find fields from configuration
         let timewindowEnd: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).add(1, 'days').startOf('day').valueOf();
@@ -656,8 +512,8 @@ export class GraphOperator {
             const datewindowChangeFunc = (e: MouseEvent, yAxisRange?: Array<Array<number>>) => {
                 let datewindow: number[] = [];
 
-                if (this.ragnebarGraph) {
-                    datewindow = this.ragnebarGraph.xAxisRange();
+                if (this.rangebarGraph) {
+                    datewindow = this.rangebarGraph.xAxisRange();
                 } else {
                     datewindow = this.mainGraph.xAxisRange();
                 }
@@ -695,8 +551,8 @@ export class GraphOperator {
                         } else {
                             this.start = this.end - (maxShowP * 1.5);
                             // update datewindow
-                            if (this.ragnebarGraph) {
-                                this.ragnebarGraph.updateOptions({
+                            if (this.rangebarGraph) {
+                                this.rangebarGraph.updateOptions({
                                     dateWindow: [this.start, this.end]
                                 });
                             } else {
@@ -850,9 +706,9 @@ export class GraphOperator {
                 this.start = datewindow[0];
                 this.end = datewindow[1];
                 this.update();
-                if (this.ragnebarGraph) {
+                if (this.rangebarGraph) {
                     // shrink and grow base on middle datetime
-                    this.ragnebarGraph.updateOptions({
+                    this.rangebarGraph.updateOptions({
                         dateWindow: [this.start, this.end]
                     });
                 }
@@ -892,6 +748,12 @@ export class GraphOperator {
                 }
 
 
+            }, (active: boolean) => {
+                if(this.rectSelection && active){
+                    this.rectSelection.enable();
+                } else {
+                    this.rectSelection?.disable();
+                }
             });
 
             // create graph instance
@@ -920,7 +782,7 @@ export class GraphOperator {
                 highlightCallback: (e, x, ps, row, seriesName) => {
                     // make sure we got current selection and even no highlightCall in viewConfig we still need to make click dbl working.
                     currentSelection = seriesName;
-                    if (currentSelection != seriesName && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                         this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
                 },
@@ -957,7 +819,7 @@ export class GraphOperator {
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
                 },
-                plugins: [this.toolbar]
+                plugins: [this.rectSelection, this.toolbar]
             });
             // add dbl event
             if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback) {
@@ -1437,7 +1299,7 @@ export class GraphOperator {
                 bottom.appendChild(rangeBar);
                 this.graphContainer.appendChild(bottom);
                 //create range-bar graph
-                this.ragnebarGraph = new Dygraph(rangeBar, [
+                this.rangebarGraph = new Dygraph(rangeBar, [
                     firstData,   // first
                     lastData    // last
                 ], {
@@ -1483,8 +1345,8 @@ export class GraphOperator {
 
 
                 // check
-                if (this.ragnebarGraph && this.mainGraph) {
-                    let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
+                if (this.rangebarGraph && this.mainGraph) {
+                    let sync = new Synchronizer([this.rangebarGraph, this.mainGraph]);
                     sync.synchronize();
                 }
 
@@ -1494,7 +1356,7 @@ export class GraphOperator {
                 let singleHandle: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle-single");
                 const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
-                    const dateWindow = this.ragnebarGraph.xAxisRange();
+                    const dateWindow = this.rangebarGraph.xAxisRange();
                     currentDatewindowOnMouseDown = dateWindow;
 
                     window.addEventListener("mouseup", (e) => {
@@ -1587,8 +1449,8 @@ export class GraphOperator {
                 } else {
                     this.start = this.end - (maxShowP * 1.5);
                     // update datewindow
-                    if (this.ragnebarGraph) {
-                        this.ragnebarGraph.updateOptions({
+                    if (this.rangebarGraph) {
+                        this.rangebarGraph.updateOptions({
                             dateWindow: [this.start, this.end]
                         });
                     } else {
@@ -1610,10 +1472,17 @@ export class GraphOperator {
     };
 
 
+    /**
+     * render graph
+     * @param first
+     * @param last
+     * @param refersh
+     * @param range
+     */
     update = (first?: number, last?: number, refersh?: boolean, range?: [number, number]) => {
 
         let mainGraph: any = this.mainGraph;
-        let rangebarGraph: any = this.ragnebarGraph;
+        let rangebarGraph: any = this.rangebarGraph;
         let graphCollection = this.currentCollection;
         let rangeCollection = this.rangeCollection;
         let start = this.start;

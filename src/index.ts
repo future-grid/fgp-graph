@@ -1,7 +1,7 @@
 import Dygraph from "dygraphs";
 
-import {DomAttrs, GraphConfig, ViewConfig, GraphCollection, GraphExports, ViewOptions} from "./metadata/configurations";
-import {DropdownButton, DomElementOperator, GraphOperator} from "./widgets/DomElements";
+import {DomAttrs, ViewConfig, ViewOptions} from "./metadata/configurations";
+import {DomElementOperator, GraphOperator} from "./widgets/DomElements";
 
 import {ResizeObserver, ResizeObserverEntry} from '@juggle/resize-observer';
 
@@ -12,8 +12,6 @@ export default class FgpGraph {
     graphContainer: HTMLElement;
 
     body: HTMLElement;
-
-    private bottom!: HTMLElement;
 
     private graph!: Dygraph;
 
@@ -111,7 +109,7 @@ export default class FgpGraph {
                         // resize graph manually, because dygraph resizing base on window object.
                         console.log(`new size is: ${domObserverEntry.contentRect.width} ${domObserverEntry.contentRect.height}`);
                         let evt = window.document.createEvent('UIEvents');
-                        evt.initEvent('resize', true, false);
+                        evt.initEvent('resize', false, false);
                         window.dispatchEvent(evt);
                     }
                 } else {
@@ -205,15 +203,6 @@ export default class FgpGraph {
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
-            let dropdownOpts: Array<{ id: string, label: string, selected?: boolean }> = [];
-            this.viewConfigs.forEach(view => {
-                if (view.show) {
-                    // init graph 
-                    showView = view;
-                }
-                dropdownOpts.push({id: view.name, label: view.name, selected: view.show});
-            });
-
             // check if showView is undefined
             if (!showView && this.viewConfigs.length > 0) {
                 showView = this.viewConfigs[0];

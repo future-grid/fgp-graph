@@ -9,8 +9,6 @@ export default class Badges {
 
     private dateWindow: [number, number] = [0, 0];
 
-    private isInit:boolean = true;
-
     constructor(public parentElement: Element, public collection: Array<GraphCollection>, public collectionSelectionListener?: (collections: Array<GraphCollection>) => void) {
         this.initDom();
     }
@@ -110,9 +108,6 @@ export default class Badges {
      * @param collection
      */
     public autoSelect = (collection: GraphCollection) => {
-        if(!this.isInit){
-            return false;
-        }
         this.badgesArray.map(badge => {
             if (collection.name === badge.getAttribute("data-fgp-badge")) {
                 // change color
@@ -121,7 +116,6 @@ export default class Badges {
                 badge.setAttribute("class", "badge badge-pill badge-secondary badge-interval");
             }
         });
-        this.isInit = false;
     };
 
     /**

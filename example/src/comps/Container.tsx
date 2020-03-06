@@ -52,7 +52,7 @@ export default class GraphContainer extends Component<Props, States> {
             name: "device view",
             connectSeparatedPoints: true,
             graphConfig: {
-                hideHeader: {views: false, intervals: false, toolbar: true, series: false},
+                hideHeader: {views: false, intervals: false, toolbar: false, series: false},
                 // hideHeader: true,
                 features: {
                     zoom: true,
@@ -60,7 +60,7 @@ export default class GraphContainer extends Component<Props, States> {
                     rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
                     legend: this.formatters.legendForAllSeries,
                     exports: [GraphExports.Data, GraphExports.Image],
-                    rangeLocked: true   // lock or unlock range bar
+                    rangeLocked: false   // lock or unlock range bar
                 },
                 entities: [
                     {id: "substation1", type: "substation", name: "substation1"},
@@ -223,6 +223,9 @@ export default class GraphContainer extends Component<Props, States> {
                     },
                     clickCallback: (series) => {
                         console.debug("click callback, ", series);
+                    },
+                    multiSelectionCallback: (series: Array<string>) => {
+                        console.log(`${series}`);
                     }
                 }
             },
@@ -353,6 +356,9 @@ export default class GraphContainer extends Component<Props, States> {
                     },
                     clickCallback: (series) => {
                         console.debug("click callback, ", series);
+                    },
+                    multiSelectionCallback: (series: Array<string>) => {
+                        console.log(`${series}`);
                     }
                 }
             },
@@ -511,12 +517,9 @@ export default class GraphContainer extends Component<Props, States> {
         const mainGraph = g;
 
 
-
         // setTimeout(()=>{
         //     mainGraph.changeView("scatter view");
         // }, 5000);
-
-
 
 
         // this.setState({
@@ -569,15 +572,10 @@ export default class GraphContainer extends Component<Props, States> {
     componentDidMount(): void {
 
 
-
-
     }
 
 
     render() {
-
-
-
 
 
         return (
@@ -612,7 +610,6 @@ export default class GraphContainer extends Component<Props, States> {
                 }
 
 
-
                 {
                     this.state.childrenGraph.map((_config: { id: string; viewConfigs: Array<ViewConfig>; onReady(div: HTMLDivElement, g: FgpGraph): void }) => {
                         return (
@@ -621,7 +618,8 @@ export default class GraphContainer extends Component<Props, States> {
                                     <GenericGraph viewConfigs={_config.viewConfigs} onReady={_config.onReady}/>
                                 </Card>
                                 <Card>
-                                    <ReactJson src={_config.viewConfigs} name={'viewConfigs'} collapsed={true} iconStyle={"circle"}/>
+                                    <ReactJson src={_config.viewConfigs} name={'viewConfigs'} collapsed={true}
+                                               iconStyle={"circle"}/>
                                 </Card>
                             </div>
 
