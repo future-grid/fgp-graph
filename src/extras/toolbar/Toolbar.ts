@@ -166,6 +166,11 @@ export default class Toolbar {
     private createSeries = () => {
         if (this.graphHeader) {
             this.series = new Series(this.graphHeader, this.viewConfig, this.g);
+            // check if filter exist
+            if(this.filter){
+                //
+                this.filter.setSeriesWidget(this.series);
+            }
         }
     };
 

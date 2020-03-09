@@ -9,9 +9,11 @@ export default class Series {
 
     private isInit: boolean = true;
 
-    constructor(public parentElement: Element, public viewConfig: ViewConfig, public g?: Dygraph, onChangeListener?: () => void) {
+    private options:Array<HTMLInputElement>;
 
+    constructor(public parentElement: Element, public viewConfig: ViewConfig, public g?: Dygraph, onChangeListener?: () => void) {
         this.initDom();
+        this.options = [];
     }
 
 
@@ -100,6 +102,7 @@ export default class Series {
                     });
                     option.append(checkbox);
                     option.append(`${_child.name}`);
+                    this.options.push(checkbox);
                     parentElement.append(option);
                 }
             });
@@ -120,6 +123,7 @@ export default class Series {
                     });
                     option.append(checkbox);
                     option.append(`${_series.label}`);
+                    this.options.push(checkbox);
                     parentElement.append(option);
                 });
             }
@@ -132,6 +136,19 @@ export default class Series {
         if (this.isInit) {
             this.createOptions(this.viewConfig, this.checkBoxDiv);
             this.isInit = false;
+        }
+
+    };
+
+    /**
+     * update dropdown selection
+     * @param checked
+     * @param index
+     */
+    public updateOption = (checked: boolean, index: number) => {
+        console.log(`${checked} ${index} ${this.options[index]}`);
+        if(this.options[index]){
+            this.options[index].checked = checked;
         }
 
     };

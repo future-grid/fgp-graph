@@ -2,10 +2,13 @@ import {FilterType, GraphCollection, ViewConfig} from "../../../metadata/configu
 import {Formatters} from "../../formatters";
 import moment from "moment-timezone";
 import {hsvToRGB} from "../../../services/colorService";
+import Series from "./Series";
 
 export default class Filter {
 
     private chosenCollection?: GraphCollection;
+
+    private seriesWidget?:Series;
 
     constructor(public parentElement: Element, public viewConfig: ViewConfig, public g?: Dygraph) {
         this.initDom();
@@ -32,6 +35,14 @@ export default class Filter {
             // never hide mark lines
             visibility[index] = series.includes(value) || value.indexOf("_markline") != -1;
         });
+
+        if(this.seriesWidget && this.chosenCollection){
+            // update visibility
+            visibility.forEach((v, i) => {
+                this.seriesWidget?.updateOption(v, i);
+            });
+
+        }
 
         // set visibility
         this.g?.updateOptions({
@@ -225,6 +236,10 @@ export default class Filter {
     public setData = (collection: GraphCollection) => {
         this.chosenCollection = collection;
 
+    };
+
+    public setSeriesWidget = (seriesWidget: Series) =>{
+        this.seriesWidget = seriesWidget;
     };
 
 
