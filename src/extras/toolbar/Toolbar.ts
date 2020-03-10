@@ -53,7 +53,7 @@ export default class Toolbar {
 
     private readonly views: Array<ViewConfig>;
 
-    constructor(view: ViewConfig, views: Array<ViewConfig>, public collectionSelectionListener: (collections: Array<GraphCollection>) => void, public intervalSelectionListener: (collection: GraphCollection, dateWindow: [number, number]) => void, public viewChangeListener: (view: ViewConfig) => void, public reactSelectionListener?: (active: boolean) => void) {
+    constructor(view: ViewConfig, views: Array<ViewConfig>, public collectionSelectionListener: (collections: Array<GraphCollection>) => void, public intervalSelectionListener: (collection: GraphCollection, dateWindow: [number, number]) => void, public viewChangeListener: (view: ViewConfig) => void, public reactSelectionListener?: (active: boolean) => void, public colorFilterListener?: (isLock:boolean) => void) {
         this.collectionOpts = view.graphConfig.collections;
         this.views = views;
         this.viewConfig = view;
@@ -176,7 +176,7 @@ export default class Toolbar {
 
     private createFilter = () => {
         if (this.graphHeader) {
-            this.filter = new Filter(this.graphHeader, this.viewConfig, this.g);
+            this.filter = new Filter(this.graphHeader, this.viewConfig, this.g, this.colorFilterListener);
         }
     };
 

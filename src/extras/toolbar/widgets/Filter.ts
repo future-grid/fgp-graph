@@ -10,7 +10,7 @@ export default class Filter {
 
     private seriesWidget?:Series;
 
-    constructor(public parentElement: Element, public viewConfig: ViewConfig, public g?: Dygraph) {
+    constructor(public parentElement: Element, public viewConfig: ViewConfig, public g?: Dygraph, public lockColorListener?: (isLock:boolean) => void) {
         this.initDom();
     }
 
@@ -74,6 +74,9 @@ export default class Filter {
         // get current y and y2 axis scaling max and min
         let ranges: Array<Array<number>> = (<any>this.g).yAxisRanges();
         if (graphLabels && graphLabels.length - 1 === colors.length) {
+            if(this.lockColorListener){
+                this.lockColorListener(true);
+            }
             this.g?.updateOptions({
                 colors: colors,
                 axes: {
@@ -94,6 +97,9 @@ export default class Filter {
             });
         } else {
             if (this.viewConfig.graphConfig.entities.length > 1) {
+                if(this.lockColorListener){
+                    this.lockColorListener(false);
+                }
                 this.g?.updateOptions({
                     colors: undefined,
                     axes: {
@@ -114,6 +120,11 @@ export default class Filter {
                 });
             } else {
                 if (this.chosenCollection) {
+
+                    if(this.lockColorListener){
+                        this.lockColorListener(false);
+                    }
+
                     let defaultColors: Array<string> = [];
                     const num = this.chosenCollection.series.length;
                     this.chosenCollection.series.forEach((series, i) => {

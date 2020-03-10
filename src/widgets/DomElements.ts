@@ -103,6 +103,8 @@ export class GraphOperator {
 
     private rectSelection?: RectSelection;
 
+    private colorLocked:boolean = false;
+
 
     constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
         this.mainGraph = mainGraph;
@@ -754,6 +756,8 @@ export class GraphOperator {
                 } else {
                     this.rectSelection?.disable();
                 }
+            }, (isLocked)=>{
+                    this.colorLocked = isLocked;
             });
 
             // create graph instance
@@ -1987,12 +1991,17 @@ export class GraphOperator {
                     this.toolbar ? this.toolbar.updateData(this.currentCollection, mainLabels, this.currentGraphData) : null;
                 }
 
+                // lock color
+                if(this.colorLocked){
+                    colors = mainGraph.getColors();
+                }
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
                     visibility: latestVisibility.length > 0 ? latestVisibility : orgVisibility,
-                    colors: colors.length == 0 ? undefined : colors,
+                    colors: colors.length > 0 ? colors : undefined,
                     labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
