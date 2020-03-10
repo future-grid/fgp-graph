@@ -30,6 +30,7 @@ export default class GraphContainer extends Component<Props, States> {
     private childViewConfigs: Array<ViewConfig>;
 
 
+
     constructor(props: Props) {
         super(props);
 
@@ -220,11 +221,11 @@ export default class GraphContainer extends Component<Props, States> {
                     },
                     syncDateWindow: (dateWindow) => {
                         // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
-                        this.setState({
-                            syncDateWindow: [dateWindow[0], dateWindow[1]]
-                        });
-
-                        vsConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
+                        // this.setState({
+                        //     syncDateWindow: [dateWindow[0], dateWindow[1]]
+                        // });
+                        //
+                        // vsConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
                     },
                     dbClickCallback: (series) => {
                         // console.debug("dbl callback, ", series);
@@ -369,11 +370,11 @@ export default class GraphContainer extends Component<Props, States> {
                         console.log(`${series}`);
                     },
                     syncDateWindow: (dateWindow: number[]) => {
-                        this.setState({
-                            syncDateWindow: [dateWindow[0], dateWindow[1]]
-                        });
-                        // set init range for device view
-                        vdConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
+                        // this.setState({
+                        //     syncDateWindow: [dateWindow[0], dateWindow[1]]
+                        // });
+                        // // set init range for device view
+                        // vdConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
                     }
                 }
             },
@@ -564,13 +565,20 @@ export default class GraphContainer extends Component<Props, States> {
                 childrenGraph: []
             });
         } else {
+            // get rid of initRange config
+            this.childViewConfigs.map(view => {
+                view.initRange = undefined;
+            });
             // add new child graph
             this.setState({
                 childrenGraph: [{
                     id: '' + Math.random() * 1000,
                     viewConfigs: this.childViewConfigs,
-                    onReady: (div: HTMLDivElement, g: FgpGraph) => {
-                        mainGraph.setChildren([g]);
+                    onReady: (div: HTMLDivElement, childGraph: FgpGraph) => {
+                        mainGraph.setChildren([childGraph]);
+                        const dateWindow = mainGraph.currentDateWindow;
+                        // update datewindow
+                        childGraph.updateDatewinow([dateWindow[0], dateWindow[1]]);
                     }
                 }]
             });

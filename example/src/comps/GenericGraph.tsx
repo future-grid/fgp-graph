@@ -29,19 +29,18 @@ export default class GenericGraph extends Component<GraphProps, GraphStates> {
 
     componentDidMount(): void {
         if (this.mainGraph.current) {
-
             let graph = new FgpGraph(this.mainGraph.current, this.props.viewConfigs, {
                 onViewChange: this.props.viewChangeListener,
                 onIntervalChange: this.props.intervalChangeListener
-            });
+            }, true);
             if (this.props.onReady) {
                 graph.initGraph((g: FgpGraph) => {
                     if (this.props.onReady && this.mainGraph.current) {
                         this.props.onReady(this.mainGraph.current, graph);
                     }
-                });
+                }, true);
             } else {
-                graph.initGraph();
+                graph.initGraph(undefined, true);
             }
 
         }

@@ -78,6 +78,8 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
+    private currentDateWindow?: { start: number, end: number };
+
     private currentGraphData: any[];
 
     private readonly graphContainer: HTMLElement;
@@ -103,10 +105,12 @@ export class GraphOperator {
 
     private rectSelection?: RectSelection;
 
-    private colorLocked:boolean = false;
+    private colorLocked: boolean = false;
+
+    private needSync: boolean = false;
 
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string, needSync?: boolean) {
         this.mainGraph = mainGraph;
         this.graphId = id;
         this.graphInstance = fgpGraph;
@@ -122,6 +126,10 @@ export class GraphOperator {
         this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
         let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
+        if (needSync) {
+            this.needSync = true;
+        }
+
     }
 
     public recreateElement = (el: HTMLElement, withChildren: boolean) => {
@@ -366,7 +374,7 @@ export class GraphOperator {
         });
 
 
-        // 
+        //
         this.currentView.dataService.fetchFirstNLast([this.currentView.graphConfig.rangeEntity.name], this.currentView.graphConfig.rangeEntity.type, this.currentView.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
             // get first and last records, just need start and end timestamp
             let first: any = {timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf()};
@@ -721,6 +729,10 @@ export class GraphOperator {
             }, (view) => {
 
                 // change show
+                if (this.needSync && this.currentDateWindow) {
+                    //
+                    view.initRange = this.currentDateWindow;
+                }
 
                 this.init(view, (graph: Dygraph) => {
                     this.mainGraph = graph;
@@ -751,13 +763,13 @@ export class GraphOperator {
 
 
             }, (active: boolean) => {
-                if(this.rectSelection && active){
+                if (this.rectSelection && active) {
                     this.rectSelection.enable();
                 } else {
                     this.rectSelection?.disable();
                 }
-            }, (isLocked)=>{
-                    this.colorLocked = isLocked;
+            }, (isLocked) => {
+                this.colorLocked = isLocked;
             });
 
             // create graph instance
@@ -820,6 +832,7 @@ export class GraphOperator {
                     if (this.toolbar) {
                         this.toolbar.updateDateWindow(xAxisRange, this.xBoundary);
                     }
+                    this.currentDateWindow = {start: xAxisRange[0], end: xAxisRange[1]};
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
                 },
@@ -1992,7 +2005,7 @@ export class GraphOperator {
                 }
 
                 // lock color
-                if(this.colorLocked){
+                if (this.colorLocked) {
                     colors = mainGraph.getColors();
                 }
 

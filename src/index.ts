@@ -33,7 +33,7 @@ export default class FgpGraph {
     // store locally
     private rangeBarData: any = [];
 
-    private currentDateWindow: number[] = [];
+    public currentDateWindow: number[] = [];
 
     id: string;
 
@@ -42,6 +42,12 @@ export default class FgpGraph {
     private callbackDelayTimer: any = 0;
 
     eventListeners?: EventHandlers;
+
+    private graphDateWindow: [number, number];
+
+    private readonly syncViews: boolean = false;
+
+    private isReady: boolean = false;
 
 
     /**
@@ -52,12 +58,16 @@ export default class FgpGraph {
      * graph configuration
      * @memberof FgpGraph
      */
-    constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>, eventHandlers?: EventHandlers) {
+    constructor(dom: HTMLElement, viewConfigs: Array<ViewConfig>, eventHandlers?: EventHandlers, syncViews?: boolean) {
 
         this.parentDom = dom;
-
+        this.graphDateWindow = [0, 0];
         if (eventHandlers) {
             this.eventListeners = eventHandlers;
+        }
+        console.log(`need to sync views? ${syncViews}`);
+        if (syncViews) {
+            this.syncViews = true;
         }
 
 
@@ -74,7 +84,6 @@ export default class FgpGraph {
         }
 
 
-
         let intervalsLabelsAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-interval-labels"}];
         this.intervalLabelsArea = DomElementOperator.createElement('div', intervalsLabelsAttrs);
 
@@ -86,7 +95,6 @@ export default class FgpGraph {
 
         let toolbarAreaAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-toolbar-area"}];
         const toolbarArea = DomElementOperator.createElement('div', toolbarAreaAttrs);
-
 
 
         // create doms
@@ -129,6 +137,10 @@ export default class FgpGraph {
      */
     private dateWindowHandler = (dateWindow: [number, number], currentView?: ViewConfig) => {
 
+        if (this.syncViews) {
+            // store data
+            this.graphDateWindow = dateWindow;
+        }
 
         if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
             if (this.callbackDelayTimer) {
@@ -164,6 +176,11 @@ export default class FgpGraph {
             if (config.name === view) {
                 // update show attribute
                 config.show = true;
+
+                if (this.syncViews && this.graphDateWindow) {
+                    config.initRange = {start: this.graphDateWindow[0], end: this.graphDateWindow[1]};
+                }
+
                 this.operator.init(config, (graph: Dygraph) => {
                     this.graph = graph;
                     this.children.forEach(graph => {
@@ -198,8 +215,8 @@ export default class FgpGraph {
      * @private
      * @memberof FgpGraph
      */
-    public initGraph = (ready?: (g: FgpGraph) => void) => {
-        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.dateWindowHandler, this, this.eventListeners, this.id);
+    public initGraph = (ready?: (g: FgpGraph) => void, needSync?: boolean) => {
+        this.operator = new GraphOperator(this.graph, this.rangeBarGraph, this.graphContainer, this.body, this.dateWindowHandler, this, this.eventListeners, this.id, needSync);
         // which "view" should be shown first? device or scatter?
         if (this.viewConfigs) {
             let showView: ViewConfig | undefined;
@@ -214,9 +231,10 @@ export default class FgpGraph {
             if (showView) {
                 this.operator.init(showView, (graph: Dygraph) => {
                     this.graph = graph;
-                    if(ready){
+                    if (ready) {
                         ready(this);
                     }
+                    this.isReady = true;
                 }, () => {
                     this.children.forEach(graph => {
                         // call updateDatewinow
@@ -256,7 +274,7 @@ export default class FgpGraph {
         }
     };
 
-    private updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
+    updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
         // update graph
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
