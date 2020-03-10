@@ -559,15 +559,16 @@ export default class GraphContainer extends Component<Props, States> {
     onViewChange = (g: FgpGraph, view: ViewConfig): void => {
         console.log(`view changed to [${view.name}]`);
         const mainGraph = g;
+        const dateWindow = mainGraph.currentDateWindow;
         if ("device view" === view.name) {
             // add new child graph
             this.setState({
                 childrenGraph: []
             });
         } else {
-            // get rid of initRange config
+            // update initRange for children graphs
             this.childViewConfigs.map(view => {
-                view.initRange = undefined;
+                view.initRange = {start: dateWindow[0], end: dateWindow[1]}
             });
             // add new child graph
             this.setState({
@@ -576,15 +577,10 @@ export default class GraphContainer extends Component<Props, States> {
                     viewConfigs: this.childViewConfigs,
                     onReady: (div: HTMLDivElement, childGraph: FgpGraph) => {
                         mainGraph.setChildren([childGraph]);
-                        const dateWindow = mainGraph.currentDateWindow;
-                        // update datewindow
-                        childGraph.updateDatewinow([dateWindow[0], dateWindow[1]]);
                     }
                 }]
             });
         }
-
-
     };
 
     onIntervalChange = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }): void => {
