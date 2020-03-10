@@ -7,7 +7,7 @@ import moment from "moment-timezone";
 import FgpGraph from "@future-grid/fgp-graph";
 import GenericGraph from "./GenericGraph";
 
-import {Container, Badge, Card, Row} from 'react-bootstrap';
+import {Badge, Card, Container, Row} from 'react-bootstrap';
 import ReactJson from "react-json-view";
 
 type Props = {}
@@ -62,7 +62,7 @@ export default class GraphContainer extends Component<Props, States> {
                     // rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
                     rangeBar: true,
                     legend: this.formatters.legendForAllSeries,
-                    exports: [GraphExports.Data, GraphExports.Image],
+                    exports: [GraphExports.Data, GraphExports.Image, GraphExports.Draw],
                     rangeLocked: false   // lock or unlock range bar
                 },
                 entities: [

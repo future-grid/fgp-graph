@@ -8,7 +8,8 @@ import {DataHandler} from "../services/dataService";
  */
 export enum GraphExports {
     Image = "image",
-    Data = "data"
+    Data = "data",
+    Draw = "draw"
 }
 
 export interface ToolbarBtn {

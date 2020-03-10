@@ -1,6 +1,5 @@
 import {DomAttrs, GraphCollection, GraphExports} from "../../../metadata/configurations";
 import moment from "moment-timezone";
-import Dygraph from "dygraphs";
 import {ExportUtils} from "../../../services/dataService";
 import {DomElementOperator} from "../../../widgets/DomElements";
 
@@ -88,26 +87,27 @@ export default class Exports {
                     }
                 });
                 buttonsContainer.appendChild(btnImage);
+            } else if (_config === GraphExports.Draw) {
+                // add rect selection
+                if (this.reactSelectionListener) {
+                    let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-draw"}];
+                    let btnDraw = DomElementOperator.createElement('button', btnAttrs);
+                    btnDraw.addEventListener("click", (event) => {
+                        this.rectSelectStatus = !this.rectSelectStatus;
+
+                        if (this.rectSelectStatus) {
+                            btnDraw.style.backgroundColor = "yellow";
+                        } else {
+                            btnDraw.style.backgroundColor = "";
+                        }
+
+                        this.reactSelectionListener ? this.reactSelectionListener(this.rectSelectStatus) : null;
+                    });
+                    buttonsContainer.appendChild(btnDraw);
+                }
             }
         });
 
-        // add rect selection
-        if (this.reactSelectionListener) {
-            let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-draw"}];
-            let btnDraw = DomElementOperator.createElement('button', btnAttrs);
-            btnDraw.addEventListener("click", (event) => {
-                this.rectSelectStatus = !this.rectSelectStatus;
-
-                if(this.rectSelectStatus){
-                    btnDraw.style.backgroundColor = "yellow";
-                } else {
-                    btnDraw.style.backgroundColor = "";
-                }
-
-                this.reactSelectionListener ? this.reactSelectionListener(this.rectSelectStatus) : null;
-            });
-            buttonsContainer.appendChild(btnDraw);
-        }
 
         this.parentElement.appendChild(buttonsContainer);
     };
