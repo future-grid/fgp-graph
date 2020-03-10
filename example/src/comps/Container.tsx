@@ -13,7 +13,8 @@ import ReactJson from "react-json-view";
 type Props = {}
 
 type States = {
-    childrenGraph: Array<{ id: string, viewConfigs: Array<ViewConfig>, onReady(div: HTMLDivElement, g: FgpGraph): void }>
+    childrenGraph: Array<{ id: string, viewConfigs: Array<ViewConfig>, onReady(div: HTMLDivElement, g: FgpGraph): void }>,
+    syncDateWindow: [number, number]
 }
 
 export default class GraphContainer extends Component<Props, States> {
@@ -33,7 +34,8 @@ export default class GraphContainer extends Component<Props, States> {
         super(props);
 
         this.state = {
-            childrenGraph: []
+            childrenGraph: [],
+            syncDateWindow: [0, 0]
         };
 
         this.formatters = new Formatters("Australia/Melbourne");
@@ -57,7 +59,8 @@ export default class GraphContainer extends Component<Props, States> {
                 features: {
                     zoom: true,
                     scroll: true,
-                    rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
+                    // rangeBar: {show: true, format: 'DD MMM YYYY h:mm a'},
+                    rangeBar: true,
                     legend: this.formatters.legendForAllSeries,
                     exports: [GraphExports.Data, GraphExports.Image],
                     rangeLocked: false   // lock or unlock range bar
@@ -217,6 +220,11 @@ export default class GraphContainer extends Component<Props, States> {
                     },
                     syncDateWindow: (dateWindow) => {
                         // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                        this.setState({
+                            syncDateWindow: [dateWindow[0], dateWindow[1]]
+                        });
+
+                        vsConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
                     },
                     dbClickCallback: (series) => {
                         // console.debug("dbl callback, ", series);
@@ -229,7 +237,7 @@ export default class GraphContainer extends Component<Props, States> {
                     }
                 }
             },
-            timezone: 'Australia/Perth',
+            timezone: 'Australia/Melbourne',
             highlightSeriesBackgroundAlpha: 1
             // timezone: 'Pacific/Auckland'
         };
@@ -359,6 +367,13 @@ export default class GraphContainer extends Component<Props, States> {
                     },
                     multiSelectionCallback: (series: Array<string>) => {
                         console.log(`${series}`);
+                    },
+                    syncDateWindow: (dateWindow: number[]) => {
+                        this.setState({
+                            syncDateWindow: [dateWindow[0], dateWindow[1]]
+                        });
+                        // set init range for device view
+                        vdConfig.initRange = {start: dateWindow[0], end: dateWindow[1]};
                     }
                 }
             },
