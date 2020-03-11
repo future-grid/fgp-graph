@@ -9,6 +9,8 @@ import GenericGraph from "./GenericGraph";
 
 import {Badge, Card, Container, Row} from 'react-bootstrap';
 import ReactJson from "react-json-view";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {IconProp} from "@fortawesome/fontawesome-svg-core";
 
 type Props = {}
 
@@ -28,7 +30,6 @@ export default class GraphContainer extends Component<Props, States> {
     private mainViewConfigs: Array<ViewConfig>;
 
     private childViewConfigs: Array<ViewConfig>;
-
 
 
     constructor(props: Props) {
@@ -588,36 +589,28 @@ export default class GraphContainer extends Component<Props, States> {
     };
 
 
-    componentDidMount(): void {
-
-
-    }
-
 
     render() {
-
 
         return (
             <Container fluid={true}>
                 {/*main graph*/}
                 <Row className="justify-content-md-center">
                     <h4>
-                        <Badge variant="info">@future-grid/fgp-graph / Main Graph</Badge>
+                        <Badge variant="info"><FontAwesomeIcon
+                            icon={['fas', 'chart-area'] as IconProp}/> @future-grid/fgp-graph / Main Graph</Badge>
                     </h4>
                 </Row>
                 <Card>
                     <GenericGraph viewConfigs={this.mainViewConfigs} onReady={this.readyCallback}
                                   viewChangeListener={this.onViewChange}
                                   intervalChangeListener={this.onIntervalChange}/>
-
                 </Card>
                 <Card>
                     <ReactJson src={this.mainViewConfigs} name={'viewConfigs'} collapsed={true} iconStyle={"circle"}/>
                 </Card>
 
-
                 <br/>
-
                 {/*children graphs*/}
 
                 {
@@ -627,7 +620,6 @@ export default class GraphContainer extends Component<Props, States> {
                         </h4>
                     </Row> : null
                 }
-
 
                 {
                     this.state.childrenGraph.map((_config: { id: string; viewConfigs: Array<ViewConfig>; onReady(div: HTMLDivElement, g: FgpGraph): void }) => {
