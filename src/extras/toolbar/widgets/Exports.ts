@@ -1,7 +1,7 @@
 import {DomAttrs, GraphCollection, GraphExports} from "../../../metadata/configurations";
 import moment from "moment-timezone";
 import {ExportUtils} from "../../../services/dataService";
-import {DomElementOperator} from "../../../widgets/DomElements";
+import {DomElementOperator} from "../../../widgets/GraphRenderer";
 
 export default class Exports {
 
