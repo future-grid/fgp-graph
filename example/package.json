@@ -6,6 +6,10 @@
     "eslint-plugin-flowtype": "^3.13.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/free-brands-svg-icons": "^5.12.1",
+    "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "@fortawesome/react-fontawesome": "^0.1.9",
     "@future-grid/fgp-graph": "file:../",
     "@testing-library/dom": ">=5",
     "@testing-library/jest-dom": "^4.2.4",
