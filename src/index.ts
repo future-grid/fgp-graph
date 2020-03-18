@@ -1,11 +1,11 @@
 import Dygraph from "dygraphs";
 
 import {DomAttrs, ViewConfig, ViewOptions} from "./metadata/configurations";
-import {DomElementOperator, GraphOperator} from "./widgets/DomElements";
 
 import {ResizeObserver, ResizeObserverEntry} from '@juggle/resize-observer';
 
 import {EventHandlers} from './metadata/graphoptions';
+import {DomElementOperator, GraphOperator} from "./widgets/GraphRenderer";
 
 export default class FgpGraph {
 
