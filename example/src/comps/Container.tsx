@@ -585,6 +585,14 @@ export default class GraphContainer extends Component<Props, States> {
                 }]
             });
         }
+
+        setTimeout(()=>{
+
+            g.updateDatewinow([moment("2019-12-20").valueOf(), moment("2019-12-30").valueOf()])
+
+        }, 5000);
+
+
     };
 
     onIntervalChange = (g: FgpGraph, interval: { name: string; value: number; show?: boolean }): void => {

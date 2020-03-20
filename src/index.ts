@@ -255,15 +255,14 @@ export default class FgpGraph {
      * @memberof FgpGraph
      */
     public updateDatewinow = (datewindow: [number, number]) => {
+        //
+        console.log(`new datewindow: ${datewindow}`);
 
         // update graph
         if (this.graph) {
             const range: Array<number> = this.graph.xAxisRange();
             // if datewindow same then ignore that
             if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
-                this.graph.updateOptions({
-                    dateWindow: datewindow
-                });
                 // reload data for current graph
                 this.operator.update(undefined, undefined, true, datewindow);
                 // get all children graphs then run update
@@ -277,12 +276,6 @@ export default class FgpGraph {
     updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
         // update graph
         if (this.graph) {
-            const range: Array<number> = this.graph.xAxisRange();
-            if (range[0] != datewindow[0] || range[1] != datewindow[1]) {
-                this.graph.updateOptions({
-                    dateWindow: datewindow
-                });
-            }
             if (forceReload) {
                 this.operator.update(undefined, undefined, true, datewindow);
             }
