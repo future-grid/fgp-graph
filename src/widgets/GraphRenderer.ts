@@ -1495,7 +1495,6 @@ export class GraphOperator {
      * @param range
      */
     update = (first?: number, last?: number, refersh?: boolean, range?: [number, number], readyCallback?: (graph: any) => void) => {
-
         let mainGraph: any = this.mainGraph;
         let rangebarGraph: any = this.rangebarGraph;
         let graphCollection = this.currentCollection;
@@ -2020,6 +2019,7 @@ export class GraphOperator {
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    dateWindow: [start, end],
                     visibility: latestVisibility.length > 0 ? latestVisibility : orgVisibility,
                     colors: colors.length > 0 ? colors : undefined,
                     labels: ['x'].concat(mainLabels),
