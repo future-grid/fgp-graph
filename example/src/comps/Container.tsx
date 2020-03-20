@@ -54,7 +54,7 @@ export default class GraphContainer extends Component<Props, States> {
     prepareViewConfigs = () => {
         const vdConfig: ViewConfig = {
             name: "device view",
-            connectSeparatedPoints: true,
+            connectSeparatedPoints: false,
             graphConfig: {
                 hideHeader: {views: false, intervals: false, toolbar: false, series: false},
                 // hideHeader: true,
@@ -531,9 +531,6 @@ export default class GraphContainer extends Component<Props, States> {
 
     readyCallback = (div: HTMLDivElement, g: FgpGraph) => {
         this.graphDiv = div;
-        const mainGraph = g;
-
-
         // setTimeout(()=>{
         //     mainGraph.changeView("scatter view");
         // }, 5000);
@@ -567,8 +564,14 @@ export default class GraphContainer extends Component<Props, States> {
                 childrenGraph: []
             });
         } else {
+
+            // setTimeout(()=>{
+            //     mainGraph.updateDatewinow([dateWindow[0], dateWindow[1]]);
+            // }, 200);
+
+
             // update initRange for children graphs
-            this.childViewConfigs.map(view => {
+            this.childViewConfigs.forEach(view => {
                 view.initRange = {start: dateWindow[0], end: dateWindow[1]}
             });
             // add new child graph
