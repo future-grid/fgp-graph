@@ -1680,21 +1680,18 @@ export class GraphOperator {
 
 
         let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } }, isY2?: boolean, isY?: boolean } => {
+
+
             // update main graph
             let graphData: any[] = [];
             let finalData: any[] = [];
-            let checkY = false;
-            let checkY2 = false;
             //init data arrays with default empty
             entities.forEach((id, _index) => {
                 graphData.push([]);
             });
 
-
             let _dates: Array<number> = [];
-            if (first && last) {
-                _dates = [first, last];
-            }
+
             data.forEach(entityData => {
                 entities.forEach((id, _index) => {
                     if (id == entityData.id) {
@@ -1708,8 +1705,20 @@ export class GraphOperator {
                     }
                 });
             });
-            //
             _dates.sort();
+            // fill gap
+            let currentTimestamp = _dates[0];
+            let lastTimestamp = _dates[_dates.length -1];
+            let expectTimestampArray = [];
+            while(currentTimestamp < lastTimestamp){
+                expectTimestampArray.push(currentTimestamp);
+                currentTimestamp += existCollection.interval;
+            }
+            // add first & last
+            if (first && last) {
+                expectTimestampArray = [first].concat(expectTimestampArray).concat([last]);
+            }
+            _dates = expectTimestampArray;
             // rest labels
             mainLabels = [];
 
