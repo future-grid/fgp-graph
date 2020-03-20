@@ -161,12 +161,13 @@ export default class DataService implements DataHandler {
                     if (_id === _data.id && _data.interval === interval) {
                         // found data
                         let _records: any[] = [];
-                        _data.data.forEach((_d: any) => {
+                        _data.data.forEach((_d: any, index: number) => {
                             if (_d.timestamp >= range.start && _d.timestamp <= range.end) {
-                                _records.push(_d);
+                                if(index !=3 && index!=5){
+                                    _records.push(_d);
+                                }
                             }
                         });
-                        console.info(_id);
                         sampleData.push({id: _id, data: _records});
                     }
                 });

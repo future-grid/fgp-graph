@@ -8,7 +8,8 @@ import {DataHandler} from "../services/dataService";
  */
 export enum GraphExports {
     Image = "image",
-    Data = "data"
+    Data = "data",
+    Draw = "draw"
 }
 
 export interface ToolbarBtn {
@@ -129,6 +130,8 @@ export interface GraphCollection {
     initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
     fill?: boolean;
     markLines?: Array<{ value: number, label: string, color?: string }>;
+    locked?: boolean,
+    show?: boolean
 }
 
 /**
@@ -193,6 +196,8 @@ export interface Callbacks {
     dbClickCallback?(series: string): void;
 
     syncDateWindow?(dateWindow: number[]): void;
+
+    multiSelectionCallback?(series: Array<string>): void;
 }
 
 /**

@@ -17,124 +17,9 @@ import {Formatters} from '../extras/formatters';
 import {FgpColor, hsvToRGB} from '../services/colorService';
 import FgpGraph from "../index";
 import {EventHandlers} from "../metadata/graphoptions";
-import RangeSelector from '../extras/RangeHandles';
-import Toolbar from "../extras/Toolbar";
+import Toolbar from "../extras/toolbar/Toolbar";
 import RangeHandles from "../extras/RangeHandles";
-
-
-export class DropdownButton {
-
-    private select: HTMLSelectElement;
-
-    private btns: Array<{ id: string, label: string, selected?: boolean }>;
-
-    constructor(select: HTMLSelectElement, buttons: Array<{ id: string, label: string, selected?: boolean, formatter?: any }>) {
-        this.select = select;
-        this.btns = buttons;
-    }
-
-    /**
-     * generate option
-     *
-     * @memberof DropdownButton
-     */
-    render = () => {
-        // remove all first
-        this.select.innerHTML = '';
-        this.btns.forEach(element => {
-            let opt: HTMLOptionElement = document.createElement('option');
-            opt.text = element.label;
-            opt.value = element.id;
-            if (element.selected) {
-                opt.selected = true;
-            }
-            // add it into select
-            this.select.add(opt);
-        });
-    }
-}
-
-
-export class DropdownMenu {
-    private dropdown: HTMLElement; // div
-    private opts: Array<{ checked: boolean, name: string, label: string }>;
-    private callback: any;
-
-    constructor(dropdownArea: HTMLElement, opts: Array<{ checked: boolean, name: string, label: string }>, callback: any) {
-        this.dropdown = dropdownArea;
-        this.opts = opts;
-        this.callback = callback;
-    }
-
-    render = () => {
-        this.dropdown.innerHTML = '';
-        let div: HTMLElement = document.createElement('div');
-        div.setAttribute("class", "fgp-graphs-dropdown");
-        //
-        let span: HTMLElement = document.createElement('div');
-        span.innerHTML = `
-        <select>
-            <option disabled selected>series</option>
-        </select>`;
-        let content: HTMLElement = document.createElement('ul');
-        content.setAttribute('class', "dropdown-content");
-
-        // add options
-        this.opts.forEach(opt => {
-            // create li
-            let li: HTMLElement = document.createElement('li');
-            let checkbox: HTMLElement = document.createElement('input');
-            checkbox.setAttribute("type", "checkbox");
-            if (opt.checked) {
-                checkbox.setAttribute("checked", "checked");
-                checkbox.setAttribute("data-value", opt.label);
-            } else {
-                checkbox.setAttribute("data-value", opt.label);
-            }
-            checkbox.addEventListener("click", (e) => {
-                //
-                let series = (<HTMLInputElement>e.target).getAttribute("data-value");
-                let checked = (<HTMLInputElement>e.target).checked;
-                // console.debug("series: ", series, checked);
-                // update graph with callback function
-                this.callback(series, checked);
-            });
-            li.appendChild(checkbox);
-            li.append(' ' + opt.label);
-            content.appendChild(li);
-        });
-        //
-        div.appendChild(span);
-        div.appendChild(content);
-        this.dropdown.appendChild(div);
-    }
-}
-
-
-export class SelectWithCheckbox {
-
-    private select: HTMLSelectElement;
-    private opts: Array<{ checked: boolean, name: string, label: string }>;
-
-    constructor(select: HTMLSelectElement, opts: Array<{ checked: boolean, name: string, label: string }>) {
-        this.select = select;
-        this.opts = opts;
-    }
-
-    render = () => {
-        this.select.innerHTML = "";
-        // create options
-        this.opts.forEach(opt => {
-            let optElement: HTMLOptionElement = document.createElement('option');
-            let checkbox: HTMLInputElement = document.createElement('input');
-            checkbox.setAttribute("type", "checkbox");
-            optElement.appendChild(checkbox);
-            optElement.append(opt.label);
-            this.select.add(optElement);
-        });
-    }
-}
-
+import RectSelection from "../extras/toolbar/RectSelection";
 
 export class DomElementOperator {
 
@@ -179,7 +64,7 @@ export class GraphOperator {
 
     private mainGraph: Dygraph;
 
-    private ragnebarGraph: Dygraph;
+    private rangebarGraph: Dygraph;
 
     private currentView!: ViewConfig;
 
@@ -193,41 +78,47 @@ export class GraphOperator {
 
     public datewindowCallback: any;
 
+    private currentDateWindow?: { start: number, end: number };
+
     private currentGraphData: any[];
 
-    private graphContainer: HTMLElement;
+    private readonly graphContainer: HTMLElement;
 
-    private graphBody: HTMLElement;
+    private readonly graphBody: HTMLElement;
 
-    private intervalsDropdown: HTMLElement;
 
-    private header: HTMLElement;
-
-    private spinner: LoadingSpinner;
+    private readonly spinner: LoadingSpinner;
 
     private xBoundary: [number, number];
 
-    private yAxisBtnArea: HTMLElement;
+    private readonly yAxisBtnArea: HTMLElement;
 
-    private y2AxisBtnArea: HTMLElement;
+    private readonly y2AxisBtnArea: HTMLElement;
 
     private lockedInterval: { name: string, interval: number } | undefined;
 
     private eventListeners?: EventHandlers;
 
-    private graphInstance: FgpGraph;
+    private readonly graphInstance: FgpGraph;
 
-    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, intervalsDropdown: HTMLElement, header: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string) {
+    private toolbar?: Toolbar;
+
+    private rectSelection?: RectSelection;
+
+    private colorLocked: boolean = false;
+
+    private readonly needSync: boolean = false;
+
+
+    constructor(mainGraph: Dygraph, rangeGraph: Dygraph, graphContainer: HTMLElement, graphBody: HTMLElement, datewindowCallback: any, fgpGraph: FgpGraph, eventListeners?: EventHandlers, id?: string, needSync: boolean = true) {
         this.mainGraph = mainGraph;
         this.graphId = id;
         this.graphInstance = fgpGraph;
-        this.ragnebarGraph = rangeGraph;
+        this.rangebarGraph = rangeGraph;
         this.graphContainer = graphContainer;
         this.datewindowCallback = datewindowCallback;
         this.graphBody = graphBody;
-        this.intervalsDropdown = intervalsDropdown;
         this.eventListeners = eventListeners;
-        this.header = header;
         this.currentGraphData = [];
         this.spinner = new LoadingSpinner(this.graphContainer);
         this.xBoundary = [0, 0];
@@ -235,6 +126,8 @@ export class GraphOperator {
         this.yAxisBtnArea = DomElementOperator.createElement('div', yAxisButtonAreaAttrs);
         let y2AxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-y2axis-btn-container'}];
         this.y2AxisBtnArea = DomElementOperator.createElement('div', y2AxisButtonAreaAttrs);
+        this.needSync = needSync
+
     }
 
     public recreateElement = (el: HTMLElement, withChildren: boolean) => {
@@ -270,7 +163,7 @@ export class GraphOperator {
                 let graph: any = this.mainGraph;
                 graph.setSelection(false, series[0]);
             } else {
-                // hide all the others 
+                // hide all the others
                 let _updateVisibility: boolean[] = [];
                 if (this.currentCollection) {
                     const _graphSeries = this.mainGraph.getLabels();
@@ -391,478 +284,8 @@ export class GraphOperator {
         }
     };
 
-    /**
-     * update labels
-     *
-     * @private
-     * @memberof GraphOperator
-     */
-    private updateCollectionLabels = (header: HTMLElement, entities: Array<Entity>, choosedCollection: GraphCollection | undefined, collections: Array<GraphCollection>) => {
-        // 
-        let labelsContainer = header.getElementsByClassName('fgp-interval-labels');// should only have one.
-        let firstLabelArea: any = null;
-
-        if (labelsContainer.length > 0) {
-            // get first one
-            firstLabelArea = labelsContainer[0];
-            firstLabelArea.innerHTML = "";
-        }
-
-        // add children
-        collections.forEach(_collection => {
-            //
-            let labelAttrs: Array<DomAttrs> = [{
-                key: 'class',
-                value: 'badge badge-pill badge-secondary badge-interval'
-            }];
-            if (choosedCollection && _collection.name == choosedCollection.name) {
-                labelAttrs = [{key: 'class', value: 'badge badge-pill badge-success badge-interval'}];
-            }
-            let label: HTMLElement = this.createElement('span', labelAttrs);
-            label.setAttribute("data-interval-locked", "false");
-            label.setAttribute("data-interval-name", _collection.label);
-            label.setAttribute("data-interval-value", _collection.interval + '');
-            label.innerText = _collection.label;
-            // make interval label lockable
-            label.addEventListener('click', (e: MouseEvent) => {
-                if (e.target) {
-                    let label = (<HTMLSpanElement>e.target);
-                    let _interval = label.getAttribute("data-interval-value");
-                    let locked = label.getAttribute("data-interval-locked");
-                    let intervalName = label.getAttribute("data-interval-name");
-                    if ("false" === locked) {
-                        // change all others 
-                        let badges: HTMLCollection = firstLabelArea.getElementsByClassName("badge-interval");
-                        for (let badge of badges) {
-                            badge.className = "badge badge-pill badge-secondary badge-interval";
-                            badge.setAttribute("data-interval-locked", "false");
-                        }
-                        // change color
-                        label.setAttribute("data-interval-locked", "true");
-                        label.className = "badge badge-pill badge-warning badge-interval";
-                        // setup locked
-                        if (intervalName && _interval) {
-                            // update choose Collection
-                            collections.map(collection => {
-                                if (collection.label === intervalName) {
-                                    this.currentCollection = choosedCollection = collection;
-                                }
-                            });
-                            this.lockedInterval = {"name": intervalName, "interval": Number(_interval)};
-                            // call refresh
-                            // this.update(undefined, undefined, true);
-                            this.refresh();
-                        }
-                    } else {
-                        // change color
-                        label.setAttribute("data-interval-locked", "false");
-                        label.className = "badge badge-pill badge-success badge-interval";
-                        // reset
-                        this.lockedInterval = undefined;
-                        let datewindow = this.mainGraph.xAxisRange();
-                        // find best collection 
-                        this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
-                            return collection.threshold && (datewindow[1] - (datewindow[0] - collection.interval)) <= (collection.threshold.max);
-                        });
-                        this.refresh();
-                        // this.update(undefined, undefined, true);
-                    }
-                }
-            });
-
-            firstLabelArea.appendChild(label);
-        });
-    };
-
-
-    private updateSeriesDropdown = (header: HTMLElement, series: Array<any>, graph: Dygraph, visibility?: Array<boolean>) => {
-        let dropdown = header.getElementsByClassName('fgp-series-dropdown');// should only have one.
-        if (dropdown && dropdown[0]) {
-            dropdown[0].innerHTML = "";
-        }
-        let select: HTMLElement = <HTMLSelectElement>this.createElement("div", []);
-        dropdown[0].appendChild(select);
-        let opts: Array<{ checked: boolean, name: string, label: string }> = [];
-        series.forEach((_series, _index) => {
-            if (visibility && visibility[_index] != undefined) {
-                opts.push(
-                    {checked: visibility[_index], name: _series, label: _series}
-                );
-            } else {
-                opts.push(
-                    {checked: true, name: _series, label: _series}
-                );
-            }
-        });
-
-        new DropdownMenu(select, opts, (series: string, checked: boolean) => {
-            let visibility: Array<boolean> = graph.getOption('visibility');
-            let labels: Array<string> = graph.getLabels();
-            let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
-            // get current y and y2 axis scaling max and min
-            let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-            labels.forEach((label: string, index: number) => {
-                if (label == series) {
-                    visibility[index - 1] = checked;
-                }
-            });
-            graph.updateOptions({
-                visibility: visibility,
-                axes: {
-                    x: {
-                        axisLabelFormatter: formatters.axisLabel
-                    },
-                    y: {
-                        valueRange: ranges[0],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    },
-                    y2: ranges.length > 1 ? {
-                        valueRange: ranges[1],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    } : undefined
-                }
-            });
-        }).render();
-    };
-
-    private updateExportButtons = (view: ViewConfig) => {
-        if (view.graphConfig.features && view.graphConfig.features.exports) {
-            // find button area
-            let buttons = this.header.getElementsByClassName("fgp-buttons");
-            if (buttons && buttons[0]) {
-                buttons[0].innerHTML = "";
-            }
-            // check each of them
-            view.graphConfig.features.exports.forEach(_export => {
-                if (_export === GraphExports.Data) {
-                    // create button and add it into header
-                    let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-data"}];
-                    let btnData = DomElementOperator.createElement('button', btnAttrs);
-                    btnData.addEventListener("click", (event) => {
-                        // export data
-                        // check data (1 or more)
-                        if (this.currentGraphData && this.currentGraphData.length > 0 && this.currentCollection) {
-                            let csvStr: string = "";
-                            // single device
-                            const currentData = this.currentGraphData;
-                            const currentCollection = this.currentCollection;
-                            // prepare the file name
-                            const _fileName = currentCollection.label + "_" + moment().toISOString() + ".csv";
-                            let _columns: string[] = ["timestamp"];
-                            const graph: Dygraph = this.mainGraph;
-                            const _series = graph.getLabels();
-                            _series.forEach((_s, _index) => {
-                                if (_index > 0) {
-                                    _columns.push(_s);
-                                }
-                            });
-                            // add titles first
-                            _columns.forEach((title, _index) => {
-                                if (_index < _columns.length - 1) {
-                                    csvStr += title + ',';
-                                } else {
-                                    csvStr += title + '\n';
-                                }
-                            });
-                            // prepare data
-                            if (currentData) {
-                                currentData.forEach((_d: any) => {
-                                    _columns.forEach((title, _index) => {
-                                        if (_index < _columns.length - 1) {
-                                            csvStr += _d[_index] + ',';
-                                        } else {
-                                            csvStr += _d[_index] + '\n';
-                                        }
-                                    });
-                                });
-                            }
-                            ExportUtils.exportCsv(csvStr, _fileName);
-                        }
-                    });
-                    buttons[0].appendChild(btnData);
-                } else if (_export === GraphExports.Image) {
-                    let btnAttrs: Array<DomAttrs> = [{key: "class", value: "fgp-export-button fgp-btn-export-image"}];
-                    let btnImage = DomElementOperator.createElement('button', btnAttrs);
-                    btnImage.addEventListener("click", (event) => {
-                        const graphContainer = this.graphContainer;
-                        if (graphContainer) {
-                            const mainGraphContainer = graphContainer.getElementsByClassName("fgp-graph-body");
-                            if (mainGraphContainer[0] && this.currentCollection) {
-                                // first one
-                                ExportUtils.saveAsImage(mainGraphContainer[0] as HTMLElement, this.currentCollection.label + "_" + moment().toISOString() + '.png');
-                            }
-                        }
-                    });
-                    buttons[0].appendChild(btnImage);
-                }
-            });
-        }
-    };
-
-    private setColors = (colors: Array<string>) => {
-        // check if length match or not
-        let graphLabels: Array<string> = this.mainGraph.getLabels();
-        let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
-        let sat = 1.0;
-        let val = 0.5;
-        // get current y and y2 axis scaling max and min
-        let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-        if (graphLabels.length - 1 === colors.length) {
-            this.mainGraph.updateOptions({
-                colors: colors,
-                axes: {
-                    x: {
-                        axisLabelFormatter: formatters.axisLabel
-                    },
-                    y: {
-                        valueRange: ranges[0],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    },
-                    y2: ranges.length > 1 ? {
-                        valueRange: ranges[1],
-                        axisLabelWidth: 80,
-                        labelsKMB: true
-                    } : undefined
-                }
-            });
-        } else {
-            if (this.currentView.graphConfig.entities.length > 1) {
-                this.mainGraph.updateOptions({
-                    colors: undefined,
-                    axes: {
-                        x: {
-                            axisLabelFormatter: formatters.axisLabel
-                        },
-                        y: {
-                            valueRange: ranges[0],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        },
-                        y2: ranges.length > 1 ? {
-                            valueRange: ranges[1],
-                            axisLabelWidth: 80,
-                            labelsKMB: true
-                        } : undefined
-                    }
-                });
-            } else {
-                if (this.currentCollection) {
-                    let defaultColors: Array<string> = [];
-                    const num = this.currentCollection.series.length;
-                    this.currentCollection.series.forEach((series, i) => {
-                        let half = Math.ceil(num / 2);
-                        let idx = i % 2 ? (half + (i + 1) / 2) : Math.ceil((i + 1) / 2);
-                        let hue = (1.0 * idx / (1 + num));
-                        let colorStr = hsvToRGB(hue, sat, val);
-                        defaultColors.push(series.color ? series.color : colorStr);
-                    });
-
-                    this.mainGraph.updateOptions({
-                        colors: defaultColors,
-                        axes: {
-                            x: {
-                                axisLabelFormatter: formatters.axisLabel
-                            },
-                            y: {
-                                valueRange: ranges[0],
-                                axisLabelWidth: 80,
-                                labelsKMB: true
-                            },
-                            y2: ranges.length > 1 ? {
-                                valueRange: ranges[1],
-                                axisLabelWidth: 80,
-                                labelsKMB: true
-                            } : undefined
-                        }
-                    });
-                }
-            }
-        }
-    };
-
-    private setVisibility = (series: Array<string>) => {
-        // set visibility
-        let graphLabels: Array<string> = this.mainGraph.getOption('labels');
-        let visibility: Array<boolean> = [];
-        let labels = graphLabels.filter((element, index, array) => {
-            if (index != 0) {
-                visibility.push(true);
-                return true;
-            }
-            return false;
-        });
-
-        let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
-        // get current y and y2 axis scaling max and min
-        let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
-
-
-        labels.map((value, index, array) => {
-            // never hide mark lines
-            visibility[index] = series.includes(value) || value.indexOf("_markline") != -1;
-        });
-
-        // set visibility
-        this.mainGraph.updateOptions({
-            visibility: visibility,
-            axes: {
-                x: {
-                    axisLabelFormatter: formatters.axisLabel
-                },
-                y: {
-                    valueRange: ranges[0],
-                    axisLabelWidth: 80,
-                    labelsKMB: true
-                },
-                y2: ranges.length > 1 ? {
-                    valueRange: ranges[1],
-                    axisLabelWidth: 80,
-                    labelsKMB: true
-                } : undefined
-            }
-        });
-    };
-
     init = (view: ViewConfig, readyCallback?: any, interactionCallback?: any) => {
         this.currentView = view;
-        this.updateExportButtons(view);
-
-        // check toolbar buttons and dropdown list
-        let toolbarArea = this.header.getElementsByClassName("fgp-toolbar-area");
-        if (toolbarArea && toolbarArea[0]) {
-            toolbarArea[0].innerHTML = '';
-        }
-
-
-        if (view.graphConfig.features.toolbar) {
-            const toolbarConfig: ToolbarConfig = view.graphConfig.features.toolbar;
-            //
-            if (toolbarConfig.buttons) {
-                toolbarConfig.buttons.forEach(btn => {
-                    //
-                    let button: HTMLSpanElement = document.createElement("button");
-                    button.className = "fgp-toolbar-button";
-                    button.textContent = btn.label;
-                    button.addEventListener('click', (event) => {
-                        //
-                        btn.func(btn.prop);
-                    });
-                    toolbarArea[0].appendChild(button);
-                });
-            }
-
-            if (toolbarConfig.dropdown) {
-                let toolbarDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-toolbar-dropdown"}];
-                toolbarConfig.dropdown.forEach(dropdown => {
-                    let toolbarDropdown = DomElementOperator.createElement('select', toolbarDropdownAttrs);
-                    let dropdownOpts: Array<{ id: string, label: string }> = [];
-                    // create options
-                    dropdown.forEach(opt => {
-                        dropdownOpts.push({id: opt.label, label: opt.label});
-                    });
-
-                    const toolbarDropdonwOptions = new DropdownButton(<HTMLSelectElement>toolbarDropdown, [...dropdownOpts]);
-                    toolbarDropdonwOptions.render();
-                    toolbarDropdown.onchange = (e) => {
-                        const toolbarDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
-                        const currentValue: string = toolbarDropdown.value;
-                        //
-                        dropdown.forEach(opt => {
-                            if (opt.label === currentValue) {
-                                // call func
-                                opt.func(opt.prop);
-                            }
-                        });
-                    };
-                    toolbarArea[0].appendChild(toolbarDropdown);
-                });
-
-
-            }
-
-        }
-
-
-        let buttons = this.header.getElementsByClassName("fgp-filter-buttons");
-        if (buttons && buttons[0]) {
-            buttons[0].innerHTML = "";
-        }
-        // check filter buttons
-        if (view.graphConfig.filters && view.graphConfig.filters.buttons) {
-            // create buttons and add event listener
-            view.graphConfig.filters.buttons.forEach(filter => {
-                let button: HTMLSpanElement = document.createElement("button");
-                button.className = "fgp-filter-button";
-                button.textContent = filter.label;
-                button.addEventListener('click', (event) => {
-                    // call function and get series list back
-                    if (!filter.type || filter.type == FilterType.HIGHLIGHT) {
-                        const series: Array<string> = <Array<string>>filter.func();
-                        this.setVisibility(series);
-                    } else if (filter.type == FilterType.COLORS) {
-                        // 
-                        let labels = [...this.mainGraph.getLabels()];
-                        labels = labels.slice(1);
-                        const colors: Array<string> = <Array<string>>filter.func(labels);
-                        // update colors
-                        this.setColors(colors);
-                    }
-
-                });
-                // add button 
-                buttons[0].appendChild(button);
-            });
-        }
-
-        // dropdown list filter buttons
-        if (view.graphConfig.filters && view.graphConfig.filters.dropdown) {
-            // put it into dropdown\
-            let filtersDropdownAttrs: Array<DomAttrs> = [{key: 'class', value: "fgp-filter-dropdown"}];
-            let filtersDropdown = DomElementOperator.createElement('select', filtersDropdownAttrs);
-
-            buttons[0].appendChild(filtersDropdown);
-
-            // create options
-            let dropdownOpts: Array<{ id: string, label: string }> = [];
-
-            let reference: Array<{ name: string, func: filterFunc, type: FilterType | undefined }> = [];
-
-            view.graphConfig.filters.dropdown.forEach(filter => {
-                //
-                dropdownOpts.push({id: filter.label, label: filter.label});
-                reference.push({name: filter.label, func: filter.func, type: filter.type});
-            });
-
-            const filterDropdonwOptions = new DropdownButton(<HTMLSelectElement>filtersDropdown, [...dropdownOpts]);
-            filterDropdonwOptions.render();
-            // add event listener
-            filtersDropdown.onchange = (e) => {
-                //
-                const filterDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
-                const currentValue: string = filterDropdown.value;
-                // call function and get series array back
-                reference.forEach(_conf => {
-                    if (_conf.name === currentValue) {
-                        // call 
-                        if (!_conf.type || _conf.type == FilterType.HIGHLIGHT) {
-                            const series: Array<string> = <Array<string>>_conf.func();
-                            // compare then update graph
-                            this.setVisibility(series);
-                        } else if (_conf.type == FilterType.COLORS) {
-                            let labels = [...this.mainGraph.getLabels()];
-                            labels = labels.slice(1);
-                            const colors: Array<string> = <Array<string>>_conf.func(labels);
-                            this.setColors(colors);
-                        }
-
-                    }
-                });
-            };
-        }
-
 
         let currentDatewindow: [number, number];
         let formatters: Formatters = new Formatters(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess());
@@ -876,6 +299,18 @@ export class GraphOperator {
             }
         });
 
+        // bind rect selection
+        this.rectSelection = new RectSelection();
+
+        if (this.rectSelection && this.currentView.interaction?.callback?.multiSelectionCallback) {
+            this.rectSelection.setCallback((series: Array<string>) => {
+                if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.multiSelectionCallback) {
+                    this.currentView.interaction.callback.multiSelectionCallback(series);
+                }
+            });
+        }
+
+
         // find fields from configuration
         let timewindowEnd: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).add(1, 'days').startOf('day').valueOf();
         let timewindowStart: number = moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).subtract(7, 'days').startOf('day').valueOf();   // default 7 days
@@ -883,10 +318,8 @@ export class GraphOperator {
         const ranges: Array<{ name: string, value: number, show?: boolean }> | undefined = this.currentView.ranges;
         if (ranges && ranges.length > 0) {
             // get first "show" == true
-            const selected = ranges.find((value, index, arr) => {
-                if (value.show) {
-                    return value;
-                }
+            const selected = ranges.find((value: { name: string; value: number; show?: boolean }, index: number, arr: { name: string; value: number; show?: boolean }[]) => {
+                return !!value.show;
             });
             // not found then use first one
             if (!selected) {
@@ -898,7 +331,10 @@ export class GraphOperator {
         }
 
         // set init range
-        if (view.initRange) {
+        if (this.needSync && this.currentDateWindow) {
+            timewindowEnd = this.currentDateWindow.end;
+            timewindowStart = this.currentDateWindow.start;
+        } else if (view.initRange) {
             timewindowEnd = moment(view.initRange.end).tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf();
             timewindowStart = moment(view.initRange.start).tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf();
         }
@@ -919,133 +355,6 @@ export class GraphOperator {
         });
 
         let choosedCollection: GraphCollection | undefined;
-
-        const intervalsDropdonwOptions = new DropdownButton(<HTMLSelectElement>this.intervalsDropdown, [...dropdownOpts]);
-        intervalsDropdonwOptions.render();
-
-        // if configured then show it, otherwise hide it.
-        if (dropdownOpts.length === 0) {
-            this.intervalsDropdown.style.display = "none";
-        } else {
-            this.intervalsDropdown.style.display = "";
-        }
-
-
-        this.intervalsDropdown.onchange = (e) => {
-            const intervalDropdown: HTMLSelectElement = <HTMLSelectElement>e.currentTarget;
-            graphRangesConfig.forEach(config => {
-                if (config.name == intervalDropdown.value) {
-
-                    if (this.eventListeners && this.eventListeners.onIntervalChange) {
-                        this.eventListeners.onIntervalChange(this.graphInstance, config);
-                    }
-
-                    // get the middle timestamp of current timewindow.
-                    let middleDatetime = currentDatewindow[0] + (currentDatewindow[1] - currentDatewindow[0]) / 2;
-                    let halfConfigRequire = config.value / 2;
-
-                    // find the correct collection and update graph
-                    choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
-                        return collection.threshold && (timewindowEnd - (timewindowEnd - config.value)) <= (collection.threshold.max);
-                    });
-
-                    //update 
-                    // this.mainGraph = this.mainGraph;
-                    // this.ragnebarGraph = this.ragnebarGraph;
-                    this.currentCollection = choosedCollection;
-                    // this.currentView = this.currentView;
-                    this.rangeCollection = this.currentView.graphConfig.rangeCollection;
-                    if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
-                        this.start = this.xBoundary[0];
-                        this.end = this.xBoundary[1];
-                    } else if ((middleDatetime - halfConfigRequire) < this.xBoundary[0] && ((middleDatetime + halfConfigRequire) < this.xBoundary[1])) {
-                        //
-                        this.start = this.xBoundary[0];
-                        this.end = this.xBoundary[0] + halfConfigRequire * 2;
-                    } else if ((middleDatetime - halfConfigRequire) > this.xBoundary[0] && ((middleDatetime + halfConfigRequire) > this.xBoundary[1])) {
-                        this.end = this.xBoundary[1];
-                        this.start = this.xBoundary[1] - halfConfigRequire * 2;
-                    } else {
-                        this.start = (middleDatetime - halfConfigRequire);
-                        this.end = (middleDatetime + halfConfigRequire);
-                    }
-
-                    // if ragnebar graph not exist, ignore it.
-                    if (this.ragnebarGraph) {
-                        // shrink and grow base on middle datetime
-                        this.ragnebarGraph.updateOptions({
-                            dateWindow: [this.start, this.end]
-                        });
-                    }
-                    console.log("2: before upate the collection is ", this.currentCollection, this.currentView);
-                    this.update();
-                    this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
-                    if (interactionCallback) {
-                        // ready to update children
-                        interactionCallback();
-                    }
-                }
-            });
-        };
-
-
-        if (view.graphConfig.hideHeader && view.graphConfig.hideHeader === true) {
-            this.header.style.display = 'none';
-        } else {
-            let viewDrops = this.header.getElementsByClassName('fgp-views-dropdown');
-            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.views === true) {
-                // hide views
-
-                // only have one
-                if (viewDrops && viewDrops[0]) {
-                    (<HTMLSelectElement>viewDrops[0]).style.display = "none";
-                }
-            } else {
-                if (viewDrops && viewDrops[0]) {
-                    (<HTMLSelectElement>viewDrops[0]).style.display = "";
-                }
-            }
-
-            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.toolbar === true) {
-                // hide views
-                let toolbar = this.header.getElementsByClassName('fgp-filter-buttons');
-                // only have one
-                if (toolbar && toolbar[0]) {
-                    (<HTMLElement>toolbar[0]).style.display = "none";
-                }
-            }
-            let intervalDrops = this.header.getElementsByClassName('fgp-intervals-dropdown');
-            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.intervals === true) {
-                // hide views
-
-                // only have one
-                if (intervalDrops && intervalDrops[0]) {
-                    (<HTMLElement>intervalDrops[0]).style.display = "none";
-                }
-            } else {
-                if (intervalDrops && intervalDrops[0]) {
-                    (<HTMLElement>intervalDrops[0]).style.display = "";
-                }
-            }
-
-            //
-            let seriesDrops = this.header.getElementsByClassName('fgp-series-dropdown');
-            if (view.graphConfig.hideHeader && view.graphConfig.hideHeader.series === true) {
-                // hide views
-
-                // only have one
-                if (seriesDrops && seriesDrops[0]) {
-                    (<HTMLElement>seriesDrops[0]).style.display = "none";
-                }
-            } else {
-                if (seriesDrops && seriesDrops[0]) {
-                    (<HTMLElement>seriesDrops[0]).style.display = "";
-                }
-            }
-
-
-        }
-
         // get fields
         let fieldsForCollection: any[] = [];
         // get range config and find the first and last
@@ -1066,7 +375,7 @@ export class GraphOperator {
         });
 
 
-        // 
+        //
         this.currentView.dataService.fetchFirstNLast([this.currentView.graphConfig.rangeEntity.name], this.currentView.graphConfig.rangeEntity.type, this.currentView.graphConfig.rangeCollection.name, Array.from(new Set(fieldsForCollection))).then(resp => {
             // get first and last records, just need start and end timestamp
             let first: any = {timestamp: moment.tz(this.currentView.timezone ? this.currentView.timezone : moment.tz.guess()).valueOf()};
@@ -1096,7 +405,13 @@ export class GraphOperator {
             });
 
             // init empty graph with start and end  no other data
-            let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
+            // let firstRanges: any = graphRangesConfig.find(range => range.show && range.show == true);
+
+            let firstRanges: any = graphRangesConfig.find((range: { name: string; value: number; show?: boolean }, index: number, object: ({ name: string; value: number; show?: boolean })[]) => {
+                return range ? range.show : false;
+            });
+
+
             if (!firstRanges) {
                 // throw errors;
                 console.warn("non default range for range-bar, use default 7 days");
@@ -1145,7 +460,7 @@ export class GraphOperator {
                 // upate choosed collection
                 const gap = this.currentView.initRange.end - this.currentView.initRange.start;
 
-                choosedCollection = this.currentView.graphConfig.collections.find((collection) => {
+                choosedCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection) => {
                     return collection.threshold && (gap) <= (collection.threshold.max - collection.threshold.min);
                 });
             }
@@ -1201,7 +516,6 @@ export class GraphOperator {
             if (choosedCollection) {
                 // set currentCollection to choosedCollection
                 this.currentCollection = choosedCollection;
-                console.log("update collection to ", this.currentCollection);
             }
 
             let currentDatewindowOnMouseDown: any[] = [];
@@ -1209,8 +523,8 @@ export class GraphOperator {
             const datewindowChangeFunc = (e: MouseEvent, yAxisRange?: Array<Array<number>>) => {
                 let datewindow: number[] = [];
 
-                if (this.ragnebarGraph) {
-                    datewindow = this.ragnebarGraph.xAxisRange();
+                if (this.rangebarGraph) {
+                    datewindow = this.rangebarGraph.xAxisRange();
                 } else {
                     datewindow = this.mainGraph.xAxisRange();
                 }
@@ -1218,7 +532,7 @@ export class GraphOperator {
                 if (datewindow[0] == currentDatewindowOnMouseDown[0] && datewindow[1] == currentDatewindowOnMouseDown[1]) {
                     // console.debug("no change!");
                 } else {
-                    // fetch data again 
+                    // fetch data again
                     // sorting
                     this.currentView.graphConfig.collections.sort((a, b) => {
                         return a.interval > b.interval ? 1 : -1;
@@ -1248,8 +562,8 @@ export class GraphOperator {
                         } else {
                             this.start = this.end - (maxShowP * 1.5);
                             // update datewindow
-                            if (this.ragnebarGraph) {
-                                this.ragnebarGraph.updateOptions({
+                            if (this.rangebarGraph) {
+                                this.rangebarGraph.updateOptions({
                                     dateWindow: [this.start, this.end]
                                 });
                             } else {
@@ -1288,12 +602,7 @@ export class GraphOperator {
                     this.currentCollection = collection;
                     this.rangeCollection = this.currentView.graphConfig.rangeCollection;
 
-                    console.log("3: before upate the collection is ", this.currentCollection, this.currentView);
                     this.update(undefined, undefined, true);
-                    if (!this.lockedInterval) {
-                        this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
-                    }
-
                 }
             };
 
@@ -1380,11 +689,87 @@ export class GraphOperator {
                 });
             }
 
-            if (this.mainGraph) {
-                // clear old graph
-                // (<any>this.mainGraph).hidden_ctx_.clearRect(0, 0, (<any>this.mainGraph).hidden_.width, (<any>this.mainGraph).hidden_.height);
-                this.mainGraph.destroy();
-            }
+            // create toolbar on top, instead of old way!
+            this.toolbar = new Toolbar(this.currentView, this.graphInstance.viewConfigs, (collections: GraphCollection[]) => {
+                // udpate graph here
+                console.log(`new collection config from badges!`, collections);
+
+                const showCollection = collections.find(_coll => {
+                    return _coll.show;
+                });
+
+                if (showCollection) {
+                    this.currentCollection = showCollection;
+                    if (showCollection.locked) {
+                        this.lockedInterval = {
+                            "name": showCollection.name,
+                            "interval": Number(showCollection.interval)
+                        };
+                    } else {
+                        this.lockedInterval = undefined;
+                    }
+                    // reload data
+                    this.refresh();
+                }
+
+            }, (collection, datewindow) => {
+                this.currentCollection = collection;
+                this.start = datewindow[0];
+                this.end = datewindow[1];
+                this.update();
+                if (this.rangebarGraph) {
+                    // shrink and grow base on middle datetime
+                    this.rangebarGraph.updateOptions({
+                        dateWindow: [this.start, this.end]
+                    });
+                }
+
+                if (interactionCallback) {
+                    interactionCallback();
+                }
+            }, (view) => {
+
+                // change show
+                if (this.needSync && this.currentDateWindow) {
+                    //
+                    view.initRange = this.currentDateWindow;
+                }
+                this.init(view, (graph: Dygraph) => {
+                    this.mainGraph = graph;
+
+                    this.graphInstance.children.forEach(graph => {
+                        // call updateDatewinow
+                        if (graph.id != this.graphInstance.id) {
+                            // update data
+                            graph.operator.refresh();
+                        }
+                    });
+                    // check if we need to tell others the view changed.
+                    if (this.graphInstance.eventListeners && this.graphInstance.eventListeners.onViewChange) {
+                        //f call
+                        this.graphInstance.eventListeners.onViewChange(this.graphInstance, view);
+                    }
+                }, () => {
+                    this.graphInstance.children.forEach(graph => {
+                        // call updateDatewinow
+                        if (graph.id != this.graphInstance.id) {
+                            // update data
+                            graph.operator.refresh();
+                        }
+                    });
+                });
+
+
+            }, (active: boolean) => {
+                if (this.rectSelection && active) {
+                    this.rectSelection.enable();
+                } else {
+                    this.rectSelection?.disable();
+                }
+            }, (isLocked) => {
+                this.colorLocked = isLocked;
+            });
+
             // create graph instance
             this.mainGraph = new Dygraph(this.graphBody, initialData, {
                 labels: ['x'].concat(mainGraphLabels),
@@ -1411,8 +796,7 @@ export class GraphOperator {
                 highlightCallback: (e, x, ps, row, seriesName) => {
                     // make sure we got current selection and even no highlightCall in viewConfig we still need to make click dbl working.
                     currentSelection = seriesName;
-                    if (currentSelection != seriesName && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
-                        console.log("current selection is ", currentSelection);
+                    if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                         this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
                 },
@@ -1442,10 +826,15 @@ export class GraphOperator {
                         // remove spinner from container
                         this.spinner.done();
                     }
+
+                    if (this.toolbar) {
+                        this.toolbar.updateDateWindow(xAxisRange, this.xBoundary);
+                    }
+                    this.currentDateWindow = {start: xAxisRange[0], end: xAxisRange[1]};
                     // update datewindow
                     this.datewindowCallback(xAxisRange, this.currentView);
                 },
-                // plugins: [new Toolbar({collections: this.currentView.graphConfig.collections})]
+                plugins: [this.rectSelection, this.toolbar]
             });
             // add dbl event
             if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.dbClickCallback) {
@@ -1467,7 +856,7 @@ export class GraphOperator {
                     let ranges: Array<Array<number>> = this.mainGraph.yAxisRanges();
                     if (g && btn.getAttribute("fgp-ctrl") === "x-pan-left") {
                         let newDatewindow = [0, 0];
-                        // move left 
+                        // move left
                         // current datewindow
                         const datewindow: [number, number] = g.xAxisRange();
                         const dateGap = datewindow[1] - datewindow[0];
@@ -1510,7 +899,7 @@ export class GraphOperator {
                         }, 1000);
                     } else if (g && btn.getAttribute("fgp-ctrl") === "x-pan-right") {
                         let newDatewindow = [0, 0];
-                        // move left 
+                        // move left
                         // current datewindow
                         const datewindow: [number, number] = g.xAxisRange();
                         const dateGap = datewindow[1] - datewindow[0];
@@ -1642,7 +1031,7 @@ export class GraphOperator {
             let xAxisButtonAreaAttrs: Array<DomAttrs> = [{key: 'class', value: 'fgp-graph-xaxis-btn-container'}];
             let xAxisBtnArea: HTMLElement = DomElementOperator.createElement('div', xAxisButtonAreaAttrs);
 
-            // add buttons 
+            // add buttons
             let xAxisZoomInBtnAttrs: Array<DomAttrs> = [{
                 key: 'class',
                 value: 'fgp-graph-xaxis-btn fgp-btn-zoom-in fgp-btn-v'
@@ -1694,7 +1083,7 @@ export class GraphOperator {
                         yAxes[0]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
                         yAxes[0]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
                     } else if (side === "right") {
-                        // 
+                        //
                         const range = ranges[1];
                         yAxes[1]['valueRange'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
                         yAxes[1]['valueWindow'] = [range[0] + (range[1] - range[0]) * 0.2, range[1] - (range[1] - range[0]) * 0.2];
@@ -1711,7 +1100,7 @@ export class GraphOperator {
                         yAxes[0]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
                         yAxes[0]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
                     } else if (side === "right") {
-                        // 
+                        //
                         const range = ranges[1];
                         yAxes[1]['valueRange'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
                         yAxes[1]['valueWindow'] = [range[0] - (range[1] - range[0]) * 0.2, range[1] + (range[1] - range[0]) * 0.2];
@@ -1780,7 +1169,7 @@ export class GraphOperator {
             };
             // check if exist or not
             if (this.graphContainer.getElementsByClassName("fgp-graph-yaxis-btn").length == 0) {
-                // add buttons 
+                // add buttons
                 let yAxisZoomInBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
                     value: 'fgp-graph-yaxis-btn fgp-btn-zoom-in fgp-btn-v'
@@ -1821,7 +1210,7 @@ export class GraphOperator {
 
             // add buttons for y and y2 ctrl
             if (this.graphContainer.getElementsByClassName("fgp-graph-y2axis-btn").length == 0) {
-                // add buttons 
+                // add buttons
                 let y2AxisZoomInBtnAttrs: Array<DomAttrs> = [{
                     key: 'class',
                     value: 'fgp-graph-y2axis-btn fgp-btn-zoom-in fgp-btn-v'
@@ -1925,7 +1314,7 @@ export class GraphOperator {
                 bottom.appendChild(rangeBar);
                 this.graphContainer.appendChild(bottom);
                 //create range-bar graph
-                this.ragnebarGraph = new Dygraph(rangeBar, [
+                this.rangebarGraph = new Dygraph(rangeBar, [
                     firstData,   // first
                     lastData    // last
                 ], {
@@ -1962,25 +1351,28 @@ export class GraphOperator {
                             if (handles[0] instanceof HTMLElement) {
                                 (<HTMLElement>handles[0]).style.zIndex = "11";
                             }
+                        } else {
+                            this.datewindowCallback(xAxisRange, this.currentView);
                         }
-
-                        this.datewindowCallback(xAxisRange, this.currentView);
                     },
                     plugins: this.currentView.graphConfig.features.rangeLocked ? [RangeHandles] : []
                 });
 
 
                 // check
-                let sync = new Synchronizer([this.ragnebarGraph, this.mainGraph]);
-                sync.synchronize();
+                if (this.rangebarGraph && this.mainGraph) {
+                    let sync = new Synchronizer([this.rangebarGraph, this.mainGraph]);
+                    sync.synchronize();
+                }
+
                 // readyCallback(this.mainGraph);
                 let rangeBarCanvas: any = (rangeBar.getElementsByClassName("dygraph-rangesel-fgcanvas")[0]);
                 let rangeBarHandles: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle");
                 let singleHandle: any = rangeBar.getElementsByClassName("dygraph-rangesel-zoomhandle-single");
                 const rangebarMousedownFunc = (e: MouseEvent) => {
                     // check
-                    const datewindow = this.ragnebarGraph.xAxisRange();
-                    currentDatewindowOnMouseDown = datewindow;
+                    const dateWindow = this.rangebarGraph.xAxisRange();
+                    currentDatewindowOnMouseDown = dateWindow;
 
                     window.addEventListener("mouseup", (e) => {
                         datewindowChangeFunc(e, []);
@@ -2012,7 +1404,7 @@ export class GraphOperator {
                     singleHandle[0].addEventListener('mousedown', rangebarMousedownFunc);
                 }
 
-                // add mouse listener 
+                // add mouse listener
                 rangeBarCanvas.addEventListener('mousedown', rangebarMousedownFunc);
             }
             // update datewindow
@@ -2023,30 +1415,9 @@ export class GraphOperator {
             this.start = timewindowStart;
             this.end = timewindowEnd;
 
-            //
-            console.log("4: before upate the collection is ", this.currentCollection, this.currentView);
-            this.update(first.timestamp, last.timestamp);
-            // send "ready" after update 
-            readyCallback(this.mainGraph);
-            this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, choosedCollection, this.currentView.graphConfig.collections);
-            const seriesName: string[] = [];
-
-            if (this.currentView.graphConfig.entities.length > 1) {
-                this.currentView.graphConfig.entities.forEach(entity => {
-                    if (!entity.fragment) {
-                        seriesName.push(entity.name);
-                    }
-                });
-            } else {
-                // single device with multiple lines
-                if (choosedCollection) {
-                    choosedCollection.series.forEach(series => {
-                        seriesName.push(series.label);
-                    });
-                }
-            }
-            this.updateSeriesDropdown(this.header, seriesName, this.mainGraph, initVisibility);
-
+            this.update(first.timestamp, last.timestamp, undefined, undefined, readyCallback);
+            // send "ready" after update
+            // readyCallback(this.mainGraph);
         });
     };
 
@@ -2073,7 +1444,7 @@ export class GraphOperator {
 
 
             if (!this.lockedInterval) {
-                this.currentCollection = this.currentView.graphConfig.collections.find((collection) => {
+                this.currentCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection) => {
                     return collection.threshold && (datewindow[1] - datewindow[0]) <= (collection.threshold.max);
                 });
             } else if (this.currentCollection) {
@@ -2093,8 +1464,8 @@ export class GraphOperator {
                 } else {
                     this.start = this.end - (maxShowP * 1.5);
                     // update datewindow
-                    if (this.ragnebarGraph) {
-                        this.ragnebarGraph.updateOptions({
+                    if (this.rangebarGraph) {
+                        this.rangebarGraph.updateOptions({
                             dateWindow: [this.start, this.end]
                         });
                     } else {
@@ -2107,34 +1478,32 @@ export class GraphOperator {
 
             let collection: GraphCollection = {label: "", name: "", series: [], interval: 0};
             Object.assign(collection, this.currentCollection);
-            console.log("5: efore upate the collection is ", this.currentCollection, this.currentView);
 
             // check initScale
             this.update(undefined, undefined, true);
-            if (!this.lockedInterval) {
-
-
-                this.updateCollectionLabels(this.header, this.currentView.graphConfig.entities, this.currentCollection, this.currentView.graphConfig.collections);
-            }
         }
 
 
     };
 
 
-    update = (first?: number, last?: number, refersh?: boolean, range?: [number, number]) => {
-
+    /**
+     * render graph
+     * @param first
+     * @param last
+     * @param refersh
+     * @param range
+     */
+    update = (first?: number, last?: number, refersh?: boolean, range?: [number, number], readyCallback?: (graph: any) => void) => {
         let mainGraph: any = this.mainGraph;
-        let rangebarGraph: any = this.ragnebarGraph;
+        let rangebarGraph: any = this.rangebarGraph;
         let graphCollection = this.currentCollection;
         let rangeCollection = this.rangeCollection;
         let start = this.start;
         let end = this.end;
 
         // check if currentCollection doesnt exist in currentView then ignore it
-        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => {
-            return collection.name === this.currentCollection?.name;
-        });
+        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => collection.name === this.currentCollection?.name);
 
         // wrong collection and ignore it
         if (!existCollection) {
@@ -2295,7 +1664,7 @@ export class GraphOperator {
                         }
                     }
                 } else {
-                    // disable step and show 
+                    // disable step and show
                     mainGraphSeries[series.label]["stepPlot"] = false;
                     mainGraphSeries[series.label]["strokeWidth"] = 1;
                     mainGraphSeries[series.label]["drawPoints"] = false;
@@ -2310,26 +1679,23 @@ export class GraphOperator {
 
 
         let prepareGraphData = (data: any[], entities: any[], collection: any): { data: Array<any>, axis?: { y: { min: number, max: number }, y2?: { min: number, max: number } }, isY2?: boolean, isY?: boolean } => {
+
+
             // update main graph
             let graphData: any[] = [];
             let finalData: any[] = [];
-            let checkY = false;
-            let checkY2 = false;
-            //init data arrays with default empty 
+            //init data arrays with default empty
             entities.forEach((id, _index) => {
                 graphData.push([]);
             });
 
-
             let _dates: Array<number> = [];
-            if (first && last) {
-                _dates = [first, last];
-            }
+
             data.forEach(entityData => {
                 entities.forEach((id, _index) => {
                     if (id == entityData.id) {
                         graphData.splice(_index, 1, entityData.data);
-                        // merge date 
+                        // merge date
                         entityData.data.forEach((item: any) => {  // item is object
                             if (_dates.indexOf(item.timestamp) == -1) {
                                 _dates.push(item.timestamp);
@@ -2338,8 +1704,20 @@ export class GraphOperator {
                     }
                 });
             });
-            // 
             _dates.sort();
+            // fill gap
+            let currentTimestamp = _dates[0];
+            let lastTimestamp = _dates[_dates.length -1];
+            let expectTimestampArray = [];
+            while(currentTimestamp < lastTimestamp){
+                expectTimestampArray.push(currentTimestamp);
+                currentTimestamp += existCollection.interval;
+            }
+            // add first & last
+            if (first && last) {
+                expectTimestampArray = [first].concat(expectTimestampArray).concat([last]);
+            }
+            _dates = expectTimestampArray;
             // rest labels
             mainLabels = [];
 
@@ -2366,7 +1744,7 @@ export class GraphOperator {
                         }
 
                         // update min max for current field
-                        // left 
+                        // left
                         yIndexs.forEach(_yIndex => {
                             if (_yIndex == (_index + 1)) {
                                 //
@@ -2386,7 +1764,7 @@ export class GraphOperator {
                             }
                         });
 
-                        // right 
+                        // right
                         y2Indexs.forEach(_yIndex => {
                             if (_yIndex == (_index + 1)) {
                                 //
@@ -2453,7 +1831,7 @@ export class GraphOperator {
                                 // }
                             });
 
-                            // right 
+                            // right
                             y2Indexs.forEach(_yIndex => {
                                 // if (_yIndex == (_index + 1)) {
                                 //
@@ -2484,7 +1862,6 @@ export class GraphOperator {
         if (graphCollection) {
             this.spinner.show();
             // get data for
-            console.log("going to get data for graph ", this.graphId, mainEntities, mainDeviceType, graphCollection);
             view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, {
                 start: start,
                 end: end
@@ -2605,8 +1982,6 @@ export class GraphOperator {
                     });
                 }
 
-                console.log(this.currentGraphData, mainGraphSeries, mainLabels);
-
                 const latestVisibility: Array<boolean> = [];
 
                 const orgVisibility: Array<boolean> = mainGraph.getOption('visibility');
@@ -2615,9 +1990,9 @@ export class GraphOperator {
                     let initVisibility: boolean[] = [];
                     let seriesNames: Array<string> = [];
                     graphCollection.series.forEach((series, _index) => {
-                        if (series.visibility == undefined || series.visibility == true) {
+                        if (series.visibility == undefined || series.visibility) {
                             initVisibility[_index] = true;
-                        } else if (series.visibility == false) {
+                        } else if (!series.visibility) {
                             initVisibility[_index] = false;
                         }
                         seriesNames.push(series.label);
@@ -2627,18 +2002,26 @@ export class GraphOperator {
                     mainLabels.forEach((label, _index) => {
                         latestVisibility[_index] = initVisibility[_index] != undefined ? initVisibility[_index] : true;
                     });
-
-                    // update dropdown list
-                    this.updateSeriesDropdown(this.header, seriesNames, this.mainGraph, initVisibility);
                 }
                 // clear draw area
                 (mainGraph).hidden_ctx_.clearRect(0, 0, (mainGraph).hidden_.width, (mainGraph).hidden_.height);
+
+                if (this.currentCollection) {
+                    this.toolbar ? this.toolbar.updateData(this.currentCollection, mainLabels, this.currentGraphData) : null;
+                }
+
+                // lock color
+                if (this.colorLocked) {
+                    colors = mainGraph.getColors();
+                }
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
                     series: mainGraphSeries,
+                    dateWindow: [start, end],
                     visibility: latestVisibility.length > 0 ? latestVisibility : orgVisibility,
-                    colors: colors.length == 0 ? undefined : colors,
+                    colors: colors.length > 0 ? colors : undefined,
                     labels: ['x'].concat(mainLabels),
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
@@ -2679,8 +2062,12 @@ export class GraphOperator {
                             }
 
                         });
-                        console.log(annos);
                         mainGraph.setAnnotations(annos);
+                    }
+
+                    // first time graph ready
+                    if (readyCallback) {
+                        readyCallback(mainGraph);
                     }
                 });
 
