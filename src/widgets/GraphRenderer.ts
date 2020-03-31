@@ -1,17 +1,8 @@
 import Dygraph from 'dygraphs';
-import {
-    ViewConfig,
-    GraphCollection,
-    DomAttrs,
-    GraphSeries,
-    Entity,
-    GraphExports,
-    filterFunc,
-    FilterType, ToolbarConfig
-} from '../metadata/configurations';
+import {DataRequestTarget, DomAttrs, GraphCollection, GraphSeries, ViewConfig} from '../metadata/configurations';
 import moment from 'moment-timezone';
 import {Synchronizer} from '../extras/synchronizer';
-import {DataHandler, ExportUtils, LoadingSpinner} from '../services/dataService';
+import {LoadingSpinner} from '../services/dataService';
 import {GraphInteractions} from '../extras/interactions';
 import {Formatters} from '../extras/formatters';
 import {FgpColor, hsvToRGB} from '../services/colorService';
@@ -1865,7 +1856,7 @@ export class GraphOperator {
             view.dataService.fetchdata(mainEntities, mainDeviceType, graphCollection.name, {
                 start: start,
                 end: end
-            }, Array.from(new Set(fieldsForMainGraph)), graphCollection.series).then(resp => {
+            }, Array.from(new Set(fieldsForMainGraph)), graphCollection.series, DataRequestTarget.GRAPH).then(resp => {
                 let graphData = prepareGraphData(resp, mainEntities, graphCollection);
                 let yScale: { valueRange: Array<number> } = {valueRange: []};
                 let y2Scale: { valueRange: Array<number> } = {valueRange: []};
@@ -2093,7 +2084,7 @@ export class GraphOperator {
             view.dataService.fetchdata(rangeEntities, rangeDeviceType, rangeCollection.name, {
                 start: start,
                 end: end
-            }, Array.from(new Set(fieldsForRangebarGraph))).then(resp => {
+            }, Array.from(new Set(fieldsForRangebarGraph)), undefined, DataRequestTarget.RANGE_BAR).then(resp => {
                 // merge data
                 const currentDatewindowData = prepareGraphData(resp, rangeEntities, rangeCollection);
                 let preData: Array<any> = rangebarGraph.file_;

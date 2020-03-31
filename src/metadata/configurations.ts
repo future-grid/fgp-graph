@@ -12,6 +12,11 @@ export enum GraphExports {
     Draw = "draw"
 }
 
+export enum DataRequestTarget {
+    RANGE_BAR = "rangebar",
+    GRAPH = "graph"
+}
+
 export interface ToolbarBtn {
     label: string,
     prop: any,

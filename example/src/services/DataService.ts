@@ -1,6 +1,7 @@
 import {DataHandler} from "@future-grid/fgp-graph/lib/services/dataService";
 import {GraphSeries} from "@future-grid/fgp-graph/lib/metadata/configurations";
 import moment from "moment-timezone";
+import {DataRequestTarget} from "@future-grid/fgp-graph/lib/metadata/configurations";
 
 export default class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included
@@ -60,8 +61,9 @@ export default class DataService implements DataHandler {
     }
 
 
-    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>): Promise<{ id: string; data: any[]; }[]> {
-        // console.debug("fetching data from server...");
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>, target?:DataRequestTarget): Promise<{ id: string; data: any[]; }[]> {
+
+        console.debug(`fetching data from server... target: ${target}`);
         let tempDate = moment(range.start).startOf('day').valueOf();
         let existData: any[] = [];
         ids.forEach(id => {
