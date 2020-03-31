@@ -291,6 +291,25 @@ export default class GraphContainer extends Component<Props, States> {
                 },
                 entities: [
                     {id: "meter1", type: "meter", name: "meter1"},
+                    {id: "meter3", type: "meter", name: "meter3"},
+                    {id: "meter4", type: "meter", name: "meter4"},
+                    {id: "meter5", type: "meter", name: "meter5"},
+                    {id: "meter6", type: "meter", name: "meter6"},
+                    {id: "meter7", type: "meter", name: "meter7"},
+                    {id: "meter8", type: "meter", name: "meter8"},
+                    {id: "meter9", type: "meter", name: "meter9"},
+                    {id: "meter10", type: "meter", name: "meter10"},
+                    {id: "meter11", type: "meter", name: "meter11"},
+                    {id: "meter12", type: "meter", name: "meter12"},
+                    {id: "meter13", type: "meter", name: "meter13"},
+                    {id: "meter14", type: "meter", name: "meter14"},
+                    {id: "meter1555555555555555555555555555555555", type: "meter", name: "meter1555555555555555555555555555555555"},
+                    {id: "meter1655555555555555555555555555555555", type: "meter", name: "meter1655555555555555555555555555555555"},
+                    {id: "meter1755555555555555555555555555555555", type: "meter", name: "meter1755555555555555555555555555555555"},
+                    {id: "meter1855555555555555555555555555555555", type: "meter", name: "meter1855555555555555555555555555555555"},
+                    {id: "meter1955555555555555555555555555555555", type: "meter", name: "meter1955555555555555555555555555555555"},
+                    {id: "meter2055555555555555555555555555555555", type: "meter", name: "meter2055555555555555555555555555555555"},
+                    {id: "meter2155555555555555555555555555555555", type: "meter", name: "meter2155555555555555555555555555555555"},
                     // {id: "meter2", type: "meter", name: "meter2"},
                     {id: "?", type: "meter", name: "?", fragment: true}
                 ],
@@ -586,11 +605,11 @@ export default class GraphContainer extends Component<Props, States> {
             });
         }
 
-        setTimeout(()=>{
-
-            g.updateDatewinow([moment("2019-12-20").valueOf(), moment("2019-12-30").valueOf()])
-
-        }, 5000);
+        // setTimeout(()=>{
+        //
+        //     g.updateDatewinow([moment("2019-12-20").valueOf(), moment("2019-12-30").valueOf()])
+        //
+        // }, 5000);
 
 
     };

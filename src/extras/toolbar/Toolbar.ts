@@ -210,7 +210,7 @@ export default class Toolbar {
         console.log(`current collection is `, collection);
         this.badges?.autoSelect(collection);
         this.exports?.setData(data, labels, collection);
-        this.series?.setData(collection);
+        this.series?.setData(data, labels, collection);
         this.filter?.setData(collection);
     };
 

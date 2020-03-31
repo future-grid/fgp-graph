@@ -7,6 +7,10 @@ export default class Series {
 
     private chosenCollection?: GraphCollection;
 
+    private currentGraphData?: Array<any>;
+
+    private labels?: string[];
+
     private isInit: boolean = true;
 
     private options: Array<HTMLInputElement>;
@@ -97,7 +101,7 @@ export default class Series {
                         }
                     });
                     visibility.map((v: boolean) => {
-                        if(!v){
+                        if (!v) {
                             fullChecked = false;
                         }
                     });
@@ -154,10 +158,28 @@ export default class Series {
                     const option = document.createElement("label");
                     const checkbox = document.createElement("input");
                     checkbox.type = 'checkbox';
-                    checkbox.checked = true;
-                    checkbox.addEventListener('click', () => {
-                        this.selectNDeselect(_child.name, checkbox.checked, allCheckbox);
+                    // find out if data column all null or NaN
+                    let hasData = false;
+                    this.labels?.forEach((label, index) => {
+                        if (label === _child.id) {
+                            // 2. check data
+                            this.currentGraphData?.forEach(_data => {
+                                //
+                                if (_data[index + 1] !== null && !isNaN(_data[index + 1])) {
+                                    hasData = true;
+                                }
+                            });
+                        }
                     });
+                    checkbox.checked = hasData;
+                    if (!hasData) {
+                        option.style.pointerEvents = "none";
+                    } else {
+                        checkbox.addEventListener('click', () => {
+                            this.selectNDeselect(_child.name, checkbox.checked, allCheckbox);
+                        });
+                    }
+
                     option.append(checkbox);
                     option.append(`${_child.name}`);
                     this.options.push(checkbox);
@@ -170,15 +192,42 @@ export default class Series {
             // device view
             parentElement.innerHTML = '';
             if (this.chosenCollection) {
+
+                //
+
                 this.chosenCollection.series.forEach(_series => {
                     const option = document.createElement("label");
                     console.log(`${_series.visibility}`);
                     const checkbox = document.createElement("input");
                     checkbox.type = 'checkbox';
-                    checkbox.checked = (!(_series.visibility !== undefined && !_series.visibility));
-                    checkbox.addEventListener('click', () => {
-                        this.selectNDeselect(_series.label, checkbox.checked, undefined);
+                    // find out if data column all null or NaN
+                    let hasData = false;
+                    this.labels?.forEach((label, index) => {
+                        if (label === _series.label) {
+                            // 2. check data
+                            this.currentGraphData?.forEach(_data => {
+                                //
+                                if (_data[index + 1] !== null && !isNaN(_data[index + 1])) {
+                                    hasData = true;
+                                }
+                            });
+                        }
                     });
+
+
+                    checkbox.checked = (!(_series.visibility !== undefined && !_series.visibility));
+
+                    if(checkbox.checked && !hasData){
+                        checkbox.checked = hasData;
+                    }
+
+                    if (!hasData) {
+                        option.style.pointerEvents = "none";
+                    } else {
+                        checkbox.addEventListener('click', () => {
+                            this.selectNDeselect(_series.label, checkbox.checked, undefined);
+                        });
+                    }
                     option.append(checkbox);
                     option.append(`${_series.label}`);
                     this.options.push(checkbox);
@@ -188,9 +237,11 @@ export default class Series {
         }
     };
 
-    public setData = (collection: GraphCollection) => {
+    public setData = (data: any, labels: string[], collection: GraphCollection) => {
         this.chosenCollection = collection;
-        // update options
+        this.currentGraphData = data;
+        this.labels = labels;
+        // update options ups to labels and data
         this.createOptions(this.viewConfig, this.checkBoxDiv);
 
     };

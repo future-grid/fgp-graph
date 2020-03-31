@@ -94,13 +94,24 @@ export default class DataService implements DataHandler {
                             }
                         });
                         if (!recordExist) {
-                            // add new one
-                            _ed.data.push({
-                                'timestamp': currentDate,
-                                'voltage': this.randomNumber(252, 255),
-                                'amp': this.randomNumber(1, 2),
-                                'avgVoltage': this.randomNumber(250, 255)
-                            });
+                            if(_ed.id === "meter11"){
+                                // add new one
+                                _ed.data.push({
+                                    'timestamp': currentDate,
+                                    'voltage': null,
+                                    'amp': null,
+                                    'avgVoltage': null
+                                });
+                            } else {
+                                // add new one
+                                _ed.data.push({
+                                    'timestamp': currentDate,
+                                    'voltage': this.randomNumber(252, 255),
+                                    'amp': this.randomNumber(1, 2),
+                                    'avgVoltage': this.randomNumber(250, 255)
+                                });
+                            }
+
                         }
                         // }
                     }
@@ -163,7 +174,7 @@ export default class DataService implements DataHandler {
                         let _records: any[] = [];
                         _data.data.forEach((_d: any, index: number) => {
                             if (_d.timestamp >= range.start && _d.timestamp <= range.end) {
-                                if(index !=3 && index!=5){
+                                if(index !==3 && index!==5){
                                     _records.push(_d);
                                 }
                             }
