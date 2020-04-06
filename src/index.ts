@@ -276,10 +276,15 @@ export default class FgpGraph {
     updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
         // update graph
         if (this.graph) {
+            // update current date-window
+            this.graph.updateOptions({
+                dateWindow: datewindow
+            });
             if (forceReload) {
                 this.operator.update(undefined, undefined, true, datewindow);
             }
         }
+
     };
 
     /**
