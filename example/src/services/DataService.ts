@@ -64,7 +64,8 @@ export default class DataService implements DataHandler {
     fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>, target?:DataRequestTarget): Promise<{ id: string; data: any[]; }[]> {
 
         console.debug(`fetching data from server... target: ${target}`);
-        let tempDate = moment(range.start).startOf('day').valueOf();
+        let firstDate = moment(range.start);
+        let tempDate = firstDate.startOf('day').valueOf();
         let existData: any[] = [];
         ids.forEach(id => {
             let exist = this.deviceData.find((_data) => {
@@ -154,15 +155,21 @@ export default class DataService implements DataHandler {
                 }
             });
 
+            /**
+             * let firstDate = moment(range.start);
+             * let tempDate = firstDate.startOf('day').valueOf();
+             */
+
             if ("substation_interval_day" === interval) {
-                tempDate += 86400000;
+                firstDate = firstDate.add(1, 'days');
             } else if ("substation_interval" === interval) {
-                tempDate += 3600000;
+                firstDate = firstDate.add(1, 'hours');
             } else if ("meter_read_day" === interval) {
-                tempDate += 86400000;
+                firstDate = firstDate.add(1, 'days');
             } else if ("meter_read" === interval) {
-                tempDate += 3600000;
+                firstDate = firstDate.add(1, 'hours');
             }
+            tempDate = firstDate.valueOf();
 
         }
 

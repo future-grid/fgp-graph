@@ -1697,13 +1697,14 @@ export class GraphOperator {
             });
             _dates.sort();
             // fill gap
-            let currentTimestamp = _dates[0];
-            let lastTimestamp = _dates[_dates.length -1];
-            let expectTimestampArray = [];
-            while(currentTimestamp < lastTimestamp){
-                expectTimestampArray.push(currentTimestamp);
-                currentTimestamp += existCollection.interval;
-            }
+            let expectTimestampArray: Array<number> = [];
+            _dates.forEach((_date, _index) => {
+                expectTimestampArray.push(_date);
+                if (_dates[_index + 1] && ((_dates[_index + 1] - _date) >= (2 * existCollection.interval)) && (_dates[_index + 1] - _date) % existCollection.interval === 0) {
+                    // add one gap here
+                    expectTimestampArray.push(_date + existCollection.interval);
+                }
+            });
             // add first & last
             if (first && last) {
                 expectTimestampArray = [first].concat(expectTimestampArray).concat([last]);
@@ -1719,7 +1720,7 @@ export class GraphOperator {
                 // get collection config
                 collection.series.forEach((series: GraphSeries, _index: number) => {
                     mainLabels.push(series.label);
-                    var f = new Function("data", "with(data) { if(" + series.exp + "!=null)return " + series.exp + ";return null;}");
+                    const f = new Function("data", "with(data) { if(" + series.exp + "!=null)return " + series.exp + ";return null;}");
                     // generate data for this column
                     _dates.forEach(date => {
                         // find date in finalData
