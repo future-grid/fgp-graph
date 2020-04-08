@@ -1494,7 +1494,7 @@ export class GraphOperator {
         let end = this.end;
 
         // check if currentCollection doesnt exist in currentView then ignore it
-        const existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => collection.name === this.currentCollection?.name);
+        let existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => collection.name === this.currentCollection?.name);
 
         // wrong collection and ignore it
         if (!existCollection) {
@@ -1505,6 +1505,12 @@ export class GraphOperator {
             // rest start and end
             start = this.start = range[0];
             end = this.end = range[1];
+            // find best interval
+            if (!this.lockedInterval) {
+                existCollection = graphCollection = this.currentCollection = this.currentView.graphConfig.collections.find((collection: GraphCollection) => {
+                    return collection.threshold && (end - start) <= (collection.threshold.max);
+                });
+            }
         }
 
         let view = this.currentView;
@@ -1700,7 +1706,7 @@ export class GraphOperator {
             let expectTimestampArray: Array<number> = [];
             _dates.forEach((_date, _index) => {
                 expectTimestampArray.push(_date);
-                if (_dates[_index + 1] && ((_dates[_index + 1] - _date) >= (2 * existCollection.interval)) && (_dates[_index + 1] - _date) % existCollection.interval === 0) {
+                if (existCollection && _dates[_index + 1] && ((_dates[_index + 1] - _date) >= (2 * existCollection.interval)) && (_dates[_index + 1] - _date) % existCollection.interval === 0) {
                     // add one gap here
                     expectTimestampArray.push(_date + existCollection.interval);
                 }

@@ -584,9 +584,9 @@ export default class GraphContainer extends Component<Props, States> {
             });
         } else {
 
-            // setTimeout(()=>{
-            //     mainGraph.updateDatewinow([dateWindow[0], dateWindow[1]]);
-            // }, 200);
+            setTimeout(()=>{
+                mainGraph.updateDatewinow([dateWindow[0], dateWindow[1]]);
+            }, 200);
 
 
             // update initRange for children graphs
@@ -605,11 +605,18 @@ export default class GraphContainer extends Component<Props, States> {
             });
         }
 
-        // setTimeout(()=>{
-        //
-        //     g.updateDatewinow([moment("2019-12-20").valueOf(), moment("2019-12-30").valueOf()])
-        //
-        // }, 5000);
+        setTimeout(()=>{
+
+            g.updateDatewinow([moment("2019-11-20").valueOf(), moment("2019-12-30").valueOf()])
+
+
+            setTimeout(()=>{
+
+                g.updateDatewinow([moment("2019-11-20").valueOf(), moment("2019-11-24").valueOf()])
+
+            }, 5000);
+
+        }, 5000);
 
 
     };

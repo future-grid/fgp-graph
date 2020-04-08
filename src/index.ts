@@ -327,4 +327,11 @@ export default class FgpGraph {
         return "not enabled in this version";
     };
 
+    /**
+     * clear graph
+     */
+    public clear = () =>{
+        console.warn("under developing!")
+    };
+
 }

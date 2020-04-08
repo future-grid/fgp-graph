@@ -84,7 +84,7 @@ export default class Intervals {
         if (this.options) {
             // find best one
             const gap = this.dateWindow[1] - this.dateWindow[0];
-            const bestInterval = this.options.find((op, index) => {
+            let bestInterval = this.options.find((op, index) => {
                 if (this.options[index + 1]) {
                     return gap >= op.value && gap < this.options[index + 1].value;
                 } else {
@@ -92,10 +92,17 @@ export default class Intervals {
                 }
             });
 
+            if(!bestInterval){
+                // check if gap less than the smallest one
+                if(gap < this.options[0].value){
+                    bestInterval = this.options[0];
+                }
+            }
+
             if (bestInterval) {
                 // reset selection
                 this.dropdownOptions.forEach(op => {
-                    op.selected = bestInterval.label === op.text;
+                    op.selected = bestInterval?.label === op.text;
                 })
             }
         }
