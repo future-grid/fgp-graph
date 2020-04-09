@@ -61,7 +61,7 @@ export default class DataService implements DataHandler {
     }
 
 
-    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>, target?:DataRequestTarget): Promise<{ id: string; data: any[]; }[]> {
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>, target?: DataRequestTarget): Promise<{ id: string; data: any[]; }[]> {
 
         console.debug(`fetching data from server... target: ${target}`);
         let firstDate = moment(range.start);
@@ -97,7 +97,7 @@ export default class DataService implements DataHandler {
                             }
                         });
                         if (!recordExist) {
-                            if(_ed.id === "meter11"){
+                            if (_ed.id === "meter11") {
                                 // add new one
                                 _ed.data.push({
                                     'timestamp': currentDate,
@@ -136,7 +136,7 @@ export default class DataService implements DataHandler {
                             let min: number = this.randomNumber(250, 252);
                             let avg: number = Math.floor((max + min) / 2);
 
-                            if("substation_interval" === interval){
+                            if ("substation_interval" === interval) {
                                 max = this.randomNumber(30, 20);
                                 min = this.randomNumber(20, 10);
                                 avg = Math.floor((max + min) / 2);
@@ -183,9 +183,9 @@ export default class DataService implements DataHandler {
                         let _records: any[] = [];
                         _data.data.forEach((_d: any, index: number) => {
                             if (_d.timestamp >= range.start && _d.timestamp <= range.end) {
-                                if(index !==3 && index!==5){
-                                    _records.push(_d);
-                                }
+                                // if(index !==3 && index!==5){
+                                _records.push(_d);
+                                // }
                             }
                         });
                         sampleData.push({id: _id, data: _records});
@@ -195,6 +195,11 @@ export default class DataService implements DataHandler {
 
             // show loading
             setTimeout(() => {
+
+                sampleData.forEach((_d) => {
+                    _d.data.splice(5, 5);
+                });
+
                 resolve(sampleData);
                 // console.debug("data has been sent to graph!");
             }, 200);

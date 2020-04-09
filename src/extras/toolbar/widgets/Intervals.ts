@@ -92,7 +92,8 @@ export default class Intervals {
                 }
             });
 
-            if(!bestInterval){
+            // if options doesn't exist, ignore it.
+            if(!bestInterval && this.options && this.options.length > 0){
                 // check if gap less than the smallest one
                 if(gap < this.options[0].value){
                     bestInterval = this.options[0];
