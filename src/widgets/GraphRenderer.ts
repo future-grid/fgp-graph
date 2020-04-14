@@ -90,7 +90,7 @@ export class GraphOperator {
 
     private eventListeners?: EventHandlers;
 
-    private readonly graphInstance: FgpGraph;
+    private graphInstance: FgpGraph;
 
     private toolbar?: Toolbar;
 
@@ -362,6 +362,12 @@ export class GraphOperator {
         this.graphContainer.addEventListener("mouseleave", (e) => {
             if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                 this.currentView.interaction.callback.highlightCallback(0, null, []);
+
+                this.graphInstance.children.forEach(child => {
+                    if (child.syncLegend) {
+                        child.graph.clearSelection();
+                    }
+                });
             }
         });
 
@@ -790,6 +796,13 @@ export class GraphOperator {
                     if (this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.highlightCallback) {
                         this.currentView.interaction.callback.highlightCallback(x, seriesName, ps);
                     }
+
+                    this.graphInstance.children.forEach(child => {
+                        if (child.syncLegend) {
+                            child.graph.setSelection(row, seriesName);
+                        }
+                    });
+
                 },
                 unhighlightCallback: (e) => {
                     currentSelection = null;
@@ -1537,7 +1550,7 @@ export class GraphOperator {
         let mainLabels: Array<string> = [];
         let isY2: boolean = false;
         if (graphCollection) {
-
+            this.graphInstance.syncLegend = !!graphCollection.syncParentSelection;
             const num = graphCollection.series.length;
             const half = Math.ceil(num / 2);
             const sat = 1.0;
@@ -1937,29 +1950,12 @@ export class GraphOperator {
                 // console.debug("Graph is clean now!~");
 
 
-                // check if we need to put marks line there
-                if (graphCollection && graphCollection.markLines) {
-                    graphCollection.markLines.forEach(markLine => {
-                        mainLabels.push(markLine.label + '_markline');
-                        if (colors.length > 0 && markLine.color) {
-                            // add color
-                            colors.push(markLine.color);
-                        }
-                    });
-                }
-
-
                 if (graphData.data) {
                     this.currentGraphData = [];
 
                     graphData.data.forEach(_data => {
                         // convert timestamp to date
                         _data[0] = new Date(_data[0]);
-                        if (graphCollection && graphCollection.markLines) {
-                            graphCollection.markLines.forEach(markLine => {
-                                _data.push(markLine.value);
-                            });
-                        }
                         this.currentGraphData.push(_data);
                     });
                 }
@@ -1967,17 +1963,6 @@ export class GraphOperator {
                     // reset mainGraphSeries to empty
                     mainGraphSeries = null;
                     colors = [];
-                } else if (graphCollection && graphCollection.markLines) {
-                    graphCollection.markLines.forEach(markLine => {
-                        mainGraphSeries[markLine.label + '_markline'] = {
-                            strokeWidth: 2,
-                            drawPoints: false,
-                            highlightCircleSize: 0,
-                            axis: 'y',
-                            color: markLine.color,
-                            strokePattern: Dygraph.DOT_DASH_LINE
-                        };
-                    });
                 }
 
                 const latestVisibility: Array<boolean> = [];
@@ -2013,6 +1998,7 @@ export class GraphOperator {
                     colors = mainGraph.getColors();
                 }
 
+
                 // update main graph
                 mainGraph.updateOptions({
                     file: this.currentGraphData,
@@ -2024,6 +2010,26 @@ export class GraphOperator {
                     fillGraph: graphCollection && graphCollection.fill ? graphCollection.fill : false,
                     highlightSeriesOpts: {
                         strokeWidth: 1.5
+                    },
+                    underlayCallback: (ctx: CanvasRenderingContext2D, area: dygraphs.Area, g: Dygraph) => {
+                        // clear marker line
+                        this.currentCollection?.markLines?.forEach(markerLine => {
+                            let yPosition = 0;
+                            if (!markerLine.y || markerLine.y === "left") {
+                                yPosition = g.toDomYCoord(markerLine.value, 0);
+                            } else {
+                                yPosition = g.toDomYCoord(markerLine.value, 1);
+                            }
+
+                            // draw line
+                            ctx.beginPath();
+                            ctx.strokeStyle = markerLine.color ? markerLine.color : "#FF0000";
+                            ctx.setLineDash([2, 4]);
+                            ctx.moveTo(area.x, yPosition);
+                            ctx.lineTo(area.w, yPosition);
+                            ctx.stroke();
+                            ctx.setLineDash([0, 0]);
+                        });
                     },
                     axes: {
                         x: {
@@ -2043,26 +2049,6 @@ export class GraphOperator {
                 });
 
                 mainGraph.ready(() => {
-                    // do we need to update annotations
-                    if (graphCollection && graphCollection.markLines) {
-                        const annos: Array<dygraphs.Annotation> = [];
-                        graphCollection.markLines.forEach((line, _index) => {
-
-                            if (this.currentGraphData && this.currentGraphData.length > 0) {
-                                annos.push({
-                                    series: line.label + '_markline',
-                                    x: this.currentGraphData[this.currentGraphData.length - 1][0].getTime(),
-                                    shortText: line.label,
-                                    width: 100,
-                                    height: 23,
-                                    tickHeight: 1,
-                                });
-                            }
-
-                        });
-                        mainGraph.setAnnotations(annos);
-                    }
-
                     // first time graph ready
                     if (readyCallback) {
                         readyCallback(mainGraph);

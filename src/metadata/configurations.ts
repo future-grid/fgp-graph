@@ -134,9 +134,10 @@ export interface GraphCollection {
     threshold?: { min: number, max: number };
     initScales?: { left?: { min: number, max: number }, right?: { min: number, max: number } };
     fill?: boolean;
-    markLines?: Array<{ value: number, label: string, color?: string }>;
+    markLines?: Array<{ value: number, label: string, color?: string, y?: string }>;
     locked?: boolean,
-    show?: boolean
+    show?: boolean,
+    syncParentSelection?: boolean
 }
 
 /**

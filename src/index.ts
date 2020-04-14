@@ -13,7 +13,7 @@ export default class FgpGraph {
 
     body: HTMLElement;
 
-    private graph!: Dygraph;
+    public graph!: Dygraph;
 
     private rangeBarGraph!: Dygraph;
 
@@ -21,6 +21,7 @@ export default class FgpGraph {
 
     private parentDom: HTMLElement;
 
+    public syncLegend: boolean = false;
 
     intervalLabelsArea: HTMLElement;
 
@@ -330,7 +331,7 @@ export default class FgpGraph {
     /**
      * clear graph
      */
-    public clear = () =>{
+    public clear = () => {
         console.warn("under developing!")
     };
 

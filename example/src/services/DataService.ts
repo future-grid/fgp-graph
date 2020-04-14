@@ -136,11 +136,11 @@ export default class DataService implements DataHandler {
                             let min: number = this.randomNumber(250, 252);
                             let avg: number = Math.floor((max + min) / 2);
 
-                            if ("substation_interval" === interval) {
-                                max = this.randomNumber(30, 20);
-                                min = this.randomNumber(20, 10);
-                                avg = Math.floor((max + min) / 2);
-                            }
+                            // if ("substation_interval" === interval) {
+                            //     max = this.randomNumber(30, 20);
+                            //     min = this.randomNumber(20, 10);
+                            //     avg = Math.floor((max + min) / 2);
+                            // }
 
 
                             // add new one
