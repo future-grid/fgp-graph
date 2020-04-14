@@ -429,7 +429,7 @@ export default class GraphContainer extends Component<Props, States> {
                         threshold: {min: (1000 * 60 * 60 * 24 * 10), max: (1000 * 60 * 60 * 24 * 7 * 52 * 10)},    // 7 days ~ 3 weeks
                         initScales: {left: {min: 245, max: 260}},
                         yLabel: 'voltage',
-                        syncParentSelection: true
+                        syncParentSelection: false
                     }
                 ]
             },

@@ -673,19 +673,6 @@ export class GraphOperator {
                 interactionModelConfig["mousemove"] = interactionModel.mouseMove;
             }
 
-            // check if we need to put a markline on map
-            if (choosedCollection && choosedCollection.markLines) {
-                choosedCollection.markLines.forEach(markLine => {
-                    mainGraphLabels.push(markLine.label);
-                    if (initVisibility.length > 0) {
-                        initVisibility.push(true);
-                    }
-                    initialData.forEach(initData => {
-                        initData.push(null);
-                    });
-                });
-            }
-
             // create toolbar on top, instead of old way!
             this.toolbar = new Toolbar(this.currentView, this.graphInstance.viewConfigs, (collections: GraphCollection[]) => {
                 // udpate graph here
@@ -2020,13 +2007,12 @@ export class GraphOperator {
                             } else {
                                 yPosition = g.toDomYCoord(markerLine.value, 1);
                             }
-
                             // draw line
                             ctx.beginPath();
                             ctx.strokeStyle = markerLine.color ? markerLine.color : "#FF0000";
                             ctx.setLineDash([2, 4]);
                             ctx.moveTo(area.x, yPosition);
-                            ctx.lineTo(area.w, yPosition);
+                            ctx.lineTo(area.x + area.w, yPosition);
                             ctx.stroke();
                             ctx.setLineDash([0, 0]);
                         });
