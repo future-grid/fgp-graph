@@ -12,6 +12,7 @@
     position: absolute;
     top: 0;
     width: 100%;
+    /*z-index: 20;*/
     /*height: 30px;*/
     /* background-color: antiquewhite; */
 }
@@ -63,6 +64,7 @@
     float: right;
     margin-right: 5px;
     position: relative;
+    z-index: 10;
 }
 
 .fgp-buttons {
@@ -487,6 +489,8 @@
     border: 1px #dadada solid;
     background-color: white;
     padding: 2px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 

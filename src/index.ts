@@ -13,7 +13,7 @@ export default class FgpGraph {
 
     body: HTMLElement;
 
-    private graph!: Dygraph;
+    public graph!: Dygraph;
 
     private rangeBarGraph!: Dygraph;
 
@@ -21,6 +21,7 @@ export default class FgpGraph {
 
     private parentDom: HTMLElement;
 
+    public syncLegend: boolean = false;
 
     intervalLabelsArea: HTMLElement;
 
@@ -276,10 +277,15 @@ export default class FgpGraph {
     updateDatewinowInside = (datewindow: [number, number], forceReload?: boolean) => {
         // update graph
         if (this.graph) {
+            // update current date-window
+            this.graph.updateOptions({
+                dateWindow: datewindow
+            });
             if (forceReload) {
                 this.operator.update(undefined, undefined, true, datewindow);
             }
         }
+
     };
 
     /**
@@ -320,6 +326,13 @@ export default class FgpGraph {
     public updateConfig = (config: ViewOptions) => {
         //
         return "not enabled in this version";
+    };
+
+    /**
+     * clear graph
+     */
+    public clear = () => {
+        console.warn("under developing!")
     };
 
 }

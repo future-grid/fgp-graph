@@ -1,20 +1,26 @@
 import html2canvas from 'html2canvas';
-import { GraphSeries } from '../metadata/configurations';
+import {DataRequestTarget, GraphSeries} from '../metadata/configurations';
+
 export interface DataHandler {
 
     source: string;
+
     /**
      * fetch data for multi-devices
      *
      * @param {Array<string>} ids
+     * @param deviceType
+     * @param interval
      * @param {{ start: number; end: number }} range
      * @param {Array<string>} [fields]
+     * @param seriesConfig config from viewConfig
+     * @param target rangebar or graph
      * @returns {Array<{ id: string, data: Array<any> }>}
      * @memberof DataHandler
      */
-    fetchdata(ids: Array<string>, deviceType:string, interval: string, range: { start: number; end: number }, fields?: Array<string>, seriesConfig?: Array<GraphSeries>): Promise<Array<{ id: string, data: Array<any> }>>;
+    fetchdata(ids: Array<string>, deviceType: string, interval: string, range: { start: number; end: number }, fields?: Array<string>, seriesConfig?: Array<GraphSeries>, target?: DataRequestTarget): Promise<Array<{ id: string, data: Array<any> }>>;
 
-    fetchFirstNLast(ids: Array<string>, devieType:string, interval: string, fields?: Array<string>): Promise<Array<{ id: string, data: { first: any, last: any } }>>;
+    fetchFirstNLast(ids: Array<string>, devieType: string, interval: string, fields?: Array<string>): Promise<Array<{ id: string, data: { first: any, last: any } }>>;
 }
 
 

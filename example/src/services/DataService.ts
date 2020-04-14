@@ -1,6 +1,7 @@
 import {DataHandler} from "@future-grid/fgp-graph/lib/services/dataService";
 import {GraphSeries} from "@future-grid/fgp-graph/lib/metadata/configurations";
 import moment from "moment-timezone";
+import {DataRequestTarget} from "@future-grid/fgp-graph/lib/metadata/configurations";
 
 export default class DataService implements DataHandler {
     randomNumber = (min: number, max: number) => { // min and max included
@@ -60,9 +61,11 @@ export default class DataService implements DataHandler {
     }
 
 
-    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>): Promise<{ id: string; data: any[]; }[]> {
-        // console.debug("fetching data from server...");
-        let tempDate = moment(range.start).startOf('day').valueOf();
+    fetchdata(ids: string[], type: string, interval: string, range: { start: number; end: number; }, fields?: string[], seriesConfig?: Array<GraphSeries>, target?: DataRequestTarget): Promise<{ id: string; data: any[]; }[]> {
+
+        console.debug(`fetching data from server... target: ${target}`);
+        let firstDate = moment(range.start);
+        let tempDate = firstDate.startOf('day').valueOf();
         let existData: any[] = [];
         ids.forEach(id => {
             let exist = this.deviceData.find((_data) => {
@@ -94,13 +97,24 @@ export default class DataService implements DataHandler {
                             }
                         });
                         if (!recordExist) {
-                            // add new one
-                            _ed.data.push({
-                                'timestamp': currentDate,
-                                'voltage': this.randomNumber(252, 255),
-                                'amp': this.randomNumber(1, 2),
-                                'avgVoltage': this.randomNumber(250, 255)
-                            });
+                            if (_ed.id === "meter11") {
+                                // add new one
+                                _ed.data.push({
+                                    'timestamp': currentDate,
+                                    'voltage': null,
+                                    'amp': null,
+                                    'avgVoltage': null
+                                });
+                            } else {
+                                // add new one
+                                _ed.data.push({
+                                    'timestamp': currentDate,
+                                    'voltage': this.randomNumber(252, 255),
+                                    'amp': this.randomNumber(1, 2),
+                                    'avgVoltage': this.randomNumber(250, 255)
+                                });
+                            }
+
                         }
                         // }
                     }
@@ -122,11 +136,11 @@ export default class DataService implements DataHandler {
                             let min: number = this.randomNumber(250, 252);
                             let avg: number = Math.floor((max + min) / 2);
 
-                            if("substation_interval" === interval){
-                                max = this.randomNumber(30, 20);
-                                min = this.randomNumber(20, 10);
-                                avg = Math.floor((max + min) / 2);
-                            }
+                            // if ("substation_interval" === interval) {
+                            //     max = this.randomNumber(30, 20);
+                            //     min = this.randomNumber(20, 10);
+                            //     avg = Math.floor((max + min) / 2);
+                            // }
 
 
                             // add new one
@@ -141,15 +155,21 @@ export default class DataService implements DataHandler {
                 }
             });
 
+            /**
+             * let firstDate = moment(range.start);
+             * let tempDate = firstDate.startOf('day').valueOf();
+             */
+
             if ("substation_interval_day" === interval) {
-                tempDate += 86400000;
+                firstDate = firstDate.add(1, 'days');
             } else if ("substation_interval" === interval) {
-                tempDate += 3600000;
+                firstDate = firstDate.add(1, 'hours');
             } else if ("meter_read_day" === interval) {
-                tempDate += 86400000;
+                firstDate = firstDate.add(1, 'days');
             } else if ("meter_read" === interval) {
-                tempDate += 3600000;
+                firstDate = firstDate.add(1, 'hours');
             }
+            tempDate = firstDate.valueOf();
 
         }
 
@@ -163,9 +183,9 @@ export default class DataService implements DataHandler {
                         let _records: any[] = [];
                         _data.data.forEach((_d: any, index: number) => {
                             if (_d.timestamp >= range.start && _d.timestamp <= range.end) {
-                                if(index !=3 && index!=5){
-                                    _records.push(_d);
-                                }
+                                // if(index !==3 && index!==5){
+                                _records.push(_d);
+                                // }
                             }
                         });
                         sampleData.push({id: _id, data: _records});
@@ -175,6 +195,11 @@ export default class DataService implements DataHandler {
 
             // show loading
             setTimeout(() => {
+
+                sampleData.forEach((_d) => {
+                    _d.data.splice(5, 5);
+                });
+
                 resolve(sampleData);
                 // console.debug("data has been sent to graph!");
             }, 200);
