@@ -1493,6 +1493,11 @@ export class GraphOperator {
         let start = this.start;
         let end = this.end;
 
+        // only sync date-window here
+        if (this.currentView && this.currentView.interaction && this.currentView.interaction.callback && this.currentView.interaction.callback.syncDateWindow) {
+            this.currentView.interaction.callback.syncDateWindow([start, end]);
+        }
+
         // check if currentCollection doesnt exist in currentView then ignore it
         let existCollection: GraphCollection | undefined = this.currentView.graphConfig.collections.find(collection => collection.name === this.currentCollection?.name);
 
@@ -2033,7 +2038,6 @@ export class GraphOperator {
                         }
                     }
                 });
-
                 mainGraph.ready(() => {
                     // first time graph ready
                     if (readyCallback) {

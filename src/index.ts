@@ -40,8 +40,6 @@ export default class FgpGraph {
 
     public operator!: GraphOperator;
 
-    private callbackDelayTimer: any = 0;
-
     eventListeners?: EventHandlers;
 
     private graphDateWindow: [number, number];
@@ -143,16 +141,16 @@ export default class FgpGraph {
             this.graphDateWindow = dateWindow;
         }
 
-        if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
-            if (this.callbackDelayTimer) {
-                clearTimeout(this.callbackDelayTimer);
-            }
-            this.callbackDelayTimer = setTimeout(() => {
-                if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
-                    currentView.interaction.callback.syncDateWindow(dateWindow);
-                }
-            }, 100);
-        }
+        // if ((this.currentDateWindow[0] && this.currentDateWindow[0] !== dateWindow[0]) || (this.currentDateWindow[1] && this.currentDateWindow[1] !== dateWindow[1])) {
+        //     if (this.callbackDelayTimer) {
+        //         clearTimeout(this.callbackDelayTimer);
+        //     }
+        //     this.callbackDelayTimer = setTimeout(() => {
+        //         if (currentView && currentView.interaction && currentView.interaction.callback && currentView.interaction.callback.syncDateWindow) {
+        //             currentView.interaction.callback.syncDateWindow(dateWindow);
+        //         }
+        //     }, 100);
+        // }
 
         this.currentDateWindow = dateWindow;
 

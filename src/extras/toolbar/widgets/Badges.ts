@@ -143,7 +143,7 @@ export default class Badges {
      * @param collection
      */
     public autoSelect = (collection: GraphCollection) => {
-        console.log("update badge labels");
+        // console.log("update badge labels");
         this.badgesArray.map(badge => {
             if (collection.name === badge.getAttribute("data-fgp-badge")) {
                 // change color
@@ -173,7 +173,7 @@ export default class Badges {
             this.dateWindow[1] !== dateWindow[1]
         ) {
             this.dateWindow = [dateWindow[0], dateWindow[1]];
-            console.log(`badge dateWindow has been updated! `, this.dateWindow);
+            // console.log(`badge dateWindow has been updated! `, this.dateWindow);
         }
     };
 }

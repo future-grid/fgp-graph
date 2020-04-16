@@ -220,7 +220,7 @@ export default class GraphContainer extends Component<Props, States> {
                         // console.debug("selected series: ", series);
                     },
                     syncDateWindow: (dateWindow) => {
-                        // console.debug(moment(dateWindow[0]), moment(dateWindow[1]));
+                        // console.debug("eric", moment(dateWindow[0]), moment(dateWindow[1]));
                         // this.setState({
                         //     syncDateWindow: [dateWindow[0], dateWindow[1]]
                         // });
